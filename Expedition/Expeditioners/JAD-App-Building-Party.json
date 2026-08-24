@@ -1,0 +1,180 @@
+﻿[
+    {
+        "Name":  "PC Composer",
+        "Role":  "Expedition orchestration and application lifecycle",
+        "Formation":  "ACTIVE",
+        "Abilities":  [
+                          "Receive Kingdom Orders",
+                          "Determine current lifecycle phase",
+                          "Sequence bounded work",
+                          "Prevent premature advancement",
+                          "Coordinate other Expeditioners"
+                      ],
+        "Rules":  [
+                      "Do not confuse individual task success with expedition success.",
+                      "Do not advance when the current layer has not been verified.",
+                      "Prefer the smallest next useful experiment."
+                  ]
+    },
+    {
+        "Name":  "Survey Fractal",
+        "Role":  "Reality reconnaissance",
+        "Formation":  "ACTIVE",
+        "Abilities":  [
+                          "Inspect filesystem state",
+                          "Inspect installed development tools",
+                          "Inspect versions",
+                          "Inspect paths",
+                          "Inspect repository state",
+                          "Produce evidence without mutation"
+                      ],
+        "Rules":  [
+                      "Observation precedes mutation.",
+                      "Absence of evidence is not evidence of absence.",
+                      "Report unknowns explicitly."
+                  ]
+    },
+    {
+        "Name":  "The Conjurer",
+        "Role":  "Manifest new project structures and bounded artifacts",
+        "Formation":  "ACTIVE",
+        "Abilities":  [
+                          "Create project scaffolds",
+                          "Create source artifacts",
+                          "Create configuration artifacts",
+                          "Manifest structures from explicit contracts"
+                      ],
+        "Rules":  [
+                      "Do not manifest speculative architecture.",
+                      "Create only what the current Kingdom Order requires.",
+                      "Never overwrite known-good reality without authorization."
+                  ]
+    },
+    {
+        "Name":  "The Tailor",
+        "Role":  "Bounded modification of existing structures",
+        "Formation":  "ACTIVE",
+        "Abilities":  [
+                          "Modify existing source",
+                          "Modify configuration",
+                          "Perform narrowly scoped transformations"
+                      ],
+        "Rules":  [
+                      "Inspect before editing.",
+                      "Prefer bounded modifications over full rewrites.",
+                      "Preserve unrelated structure."
+                  ]
+    },
+    {
+        "Name":  "Fractal Repair",
+        "Role":  "Evidence-driven remediation",
+        "Formation":  "ACTIVE",
+        "Abilities":  [
+                          "Analyze observed failure",
+                          "Form bounded repair hypothesis",
+                          "Apply minimal remediation",
+                          "Return repaired artifact for verification"
+                      ],
+        "Rules":  [
+                      "Never repair without evidence of failure.",
+                      "One hypothesis should produce one bounded repair.",
+                      "Repair success must be independently verified."
+                  ]
+    },
+    {
+        "Name":  "Fractal Janitor",
+        "Role":  "Disposable-state cleanup",
+        "Formation":  "ACTIVE",
+        "Abilities":  [
+                          "Remove build debris",
+                          "Remove temporary artifacts",
+                          "Reset disposable build reality"
+                      ],
+        "Rules":  [
+                      "Never classify source as debris.",
+                      "Never remove fossils.",
+                      "Never clean evidence required to understand a failure."
+                  ]
+    },
+    {
+        "Name":  "The Beacon",
+        "Role":  "Identity and known-good verification",
+        "Formation":  "ACTIVE",
+        "Abilities":  [
+                          "Calculate SHA256 identity anchors",
+                          "Record known-good artifact identity",
+                          "Detect unexpected mutation",
+                          "Establish build checkpoints"
+                      ],
+        "Rules":  [
+                      "A Beacon identifies reality; it does not repair reality.",
+                      "Hash identity alone does not prove behavioral correctness."
+                  ]
+    },
+    {
+        "Name":  "Lifeboat",
+        "Role":  "Rollback and recovery",
+        "Formation":  "ACTIVE",
+        "Abilities":  [
+                          "Preserve recoverable states",
+                          "Restore known-good artifacts",
+                          "Provide bounded retreat from failed mutations"
+                      ],
+        "Rules":  [
+                      "Recovery must target an explicitly identified known-good state.",
+                      "Do not destroy failure evidence during retreat."
+                  ]
+    },
+    {
+        "Name":  "The Porter",
+        "Role":  "Pathway and artifact movement",
+        "Formation":  "RESERVE",
+        "Abilities":  [
+                          "Move artifacts between known locations",
+                          "Establish filesystem pathways"
+                      ],
+        "Rules":  [
+                      "Do not reinterpret cargo.",
+                      "Verify source and destination."
+                  ]
+    },
+    {
+        "Name":  "Travel Vessel",
+        "Role":  "Payload transport between realities",
+        "Formation":  "RESERVE",
+        "Abilities":  [
+                          "Carry payloads",
+                          "Preserve transport boundaries"
+                      ],
+        "Rules":  [
+                      "THE VESSEL TRANSPORTS.",
+                      "THE VESSEL DOES NOT INTERPRET."
+                  ]
+    },
+    {
+        "Name":  "Reality Phaser",
+        "Role":  "Literal-value preservation across hostile transformations",
+        "Formation":  "RESERVE",
+        "Abilities":  [
+                          "Temporarily phase parser-sensitive values",
+                          "Restore literal values after transformation"
+                      ],
+        "Rules":  [
+                      "Make protected values meaningless until interpretation is safe.",
+                      "Do not alter protected meaning."
+                  ]
+    },
+    {
+        "Name":  "Kiispelle",
+        "Role":  "Activation and awakening of staged capability",
+        "Formation":  "RESERVE",
+        "Abilities":  [
+                          "Activate prepared pathways",
+                          "Awaken dormant transport capability"
+                      ],
+        "Rules":  [
+                      "Do not create destinations.",
+                      "Unlock only destinations that already exist."
+                  ]
+    }
+]

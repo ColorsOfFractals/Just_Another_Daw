@@ -1,0 +1,82 @@
+﻿{
+    "Expedition":  "JAD-KO-000",
+    "Timestamp":  "2026-08-24T12:24:39.7019889-07:00",
+    "Computer":  "GLOPPINBOOPINZ",
+    "User":  "benba",
+    "Root":  "C:\\Users\\benba\\Tinkering\\Just_Another_Daw",
+    "Filesystem":  {
+                       "RootExists":  true,
+                       "ExpeditionExists":  true,
+                       "EvidenceExists":  true,
+                       "FossilsExists":  true
+                   },
+    "Editor":  {
+                   "VSCodeCommandFound":  true,
+                   "Path":  "C:\\Users\\benba\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\code.cmd",
+                   "Version":  [
+                                   "1.133.0",
+                                   "a5b500951314efd502d07465bd138dfbd714a960",
+                                   "x64"
+                               ]
+               },
+    "Git":  {
+                "Found":  true,
+                "Path":  "C:\\Program Files\\Git\\cmd\\git.exe",
+                "Version":  "git version 2.55.0.windows.3"
+            },
+    "CMake":  {
+                  "Found":  false
+              },
+    "Compilers":  {
+                      "VisibleCommands":  [
+                                              {
+                                                  "Name":  "cl.exe",
+                                                  "Found":  false,
+                                                  "Path":  null
+                                              },
+                                              {
+                                                  "Name":  "clang.exe",
+                                                  "Found":  false,
+                                                  "Path":  null
+                                              },
+                                              {
+                                                  "Name":  "clang++.exe",
+                                                  "Found":  false,
+                                                  "Path":  null
+                                              },
+                                              {
+                                                  "Name":  "gcc.exe",
+                                                  "Found":  false,
+                                                  "Path":  null
+                                              },
+                                              {
+                                                  "Name":  "g++.exe",
+                                                  "Found":  false,
+                                                  "Path":  null
+                                              }
+                                          ]
+                  },
+    "VisualStudio":  {
+                         "VsWhereFound":  false
+                     },
+    "WindowsSDK":  {
+                       "RegistryKeyFound":  false,
+                       "Versions":  [
+
+                                    ]
+                   },
+    "Bedrock":  {
+                    "Path":  "C:\\Users\\benba\\Tinkering\\Just_Another_Daw\\Bedrock\\main.cpp",
+                    "Exists":  false
+                },
+    "Readiness":  {
+                      "EditorReady":  true,
+                      "GitReady":  true,
+                      "CMakeReady":  false,
+                      "WindowsSDKSeen":  false,
+                      "VSWithCppSeen":  true,
+                      "CompilerOnPath":  false,
+                      "BedrockExists":  false
+                  },
+    "NextPathway":  "BEDROCK source is absent. Conjurer should restore the minimal C++ specimen."
+}

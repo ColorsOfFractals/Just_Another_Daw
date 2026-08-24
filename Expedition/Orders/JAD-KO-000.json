@@ -1,0 +1,31 @@
+﻿{
+    "OrderID":  "JAD-KO-000",
+    "Project":  "Just Another DAW",
+    "Callsign":  "JAD",
+    "Expedition":  "Establish Native Development Reality",
+    "Intent":  [
+                   "Determine what native C++ development capability already exists.",
+                   "Do not install or modify external development tooling.",
+                   "Do not introduce JUCE yet.",
+                   "Do not assume a compiler.",
+                   "Gather evidence before choosing the next pathway."
+               ],
+    "CurrentSuccessCriterion":  [
+                                    "Locate JAD.",
+                                    "Identify available editors.",
+                                    "Identify available C++ compilers.",
+                                    "Identify available build systems.",
+                                    "Identify Windows SDK and Visual Studio capability.",
+                                    "Identify Git capability.",
+                                    "Identify current Bedrock source.",
+                                    "Return a bounded evidence report."
+                                ],
+    "Laws":  [
+                 "OBSERVE BEFORE MUTATION.",
+                 "BUILD SUCCESS IS NOT RUNTIME SUCCESS.",
+                 "DO NOT REPAIR WHAT HAS NOT FAILED.",
+                 "DO NOT INVENT CAPABILITIES REALITY HAS NOT REQUIRED.",
+                 "KNOWN-GOOD STATES BECOME FOSSILS.",
+                 "GENERATED BUILD REALITY MUST REMAIN DISPOSABLE."
+             ]
+}

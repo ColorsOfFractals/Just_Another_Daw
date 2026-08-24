@@ -1,0 +1,159 @@
+﻿JAD — EXPEDITION #002
+=====================
+
+TOOLCHAIN ARCHAEOLOGY
+---------------------
+
+PATH-VISIBLE COMMANDS
+---------------------
+code       : C:\Users\benba\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd
+git        : C:\Program Files\Git\cmd\git.exe
+cmake      : NOT FOUND
+ninja      : NOT FOUND
+cl         : NOT FOUND
+clang      : NOT FOUND
+clang++    : NOT FOUND
+gcc        : NOT FOUND
+g++        : NOT FOUND
+
+VISUAL STUDIO INSTALLER
+-----------------------
+vswhere exists : False
+vswhere path   : C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe
+
+FILESYSTEM LANDMARKS
+--------------------
+False : C:\Program Files\Microsoft Visual Studio
+False : C:\Program Files (x86)\Microsoft Visual Studio
+False : C:\Program Files (x86)\Windows Kits
+False : C:\Program Files\Windows Kits
+False : C:\Program Files\CMake
+False : C:\Program Files\LLVM
+False : C:\msys64
+False : C:\mingw64
+
+INSTALLED SOFTWARE MATCHES
+--------------------------
+Name     : Microsoft Visual C++ 2005 Redistributable
+Version  : 8.0.61001
+Location : 
+
+Name     : Microsoft Visual C++ 2005 Redistributable (x64)
+Version  : 8.0.59192
+Location : 
+
+Name     : Microsoft Visual C++ 2005 Redistributable (x64)
+Version  : 8.0.61000
+Location : 
+
+Name     : Microsoft Visual C++ 2008 Redistributable - x64 9.0.30729.6161
+Version  : 9.0.30729.6161
+Location : 
+
+Name     : Microsoft Visual C++ 2008 Redistributable - x86 9.0.21022
+Version  : 9.0.21022
+Location : 
+
+Name     : Microsoft Visual C++ 2008 Redistributable - x86 9.0.30729.6161
+Version  : 9.0.30729.6161
+Location : 
+
+Name     : Microsoft Visual C++ 2010  x64 Redistributable - 10.0.40219
+Version  : 10.0.40219
+Location : 
+
+Name     : Microsoft Visual C++ 2010  x86 Redistributable - 10.0.40219
+Version  : 10.0.40219
+Location : 
+
+Name     : Microsoft Visual C++ 2012 Redistributable (x64) - 11.0.61030
+Version  : 11.0.61030.0
+Location : 
+
+Name     : Microsoft Visual C++ 2012 Redistributable (x86) - 11.0.61030
+Version  : 11.0.61030.0
+Location : 
+
+Name     : Microsoft Visual C++ 2012 x64 Additional Runtime - 11.0.61030
+Version  : 11.0.61030
+Location : 
+
+Name     : Microsoft Visual C++ 2012 x64 Minimum Runtime - 11.0.61030
+Version  : 11.0.61030
+Location : 
+
+Name     : Microsoft Visual C++ 2012 x86 Additional Runtime - 11.0.61030
+Version  : 11.0.61030
+Location : 
+
+Name     : Microsoft Visual C++ 2012 x86 Minimum Runtime - 11.0.61030
+Version  : 11.0.61030
+Location : 
+
+Name     : Microsoft Visual C++ 2013 Redistributable (x64) - 12.0.40664
+Version  : 12.0.40664.0
+Location : 
+
+Name     : Microsoft Visual C++ 2013 Redistributable (x86) - 12.0.40664
+Version  : 12.0.40664.0
+Location : 
+
+Name     : Microsoft Visual C++ 2013 x64 Additional Runtime - 12.0.40664
+Version  : 12.0.40664
+Location : 
+
+Name     : Microsoft Visual C++ 2013 x64 Minimum Runtime - 12.0.40664
+Version  : 12.0.40664
+Location : 
+
+Name     : Microsoft Visual C++ 2013 x86 Additional Runtime - 12.0.40664
+Version  : 12.0.40664
+Location : 
+
+Name     : Microsoft Visual C++ 2013 x86 Minimum Runtime - 12.0.40664
+Version  : 12.0.40664
+Location : 
+
+Name     : Microsoft Visual C++ 2022 X64 Additional Runtime - 14.51.36247
+Version  : 14.51.36247
+Location : 
+
+Name     : Microsoft Visual C++ 2022 X64 Minimum Runtime - 14.51.36247
+Version  : 14.51.36247
+Location : 
+
+Name     : Microsoft Visual C++ 2022 X86 Additional Runtime - 14.51.36247
+Version  : 14.51.36247
+Location : 
+
+Name     : Microsoft Visual C++ 2022 X86 Minimum Runtime - 14.51.36247
+Version  : 14.51.36247
+Location : 
+
+Name     : Microsoft Visual C++ v14 Redistributable (x64) - 14.51.36247
+Version  : 14.51.36247.0
+Location : 
+
+Name     : Microsoft Visual C++ v14 Redistributable (x86) - 14.51.36247
+Version  : 14.51.36247.0
+Location : 
+
+Name     : Microsoft Visual Studio Code (User)
+Version  : 1.133.0
+Location : C:\Users\benba\AppData\Local\Programs\Microsoft VS Code\
+
+BEDROCK
+-------
+Exists : True
+Path   : C:\Users\benba\Tinkering\Just_Another_Daw\Bedrock\main.cpp
+SHA256 : 7B8CA22D6F7A31BF94FB1ED4994FE5D0320192002101BBECD9081239F9BB1200
+
+CURRENT CONCLUSION
+------------------
+Compiler proven on current PATH : False
+No compiler has earned KNOWN-GOOD status yet.
+
+No installations performed.
+No source modified.
+No compilation performed.
+No JUCE introduced.

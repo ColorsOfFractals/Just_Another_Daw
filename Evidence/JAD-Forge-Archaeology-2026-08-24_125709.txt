@@ -1,0 +1,83 @@
+﻿JAD — EXPEDITION #005
+=====================
+
+FORGE ARCHAEOLOGY
+-----------------
+
+VISUAL STUDIO INSTALLER
+-----------------------
+vswhere found : True
+vswhere path  : C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe
+
+VSWHERE INSTALLATIONS
+---------------------
+Name    : Visual Studio Build Tools 2026
+Version : 18.9.12112.369
+Path    : C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools
+
+VISUAL STUDIO FILESYSTEM
+------------------------
+Root: C:\Program Files\Microsoft Visual Studio
+Exists: False
+
+Root: C:\Program Files (x86)\Microsoft Visual Studio
+Exists: True
+  C:\Program Files (x86)\Microsoft Visual Studio\18
+  C:\Program Files (x86)\Microsoft Visual Studio\Installer
+  C:\Program Files (x86)\Microsoft Visual Studio\Shared
+
+PHYSICAL ARTIFACTS
+------------------
+cl.exe count      : 0
+
+link.exe count    : 0
+
+vcvars64.bat count: 0
+
+cmake.exe count   : 0
+
+WINDOWS SDK
+-----------
+SDK version count : 0
+
+INSTALLED SOFTWARE
+------------------
+Name     : Microsoft Visual Studio Code (User)
+Version  : 1.133.0
+Location : C:\Users\benba\AppData\Local\Programs\Microsoft VS Code\
+
+Name     : Microsoft Visual Studio Installer
+Version  : 4.9.50.62957
+Location : "C:\Program Files (x86)\Microsoft Visual Studio\Installer"
+
+Name     : Microsoft Visual Studio Setup Configuration
+Version  : 4.8.41.48107
+Location : 
+
+Name     : Microsoft Visual Studio Setup WMI Provider
+Version  : 4.8.41.48107
+Location : 
+
+Name     : Visual Studio Build Tools 2026
+Version  : 18.9.1
+Location : C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools
+
+DEVELOPER ENVIRONMENT
+---------------------
+No developer environment could be entered.
+
+CURRENT CONCLUSION
+------------------
+Build Tools seen : True
+cl.exe physical  : False
+link.exe physical: False
+vcvars64 physical: False
+CMake physical   : False
+Windows SDK seen : False
+
+Forge state      : UNKNOWN
+
+No installation performed.
+No repair performed.
+No compilation performed.
+No JUCE introduced.

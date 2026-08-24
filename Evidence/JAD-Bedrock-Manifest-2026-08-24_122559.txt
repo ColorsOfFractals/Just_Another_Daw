@@ -1,0 +1,56 @@
+﻿JAD — EXPEDITION #001
+=====================
+
+BEDROCK
+-------
+
+Path:
+C:\Users\benba\Tinkering\Just_Another_Daw\Bedrock\main.cpp
+
+SHA256:
+7B8CA22D6F7A31BF94FB1ED4994FE5D0320192002101BBECD9081239F9BB1200
+
+VISUAL STUDIO
+-------------
+
+Installation:
+
+
+VsDevCmd:
+
+
+VsDevCmd exists:
+
+
+DEVELOPER ENVIRONMENT SURVEY
+----------------------------
+
+
+
+WINDOWS KIT SURVEY
+------------------
+
+
+Root                                   Exists Versions
+----                                   ------ --------
+C:\Program Files (x86)\Windows Kits\10  False         
+C:\Program Files\Windows Kits\10        False         
+
+
+
+
+STATUS
+------
+
+Bedrock now exists.
+
+It has NOT been compiled.
+
+No JUCE has been introduced.
+
+No toolchain has been installed or modified.
+
+Next question:
+
+Can the existing Visual Studio developer environment expose
+a functioning MSVC compiler and suitable build pathway?

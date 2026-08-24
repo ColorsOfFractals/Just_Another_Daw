@@ -1,0 +1,74 @@
+﻿JAD — EXPEDITION #006
+=====================
+
+FRACTAL REPAIR
+--------------
+
+Observed prior state:
+
+Build Tools shell:
+Present
+
+Native C++ workload:
+Not proven
+
+Bounded repair:
+
+Add:
+Microsoft.VisualStudio.Workload.VCTools
+
+Include recommended components:
+True
+
+Existing installation:
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools
+
+Manifest:
+C:\Users\benba\Tinkering\Just_Another_Daw\Expedition\Manifests\JAD-Native-Toolchain.vsconfig
+
+Installer:
+C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe
+
+Repair exit code:
+5007
+
+POSTFLIGHT
+----------
+
+vcvars64.bat:
+False
+
+MSVC cl.exe:
+False
+
+link.exe:
+False
+
+CMake:
+False
+
+Windows SDK:
+False
+
+FORGE STATE
+-----------
+
+UNKNOWN
+
+BEDROCK
+-------
+
+Path:
+C:\Users\benba\Tinkering\Just_Another_Daw\Bedrock\main.cpp
+
+SHA256:
+7B8CA22D6F7A31BF94FB1ED4994FE5D0320192002101BBECD9081239F9BB1200
+
+Bedrock was NOT compiled.
+
+DEVELOPER ENVIRONMENT
+---------------------
+
+
+
+No JUCE was introduced.

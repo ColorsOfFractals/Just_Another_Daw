@@ -1,0 +1,68 @@
+﻿JAD — EXPEDITION #004
+=====================
+
+THE FORGE
+---------
+
+Wabble admission artifact:
+C:\Users\benba\Tinkering\Just_Another_Daw\Expedition\Admissions\Wabble-Admission-2026-08-24_124306.json
+
+Candidate:
+Microsoft.VisualStudio.BuildTools
+
+Installation exit code:
+0
+
+Manifest:
+C:\Users\benba\Tinkering\Just_Another_Daw\Expedition\Manifests\JAD-Native-Toolchain.vsconfig
+
+VISUAL STUDIO REALITY
+---------------------
+
+vswhere exists:
+True
+
+Installation:
+
+
+vcvars64:
+
+
+POSTFLIGHT
+----------
+
+MSVC cl.exe proven:
+False
+
+link.exe proven:
+False
+
+CMake proven:
+False
+
+Windows SDK proven:
+False
+
+BEDROCK
+-------
+
+Path:
+C:\Users\benba\Tinkering\Just_Another_Daw\Bedrock\main.cpp
+
+SHA256:
+7B8CA22D6F7A31BF94FB1ED4994FE5D0320192002101BBECD9081239F9BB1200
+
+Bedrock was NOT compiled.
+
+DEVELOPER ENVIRONMENT SURVEY
+----------------------------
+
+
+
+STATUS
+------
+
+Forge installation pathway completed.
+
+No JUCE was introduced.
+No Bedrock compilation occurred.

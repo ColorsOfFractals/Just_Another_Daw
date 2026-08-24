@@ -1,0 +1,27 @@
+﻿{
+    "Expedition":  "JAD-EXP-004-WABBLE-PROTOTYPE",
+    "Timestamp":  "2026-08-24T12:46:51.5935722-07:00",
+    "Candidate":  {
+                      "PackageID":  "Microsoft.VisualStudio.BuildTools",
+                      "Name":  "Visual Studio BuildTools 2026",
+                      "Version":  "18.9.1",
+                      "Publisher":  "Microsoft Corporation",
+                      "InstallerURL":  "https://download.visualstudio.microsoft.com/download/pr/7834fc97-5a8c-4392-a2a9-ed4b98f77180/e1dcfb35b5b7a285cdf3f877d0bc835c5373999ce0fc78b637c7d5fea2966c05/vs_BuildTools.exe",
+                      "InstallerSHA256":  "e1dcfb35b5b7a285cdf3f877d0bc835c5373999ce0fc78b637c7d5fea2966c05"
+                  },
+    "Checks":  {
+                   "WingetAvailable":  true,
+                   "WingetSourcePresent":  true,
+                   "PackageQuerySucceeded":  true,
+                   "ExactPackageIdentity":  true,
+                   "PublisherLooksMicrosoft":  true,
+                   "InstallerUsesHTTPS":  true,
+                   "InstallerHashDeclared":  true,
+                   "KingdomJustificationPresent":  true
+               },
+    "Decision":  "ALLOW",
+    "Reasons":  [
+                    "Candidate satisfied Wabble admission policy."
+                ],
+    "RawWingetShow":  "Found Visual Studio BuildTools 2026 [Microsoft.VisualStudio.BuildTools]\r\nVersion: 18.9.1\r\nPublisher: Microsoft Corporation\r\nMoniker: vs18-buildtools\r\nDescription: These Build Tools allow you to build Visual Studio projects from a command-line interface.\r\nHomepage: https://visualstudio.microsoft.com/\r\nLicense: Proprietary\r\nLicense Url: https://visualstudio.microsoft.com/license-terms/\r\nCopyright: Copyright (c) Microsoft Corporation. All rights reserved.\r\nTags:\r\n  c#\r\n  c++\r\n  vs\r\nInstaller:\r\n  Installer Type: exe\r\n  Installer Url: https://download.visualstudio.microsoft.com/download/pr/7834fc97-5a8c-4392-a2a9-ed4b98f77180/e1dcfb35b5b7a285cdf3f877d0bc835c5373999ce0fc78b637c7d5fea2966c05/vs_BuildTools.exe\r\n  Installer SHA256: e1dcfb35b5b7a285cdf3f877d0bc835c5373999ce0fc78b637c7d5fea2966c05\r\n  Offline Distribution Supported: true"
+}

@@ -1,0 +1,53 @@
+﻿JAD — EXPEDITION #008
+=====================
+
+EXPLICIT FORGE COMPONENT REPAIR
+-------------------------------
+
+Build Tools:
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools
+
+Installer exit code:
+5007
+
+REQUESTED COMPONENTS
+--------------------
+
+Microsoft.VisualStudio.Component.VC.Tools.x86.x64
+Microsoft.VisualStudio.Component.VC.CMake.Project
+Microsoft.VisualStudio.Component.Windows11SDK.26100
+
+COMPONENT VERIFICATION
+----------------------
+
+Microsoft.VisualStudio.Component.VC.Tools.x86.x64 : False
+Microsoft.VisualStudio.Component.VC.CMake.Project : False
+Microsoft.VisualStudio.Component.Windows11SDK.26100 : False
+
+RUNTIME TOOLCHAIN
+-----------------
+
+MSVC:
+False
+
+Linker:
+False
+
+CMake:
+False
+
+Windows SDK:
+False
+
+STATE
+-----
+
+UNKNOWN
+
+DEVELOPER ENVIRONMENT
+---------------------
+
+
+
+No Bedrock compilation occurred.
+No JUCE was introduced.

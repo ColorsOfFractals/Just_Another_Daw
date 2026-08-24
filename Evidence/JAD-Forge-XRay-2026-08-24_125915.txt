@@ -1,0 +1,52 @@
+﻿JAD — EXPEDITION #007
+=====================
+
+FORGE COMPONENT X-RAY
+---------------------
+
+vswhere found : True
+vswhere path  : C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe
+
+INSTALLATIONS
+-------------
+Display Name : Visual Studio Build Tools 2026
+Product ID   : Microsoft.VisualStudio.Product.BuildTools
+Version      : 18.9.12112.369
+Path         : C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools
+State        : 4294967295
+
+BUILD TOOLS INSTANCE
+--------------------
+Found : True
+Path  : C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools
+
+COMPONENT / WORKLOAD MARKERS
+----------------------------
+WorkloadVCTools    : True
+CoreBuildTools     : True
+MSVCx64x86         : False
+CMakeTools         : False
+
+PHYSICAL LANDMARKS
+------------------
+vcvars64 exists : False
+cl.exe count    : 0
+link.exe count  : 0
+cmake.exe count : 0
+
+WINDOWS SDK
+-----------
+SDK count : 0
+
+CURRENT CONCLUSION
+------------------
+State           : UNKNOWN
+VCTools workload: True
+MSVC x64/x86    : False
+CMake tools     : False
+Windows SDK     : False
+
+No installation performed.
+No repair performed.
+No compilation performed.
+No JUCE introduced.
