@@ -1,0 +1,50 @@
+﻿JAD — EXPEDITION #009
+=====================
+
+FORGE IGNITION
+--------------
+
+Build Tools:
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools
+
+vcvars64.bat:
+True
+
+MSVC:
+False
+
+Linker:
+False
+
+CMake:
+False
+
+Windows SDK:
+
+
+FORGE STATE
+-----------
+
+UNKNOWN
+
+BEDROCK
+-------
+
+Path:
+C:\Users\benba\Tinkering\Just_Another_Daw\Bedrock\main.cpp
+
+SHA256:
+7B8CA22D6F7A31BF94FB1ED4994FE5D0320192002101BBECD9081239F9BB1200
+
+Status:
+UNCOMPILED
+
+DEVELOPER ENVIRONMENT
+---------------------
+
+
+
+No installation occurred.
+No repair occurred.
+No compilation occurred.
+No JUCE was introduced.

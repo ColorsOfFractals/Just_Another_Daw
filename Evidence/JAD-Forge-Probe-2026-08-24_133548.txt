@@ -1,0 +1,41 @@
+﻿**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+
+============================================================
+JAD FORGE DIRECT PROBE
+============================================================
+
+=== CL.EXE ===
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x64\cl.exe
+cmd.exe : Microsoft (R) C/C++ Optimizing Compiler Version 19.51.36256 for x64
+At line:1 char:11
++ $Output = & cmd.exe /d /c "`"$Probe`"" 2>&1 | Out-String
++           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Microsoft (R) C...1.36256 for x64:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+usage: cl [ option... ] filename... [ /link linkoption... ]
+
+=== LINK.EXE ===
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x64\link.exe
+
+=== CMAKE.EXE ===
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe
+cmake version 4.3.1-msvc1
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+
+=== WINDOWS SDK ===
+WindowsSdkDir=C:\Program Files (x86)\Windows Kits\10\
+WindowsSDKVersion=10.0.26100.0\
+
+=== VC TOOLS ===
+VCToolsInstallDir=C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\
+
+=== END PROBE ===
+
