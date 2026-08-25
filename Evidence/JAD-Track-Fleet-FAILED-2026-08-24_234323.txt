@@ -1,0 +1,48 @@
+﻿JAD — EXPEDITION #040
+TRACK FLEET
+
+Starting HEAD:
+eae969c
+
+Backup:
+C:\Users\benba\Tinkering\Just_Another_Daw\Evidence\JAD-EXP-040-PreTrackFleet-2026-08-24_234323
+
+BUILD OUTPUT
+============
+
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+============================================================
+JAD EXP-040 - TRACK FLEET
+============================================================
+
+[1/2] MAPPING TRACK CONTAINER
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (3.8s)
+-- Generating done (0.4s)
+-- Build files have been written to: C:/Users/benba/Tinkering/Just_Another_Daw/Build/JUCE-Foundation
+
+[2/2] COMPILING AN UNREASONABLE NUMBER OF TRACKS
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  Checking File Globs
+  JAD_rc_lib.vcxproj -> C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_rc_lib.dir\Debug\JAD_rc_lib.lib
+  JADApplication.cpp
+  JADContext.cpp
+  Main.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Core\JADContext.cpp(18,25): error C2039: 'isAlive': is not a member of 'SessionState' [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\Model\SessionState.h(11,7):
+      see declaration of 'SessionState'
+  
+  SessionState.cpp
+  MainComponent.cpp
+  Generating Code...
+

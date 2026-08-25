@@ -1,0 +1,483 @@
+﻿JAD — EVERYTHING X-RAY
+======================
+
+STAMP
+=====
+2026-08-25_024818
+
+ROOT
+====
+C:\Users\benba\Tinkering\Just_Another_Daw
+
+VISUAL STUDIO
+=============
+Installation : C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools
+VsDevCmd     : C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat
+
+BUILD
+=====
+ExitCode : 0
+
+SOURCE / EXE
+============
+MainComponent : 08/25/2026 02:31:11
+Before EXE    : 08/25/2026 01:24:51
+After EXE     : 
+
+Before SHA:
+F15DDC74D807DBFF78A73AADD56D468BBF46BCAD872C67059DF2CD140A0B0203
+
+After SHA:
+MISSING
+
+SHA Changed:
+True
+
+EXE Timestamp Changed:
+False
+
+ERROR COUNT
+===========
+6
+
+WARNING COUNT
+=============
+0
+
+ALL ERRORS
+==========
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5): error C2679: binary '=': no operator found which takes a right-hand operand of type 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' (or there is no acceptable conversion) [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662: 'juce::Rectangle<int> juce::Rectangle<int>::removeFromRight(ValueType) noexcept': cannot convert 'this' pointer from 'const juce::Rectangle<int>' to 'juce::Rectangle<int> &' [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         with [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         [ [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:             ValueType=int [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         ] [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+
+ALL WARNINGS
+============
+
+
+DIAGNOSTIC FILES
+================
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp
+
+DIAGNOSTIC SOURCE CONTEXT
+=========================
+
+================================================================
+DIAGNOSTIC SOURCE CONTEXT
+File : C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp
+Line : 29
+================================================================
+
+      21: juce::MidiKeyboardState&
+      22: MidiSystem::getKeyboardState() noexcept
+      23: {
+      24:     return keyboardState;
+      25: }
+      26: 
+      27: void MidiSystem::refreshDevices()
+      28: {
+>>    29:     availableInputs =
+      30:         juce::MidiInput::getAvailableDevices();
+      31: }
+      32: 
+      33: int MidiSystem::getDeviceCount() const noexcept
+      34: {
+      35:     return static_cast<int> (
+      36:         availableInputs.size()
+      37:     );
+
+
+================================================================
+DIAGNOSTIC SOURCE CONTEXT
+File : C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp
+Line : 1332
+================================================================
+
+    1324:                         .toFloat()
+    1325:                         .expanded (2.0f),
+    1326:                     7.0f,
+    1327:                     2.5f
+    1328:                 );
+    1329:             }
+    1330: 
+    1331:             auto resizeHandle =
+>>  1332:                 clipBounds.removeFromRight (8);
+    1333: 
+    1334:             g.setColour (
+    1335:                 juce::Colours::white
+    1336:                     .withAlpha (
+    1337:                         clipSelected
+    1338:                             ? 0.85f
+    1339:                             : 0.30f
+    1340:                     )
+
+
+================================================================
+DIAGNOSTIC SOURCE CONTEXT
+File : C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp
+Line : 1332
+================================================================
+
+    1324:                         .toFloat()
+    1325:                         .expanded (2.0f),
+    1326:                     7.0f,
+    1327:                     2.5f
+    1328:                 );
+    1329:             }
+    1330: 
+    1331:             auto resizeHandle =
+>>  1332:                 clipBounds.removeFromRight (8);
+    1333: 
+    1334:             g.setColour (
+    1335:                 juce::Colours::white
+    1336:                     .withAlpha (
+    1337:                         clipSelected
+    1338:                             ? 0.85f
+    1339:                             : 0.30f
+    1340:                     )
+
+
+================================================================
+DIAGNOSTIC SOURCE CONTEXT
+File : C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp
+Line : 1332
+================================================================
+
+    1324:                         .toFloat()
+    1325:                         .expanded (2.0f),
+    1326:                     7.0f,
+    1327:                     2.5f
+    1328:                 );
+    1329:             }
+    1330: 
+    1331:             auto resizeHandle =
+>>  1332:                 clipBounds.removeFromRight (8);
+    1333: 
+    1334:             g.setColour (
+    1335:                 juce::Colours::white
+    1336:                     .withAlpha (
+    1337:                         clipSelected
+    1338:                             ? 0.85f
+    1339:                             : 0.30f
+    1340:                     )
+
+
+================================================================
+DIAGNOSTIC SOURCE CONTEXT
+File : C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp
+Line : 1332
+================================================================
+
+    1324:                         .toFloat()
+    1325:                         .expanded (2.0f),
+    1326:                     7.0f,
+    1327:                     2.5f
+    1328:                 );
+    1329:             }
+    1330: 
+    1331:             auto resizeHandle =
+>>  1332:                 clipBounds.removeFromRight (8);
+    1333: 
+    1334:             g.setColour (
+    1335:                 juce::Colours::white
+    1336:                     .withAlpha (
+    1337:                         clipSelected
+    1338:                             ? 0.85f
+    1339:                             : 0.30f
+    1340:                     )
+
+
+================================================================
+DIAGNOSTIC SOURCE CONTEXT
+File : C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp
+Line : 1332
+================================================================
+
+    1324:                         .toFloat()
+    1325:                         .expanded (2.0f),
+    1326:                     7.0f,
+    1327:                     2.5f
+    1328:                 );
+    1329:             }
+    1330: 
+    1331:             auto resizeHandle =
+>>  1332:                 clipBounds.removeFromRight (8);
+    1333: 
+    1334:             g.setColour (
+    1335:                 juce::Colours::white
+    1336:                     .withAlpha (
+    1337:                         clipSelected
+    1338:                             ? 0.85f
+    1339:                             : 0.30f
+    1340:                     )
+
+
+SOURCE INVENTORY
+================
+
+Source                             Modified              Bytes
+------                             --------              -----
+Source\App\JADApplication.cpp      8/24/2026 9:15:19 PM   1075
+Source\App\JADApplication.h        8/24/2026 9:15:19 PM    513
+Source\Audio\AudioSource.h         8/25/2026 1:24:09 AM    371
+Source\Audio\AudioSystem.cpp       8/25/2026 1:24:09 AM   7991
+Source\Audio\AudioSystem.h         8/25/2026 1:24:09 AM   2270
+Source\Audio\MidiSystem.cpp        8/25/2026 1:43:32 AM   3381
+Source\Audio\MidiSystem.h          8/25/2026 1:43:32 AM   1372
+Source\Audio\SynthSource.cpp       8/25/2026 1:24:09 AM   3871
+Source\Audio\SynthSource.h         8/25/2026 1:24:09 AM   1327
+Source\Audio\TrackProcessor.cpp    8/25/2026 1:24:09 AM   2481
+Source\Audio\TrackProcessor.h      8/25/2026 1:24:09 AM    667
+Source\Core\JADContext.cpp         8/25/2026 1:18:33 AM    575
+Source\Core\JADContext.h           8/24/2026 8:59:11 PM    333
+Source\Main.cpp                    8/24/2026 8:59:11 PM     77
+Source\Model\ClipModel.cpp         8/25/2026 12:10:26 AM  1134
+Source\Model\ClipModel.h           8/25/2026 12:10:26 AM   836
+Source\Model\MasterBusState.cpp    8/25/2026 12:10:26 AM   490
+Source\Model\MasterBusState.h      8/25/2026 12:10:26 AM   325
+Source\Model\ProjectState.cpp      8/25/2026 12:10:26 AM   578
+Source\Model\ProjectState.h        8/25/2026 12:10:26 AM   465
+Source\Model\SessionState.cpp      8/25/2026 12:10:26 AM  2857
+Source\Model\SessionState.h        8/25/2026 12:10:26 AM  1664
+Source\Model\TrackModel.cpp        8/25/2026 12:10:26 AM  2747
+Source\Model\TrackModel.h          8/25/2026 12:10:26 AM  1755
+Source\Model\TransportState.cpp    8/24/2026 11:27:57 PM  3871
+Source\Model\TransportState.h      8/24/2026 11:27:57 PM  2504
+Source\UI\JADLookAndFeel.cpp       8/25/2026 1:43:32 AM   5245
+Source\UI\JADLookAndFeel.h         8/25/2026 1:43:32 AM    921
+Source\UI\MainComponent.cpp        8/25/2026 2:31:11 AM  50323
+Source\UI\MainComponent.h          8/25/2026 2:31:11 AM   4126
+Source\UI\SessionOverviewPanel.cpp 8/25/2026 12:10:26 AM  5045
+Source\UI\SessionOverviewPanel.h   8/25/2026 12:10:26 AM   431
+Source\UI\SynthVoicePanel.cpp      8/24/2026 10:55:11 PM  4533
+Source\UI\SynthVoicePanel.h        8/24/2026 10:55:11 PM   856
+Source\UI\TimelineViewportState.h  8/25/2026 2:31:11 AM   2582
+Source\UI\TransportPanel.cpp       8/25/2026 12:21:49 AM  6081
+Source\UI\TransportPanel.h         8/25/2026 12:21:49 AM   906
+Source\UI\VirtualKeyboardPanel.cpp 8/25/2026 1:43:32 AM   8349
+Source\UI\VirtualKeyboardPanel.h   8/25/2026 1:43:32 AM   1196
+
+
+
+
+NEWEST OBJECTS
+==============
+
+LastWriteTime          Length FullName                                               
+-------------          ------ --------                                               
+8/25/2026 2:50:54 AM 21962793 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:52 AM  4253221 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:52 AM 16970748 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:51 AM 10243597 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:50 AM 10811854 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:49 AM 42667905 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:46 AM 28596686 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:43 AM  4335942 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:43 AM 11530245 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:42 AM     1589 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:42 AM  2655786 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:41 AM 14927701 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:50:40 AM  7187780 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:23 AM   587283 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:23 AM   782998 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   424478 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   565551 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   197534 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   202395 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   481253 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM    74840 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   373442 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   157672 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM    47161 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   149083 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM  1192115 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   628891 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   750544 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   734002 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM   563510 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/25/2026 2:49:22 AM  8286689 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:14 PM   539660 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:13 PM   454671 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:12 PM    92541 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:11 PM   229814 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:11 PM   131515 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:09 PM    90828 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:08 PM   141782 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:07 PM 16380164 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+8/24/2026 8:04:05 PM 11974162 C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE...
+
+
+
+
+GENERATED PROJECTS
+==================
+
+LastWriteTime        FullName                                                        
+-------------        --------                                                        
+8/24/2026 8:43:27 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:04:16 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/25/2026 1:43:39 AM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:43:27 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:43:27 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:04 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:07 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:10 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:43:27 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:04:16 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:04:16 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:04:16 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:04:16 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:43:22 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:44 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:43:22 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:25 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:28 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:31 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:44 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:44 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:44 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+8/24/2026 8:02:44 PM C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundati...
+
+
+
+
+JAD.VCXPROJ KNOWS THESE CURRENT SYSTEMS
+=======================================
+MainComponent       : True
+MidiSystem          : True
+JADLookAndFeel      : True
+VirtualKeyboard     : True
+TrackProcessor      : True
+SessionState        : True
+TrackModel          : True
+ClipModel           : True
+
+CMAKE KNOWS THESE CURRENT SYSTEMS
+=================================
+MainComponent       : True
+MidiSystem          : True
+JADLookAndFeel      : True
+VirtualKeyboard     : True
+TrackProcessor      : True
+SessionState        : True
+TrackModel          : True
+ClipModel           : True
+
+RAW BUILD OUTPUT
+================
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+============================================================
+JAD EVERYTHING FORGE
+============================================================
+
+=== CMAKE VERSION ===
+cmake version 4.3.1-msvc1
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+
+=== MSBUILD LOCATION ===
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe
+
+=== CXX LOCATION ===
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x64\cl.exe
+
+=== FORCE REBUILD JAD ===
+
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  Checking File Globs
+  1>Checking Build System
+  Generating JAD_artefacts/JuceLibraryCode/JAD_resources.rc
+  Building Custom Rule C:/Users/benba/Tinkering/Just_Another_Daw/CMakeLists.txt
+  JAD_rc_lib.vcxproj -> C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_rc_lib.dir\Debug\JAD_rc_lib.lib
+  Building Custom Rule C:/Users/benba/Tinkering/Just_Another_Daw/CMakeLists.txt
+  Main.cpp
+  JADApplication.cpp
+  JADContext.cpp
+  AudioSystem.cpp
+  MidiSystem.cpp
+  SynthSource.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5): error C2679: binary '=': no operator found which takes a right-hand operand of type 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' (or there is no acceptable conversion) [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\vector(1547,26):
+      could be 'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(std::initializer_list<_Ty>)'
+          with
+          [
+              _Ty=juce::MidiDeviceInfo
+          ]
+          C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5):
+          'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(std::initializer_list<_Ty>)': cannot convert argument 2 from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'std::initializer_list<_Ty>'
+          with
+          [
+              _Ty=juce::MidiDeviceInfo
+          ]
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\vector(1526,26):
+      or       'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(const std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &)'
+          C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5):
+          'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(const std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &)': cannot convert argument 2 from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'const std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              Reason: cannot convert from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'const std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\vector(800,26):
+      or       'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &&) noexcept(<expr>)'
+          C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5):
+          'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &&) noexcept(<expr>)': cannot convert argument 2 from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &&'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              Reason: cannot convert from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5):
+      while trying to match the argument list '(std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>, juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>)'
+  
+  TrackProcessor.cpp
+  SessionState.cpp
+  TransportState.cpp
+  TrackModel.cpp
+  ProjectState.cpp
+  MasterBusState.cpp
+  ClipModel.cpp
+  MainComponent.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662: 'juce::Rectangle<int> juce::Rectangle<int>::removeFromRight(ValueType) noexcept': cannot convert 'this' pointer from 'const juce::Rectangle<int>' to 'juce::Rectangle<int> &' [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         with [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         [ [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:             ValueType=int [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         ] [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,17):
+      Conversion loses qualifiers
+      C:\Users\benba\Tinkering\Just_Another_Daw\External\JUCE\modules\juce_graphics\geometry\juce_Rectangle.h(549,15):
+      see declaration of 'juce::Rectangle<int>::removeFromRight'
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28):
+      while trying to match the argument list '(int)'
+  
+  VirtualKeyboardPanel.cpp
+  JADLookAndFeel.cpp
+  SynthVoicePanel.cpp
+  TransportPanel.cpp
+  SessionOverviewPanel.cpp
+  juce_gui_extra.cpp
+  Generating Code...
+  Compiling...
+  juce_gui_basics.cpp
+  juce_gui_basics_2.cpp
+  juce_gui_basics_3.cpp
+  juce_gui_basics_4.cpp
+  juce_gui_basics_5.cpp
+  juce_graphics.cpp
+  juce_graphics_Harfbuzz.cpp
+  juce_events.cpp
+  juce_core.cpp
+  juce_core_CompilationTime.cpp
+  juce_data_structures.cpp
+  juce_audio_devices.cpp
+  juce_audio_basics.cpp
+  Generating Code...
+

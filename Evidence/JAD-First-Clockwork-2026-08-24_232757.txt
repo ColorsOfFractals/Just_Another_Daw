@@ -1,0 +1,75 @@
+﻿JAD — EXPEDITION #038
+=====================
+
+FIRST CLOCKWORK
+===============
+
+Starting HEAD:
+eae969c
+
+New model:
+Source/Model/TransportState.h
+Source/Model/TransportState.cpp
+
+Ownership:
+JADContext
+    owns SessionState
+
+SessionState
+    owns TransportState
+
+TransportState establishes:
+- play state
+- stop behavior
+- record state
+- tempo
+- beat position
+- sample position
+- sample advancement
+- time signature
+- loop enable
+- loop range
+
+Default tempo:
+120 BPM
+
+Default meter:
+4 / 4
+
+Default loop:
+0 - 4 beats
+disabled
+
+Important boundary:
+TransportState exists and compiles.
+
+It is NOT yet driven by AudioSystem.
+It is NOT yet exposed in the UI.
+It is NOT yet sequencing audio.
+
+AudioSystem:
+UNCHANGED
+
+SynthVoicePanel:
+UNCHANGED
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+B1BF37C9A04D423A98A8EBF186B11972DB3C76D3C250F345A4348460740C2F6A
+
+Backup:
+C:\Users\benba\Tinkering\Just_Another_Daw\Evidence\JAD-EXP-038-PreClockwork-2026-08-24_232757
+
+State:
+FIRST_CLOCKWORK_ALIVE

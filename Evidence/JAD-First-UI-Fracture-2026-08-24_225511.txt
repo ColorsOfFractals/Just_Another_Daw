@@ -1,0 +1,59 @@
+﻿JAD — EXPEDITION #037B
+======================
+
+FIRST UI FRACTURE
+=================
+
+Starting HEAD:
+eae969c
+
+Previous UI:
+MainComponent directly owned:
+- Waveform control
+- Frequency control
+- Gain control
+- Voice control
+
+New UI:
+MainComponent owns SynthVoicePanel.
+
+SynthVoicePanel owns:
+- Waveform control
+- Frequency control
+- Gain control
+- Voice control
+
+SynthVoicePanel references:
+AudioSystem
+
+AudioSystem:
+UNCHANGED
+
+ADSR:
+UNCHANGED
+
+CMake:
+Explicitly registers:
+- Source/UI/SynthVoicePanel.cpp
+- Source/UI/SynthVoicePanel.h
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+F5D4D498268C5A427155DD2BFA1E9E56CF0C75FBBCE83BBE7158F34FE62AFFBC
+
+Backup:
+C:\Users\benba\Tinkering\Just_Another_Daw\Evidence\JAD-EXP-037B-PreFracture-2026-08-24_225511
+
+State:
+FIRST_UI_ROOM_ALIVE

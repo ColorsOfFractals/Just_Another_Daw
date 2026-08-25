@@ -1,0 +1,84 @@
+﻿JAD — EXPEDITION #039
+=====================
+
+FIRST TRACK
+===========
+
+Starting HEAD:
+eae969c
+
+New model:
+Source/Model/TrackModel.h
+Source/Model/TrackModel.cpp
+
+Ownership:
+
+JADContext
+    owns SessionState
+
+SessionState
+    owns TransportState
+    owns TrackModel
+
+First Track:
+ID:
+1
+
+Name:
+Track 1
+
+Gain:
+1.0
+
+Pan:
+0.0
+
+Mute:
+false
+
+Solo:
+false
+
+Record Arm:
+false
+
+Important boundary:
+TrackModel exists and compiles.
+
+TrackModel is NOT yet:
+- routed through AudioSystem
+- represented in UI
+- attached to clips
+- attached to plugins
+- connected to MIDI
+- recording audio
+
+TransportState:
+PRESERVED
+
+AudioSystem:
+UNCHANGED
+
+SynthVoicePanel:
+UNCHANGED
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+F2954D93CAF9701C7808075A4A7ECEBE46C3CA43D64DDE4D469F79531FD95FD3
+
+Backup:
+C:\Users\benba\Tinkering\Just_Another_Daw\Evidence\JAD-EXP-039-PreFirstTrack-2026-08-24_233738
+
+State:
+FIRST_TRACK_ALIVE

@@ -1,0 +1,13 @@
+
+
+ProcessId       : 23784
+ParentProcessId : 29484
+Name            : MSBuild.exe
+CreationDate    : 8/25/2026 3:42:03 AM
+CommandLine     : "C:\Program Files (x86)\Microsoft Visual 
+                  Studio\18\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe" /noautoresponse /nologo 
+                  /nodemode:1 /nodeReuse:true /low:false
+
+
+
+

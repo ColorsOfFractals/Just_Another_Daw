@@ -1,0 +1,49 @@
+﻿JAD — EXPEDITION #047 CLOSEOUT
+==============================
+
+HANDS ON TIMELINE
+=================
+
+Outcome:
+HANDS_ON_TIMELINE_RUNTIME_ALIVE
+
+Established:
+- JAD builds successfully from current source.
+- Build system recovered from frozen monolithic compiler invocation.
+- MSVC /MP parallel compilation remains established.
+- MidiSystem JUCE Array -> std::vector mismatch repaired.
+- Timeline const Rectangle mutation rock repaired.
+- juce_audio_utils is linked.
+- Fresh JAD.exe emits successfully.
+- Fresh JAD.exe launches successfully.
+- Chromatic DAW workspace is visible at runtime.
+- Arrangement viewport is materialized.
+- Four seeded track lanes are visible.
+- Timeline clips have real geometry.
+- Track rack and inspector are visible.
+- Transport is visible.
+- Keyboard / Synth / Mixer dock exists.
+- Virtual chromatic keyboard is visible.
+- MIDI controls are materialized.
+- Audio reports ONLINE.
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+Executable SHA256:
+3F5D60CAB3BE769EC3AE131E26A6993CFE337E7B9E869DFBE5BCC1EF898482A3
+
+Bedtime Checkpoint:
+C:\Users\benba\Tinkering\Just_Another_Daw\Evidence\JAD-BEDTIME-2026-08-25_040852
+
+Fossil:
+C:\Users\benba\Tinkering\Just_Another_Daw\Fossils\HANDS-ON-TIMELINE-ALIVE-2026-08-25_041857
+
+Current Frontier:
+Runtime play-testing.
+
+Next Architectural Threshold:
+A meaningful JAD startup flow capable of presenting NEW EMPTY PROJECT.
+
+Closed by:
+Fu — The Committer

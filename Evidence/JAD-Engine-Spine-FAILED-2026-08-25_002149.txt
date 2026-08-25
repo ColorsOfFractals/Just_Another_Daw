@@ -1,0 +1,58 @@
+﻿JAD EXP-042A — ENGINE SPINE
+============================
+
+Starting HEAD:
+eae969c
+
+Backup:
+C:\Users\benba\Tinkering\Just_Another_Daw\Evidence\JAD-EXP-042A-PreEngineSpine-2026-08-25_002149
+
+BUILD OUTPUT
+============
+
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+============================================================
+JAD EXP-042A - ENGINE SPINE
+============================================================
+
+[1/2] ALIGNING VERTEBRAE
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (3.9s)
+-- Generating done (0.3s)
+-- Build files have been written to: C:/Users/benba/Tinkering/Just_Another_Daw/Build/JUCE-Foundation
+
+[2/2] BONKING THE SHONK
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  Checking File Globs
+  JAD_rc_lib.vcxproj -> C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_rc_lib.dir\Debug\JAD_rc_lib.lib
+  Main.cpp
+  JADApplication.cpp
+  JADContext.cpp
+  AudioSystem.cpp
+  MainComponent.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(90,5): error C2065: 'transportState': undeclared identifier [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(98,5): error C2065: 'masterBusState': undeclared identifier [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(257,9): error C2065: 'transportState': undeclared identifier [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(259,9): error C2065: 'transportState': undeclared identifier [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(272,9): error C2065: 'masterBusState': undeclared identifier [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(273,15): error C2065: 'masterBusState': undeclared identifier [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(271,16): error C2737: 'masterGain': const object must be initialized [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(277,9): error C2065: 'masterBusState': undeclared identifier [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(278,15): error C2065: 'masterBusState': undeclared identifier [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(276,16): error C2737: 'masterMuted': const object must be initialized [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(282,9): error C3536: 'masterMuted': cannot be used before it is initialized [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\AudioSystem.cpp(284,15): error C3536: 'masterGain': cannot be used before it is initialized [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+  SynthVoicePanel.cpp
+  TransportPanel.cpp
+  Generating Code...
+

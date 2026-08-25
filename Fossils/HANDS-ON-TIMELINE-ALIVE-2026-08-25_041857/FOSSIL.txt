@@ -1,0 +1,79 @@
+﻿JAD HANDS-ON TIMELINE FOSSIL
+============================
+
+Expedition:
+JAD-EXP-047
+
+State:
+HANDS_ON_TIMELINE_RUNTIME_ALIVE
+
+Workspace:
+CHROMATIC_DAW_WORKSPACE
+
+Runtime:
+PASS — human observed
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+Executable Written:
+08/25/2026 03:57:16
+
+Executable Bytes:
+27686912
+
+Executable SHA256:
+3F5D60CAB3BE769EC3AE131E26A6993CFE337E7B9E869DFBE5BCC1EF898482A3
+
+Build System:
+RECOVERED
+
+MSVC:
+PARALLEL /MP
+
+JUCE Audio Utils:
+LINKED
+
+Visible Runtime:
+- Chromatic gradient shell
+- Arrangement viewport
+- Beat / bar grid
+- Four track lanes
+- Seed A / B / C / D clips
+- Clip geometry
+- Clip resize handles
+- Track selection
+- Track mute
+- Track solo
+- Track arm
+- Track gain
+- Track pan
+- Inspector
+- Add track
+- Delete track
+- Zoom
+- Horizontal navigation
+- Snap controls
+- Transport
+- Bottom dock
+- Virtual chromatic keyboard
+- MIDI device controls
+- MIDI refresh
+- Keyboard theme control
+- Octave controls
+- Velocity control
+- Synth dock
+- Mixer dock
+- AUDIO ONLINE
+
+Known Frontier:
+Play with runtime behavior and determine what is genuinely wired.
+
+Strategic Frontier:
+Reach a meaningful launch state with NEW EMPTY PROJECT.
+
+Bedtime Checkpoint:
+C:\Users\benba\Tinkering\Just_Another_Daw\Evidence\JAD-BEDTIME-2026-08-25_040852
+
+Created:
+2026-08-25T04:18:58.0914913-07:00

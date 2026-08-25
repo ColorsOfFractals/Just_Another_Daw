@@ -1,0 +1,48 @@
+﻿JAD — EXPEDITION #040R
+======================
+
+PUT THE PULSE BACK
+==================
+
+Problem:
+EXP-040 replaced SessionState.h while creating the track collection.
+
+Legacy contract lost:
+SessionState::isAlive()
+
+Consumer:
+JADContext.cpp
+
+Repair:
+Restored SessionState::isAlive().
+
+Preserved:
+- TransportState
+- vector-owned TrackModel collection
+- four seed tracks
+- stable IDs
+- add/remove/clear/count/index/ID lookup
+
+Audio:
+UNCHANGED
+
+UI:
+UNCHANGED
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+72792A5F6737C4FCDCA0F5476F92BB8C39CC407B906F3F3D5D46E4BC991981C8
+
+State:
+TRACK_FLEET_REHYDRATED

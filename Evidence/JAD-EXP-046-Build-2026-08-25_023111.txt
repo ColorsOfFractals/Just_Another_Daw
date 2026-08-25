@@ -1,0 +1,64 @@
+﻿**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+============================================================
+JAD EXP-046 - HANDS ON THE TIMELINE
+EXP-047 - TIMELINE SEED
+============================================================
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  Checking File Globs
+  JAD_rc_lib.vcxproj -> C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_rc_lib.dir\Debug\JAD_rc_lib.lib
+  JADApplication.cpp
+  MidiSystem.cpp
+  MainComponent.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5): error C2679: binary '=': no operator found which takes a right-hand operand of type 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' (or there is no acceptable conversion) [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\vector(1547,26):
+      could be 'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(std::initializer_list<_Ty>)'
+          with
+          [
+              _Ty=juce::MidiDeviceInfo
+          ]
+          C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5):
+          'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(std::initializer_list<_Ty>)': cannot convert argument 2 from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'std::initializer_list<_Ty>'
+          with
+          [
+              _Ty=juce::MidiDeviceInfo
+          ]
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\vector(1526,26):
+      or       'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(const std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &)'
+          C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5):
+          'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(const std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &)': cannot convert argument 2 from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'const std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              Reason: cannot convert from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'const std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\vector(800,26):
+      or       'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &&) noexcept(<expr>)'
+          C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5):
+          'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>::operator =(std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &&) noexcept(<expr>)': cannot convert argument 2 from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>> &&'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              Reason: cannot convert from 'juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>' to 'std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(30,45):
+              No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\Audio\MidiSystem.cpp(29,5):
+      while trying to match the argument list '(std::vector<juce::MidiDeviceInfo,std::allocator<juce::MidiDeviceInfo>>, juce::Array<juce::MidiDeviceInfo,juce::DummyCriticalSection,0>)'
+  
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662: 'juce::Rectangle<int> juce::Rectangle<int>::removeFromRight(ValueType) noexcept': cannot convert 'this' pointer from 'const juce::Rectangle<int>' to 'juce::Rectangle<int> &' [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         with [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         [ [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:             ValueType=int [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28): error C2662:         ] [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,17):
+      Conversion loses qualifiers
+      C:\Users\benba\Tinkering\Just_Another_Daw\External\JUCE\modules\juce_graphics\geometry\juce_Rectangle.h(549,15):
+      see declaration of 'juce::Rectangle<int>::removeFromRight'
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp(1332,28):
+      while trying to match the argument list '(int)'
+  
+  JADLookAndFeel.cpp
+  Generating Code...
+

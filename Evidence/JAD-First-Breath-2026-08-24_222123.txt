@@ -1,0 +1,59 @@
+﻿JAD — EXPEDITION #035
+=====================
+
+FIRST BREATH
+============
+
+Starting commit:
+eae969c
+
+Capability:
+ADSR amplitude envelope.
+
+Attack:
+0.08 seconds
+
+Decay:
+0.22 seconds
+
+Sustain:
+0.65
+
+Release:
+0.55 seconds
+
+Thread boundary:
+UI publishes gate request atomically.
+
+Audio thread:
+Observes gate transition.
+Calls ADSR noteOn/noteOff.
+Consumes ADSR sample values.
+Multiplies oscillator by gain and envelope.
+
+Existing controls:
+Waveform preserved.
+Frequency preserved.
+Gain preserved.
+Voice preserved.
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+25D4B6EA860646EC6CEEE491027F9229DBA972B47133E5655285EDD34069C861
+
+Human observation:
+Required to verify audible attack/decay/sustain/release behavior.
+
+State:
+FIRST_BREATH_ALIVE

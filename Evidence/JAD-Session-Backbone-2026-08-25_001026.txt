@@ -1,0 +1,63 @@
+﻿JAD — EXPEDITION #041
+=====================
+
+SESSION BACKBONE
+================
+
+Starting HEAD:
+eae969c
+
+New subsystems:
+- ClipModel
+- MasterBusState
+- ProjectState
+- SessionOverviewPanel
+
+TrackModel growth:
+Each track owns a clip collection.
+
+Seed reality:
+Track 1 -> Seed A at beat 0
+Track 2 -> Seed B at beat 4
+Track 3 -> Seed C at beat 8
+Track 4 -> Seed D at beat 12
+
+SessionState owns:
+- TransportState
+- MasterBusState
+- ProjectState
+- Track fleet
+
+UI:
+SessionOverviewPanel exposes hidden model reality.
+SynthVoicePanel remains present.
+
+AudioSystem:
+UNCHANGED
+
+Audio routing:
+NOT CONNECTED
+
+Transport audio drive:
+NOT CONNECTED
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+D5885E5C14FA2BDE230A87334F113B2ECE7B603E9E03CAEF63A5750D5DCCF774
+
+Backup:
+C:\Users\benba\Tinkering\Just_Another_Daw\Evidence\JAD-EXP-041-PreSessionBackbone-2026-08-25_001026
+
+State:
+SESSION_BACKBONE_ALIVE
