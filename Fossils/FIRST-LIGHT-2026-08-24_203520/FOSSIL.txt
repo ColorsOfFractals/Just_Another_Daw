@@ -1,0 +1,41 @@
+﻿JAD FIRST LIGHT FOSSIL
+======================
+
+State:
+NATIVE_REALITY
+
+Milestone:
+The first JUCE-built JAD native Windows application
+was launched, displayed, and closed normally.
+
+JUCE:
+9.0.1
+
+JUCE SHA:
+e18f7f506c0b96f2c738a0bcd7fe6467a5005ad8
+
+Main.cpp SHA256:
+0B16E521AAC74F19A53F72F799B9675100B74A0F50FD1A4844A5E2EA37915CD2
+
+CMakeLists.txt SHA256:
+9B049644938B17EE674989B49BAA60AD086DFB24F7CCA709F9AC9EF888007266
+
+JAD.exe SHA256:
+5CA74519C93D05E4666BF0E05AA9739E452525DBCE2FCCA069C171DE23FA6A19
+
+Runtime:
+SUCCESS
+
+Boundary:
+No audio engine.
+No audio devices.
+No transport.
+No timeline.
+No mixer.
+No plug-in hosting.
+
+This fossil preserves the final empty native shell
+before DAW architecture begins.
+
+Created:
+2026-08-24T20:35:22.3701956-07:00

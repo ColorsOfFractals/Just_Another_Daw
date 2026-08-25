@@ -1,0 +1,55 @@
+﻿JAD — EXPEDITION #018 CLOSEOUT
+==============================
+
+FIRST LIGHT PRESERVATION
+------------------------
+
+Outcome:
+NATIVE_REALITY
+
+Established:
+- JUCE 9.0.1 is pinned as JAD's first external framework.
+- CMake successfully generates JAD's native build system.
+- MSVC successfully compiles and links the JUCE application.
+- JAD.exe exists as a native Windows application.
+- The JAD window rendered successfully.
+- The application closed normally with exit code 0.
+- A First Light fossil was created.
+
+JUCE:
+9.0.1
+
+JUCE SHA:
+e18f7f506c0b96f2c738a0bcd7fe6467a5005ad8
+
+Main Source:
+Source\Main.cpp
+
+Main SHA256:
+0B16E521AAC74F19A53F72F799B9675100B74A0F50FD1A4844A5E2EA37915CD2
+
+CMake:
+CMakeLists.txt
+
+CMake SHA256:
+9B049644938B17EE674989B49BAA60AD086DFB24F7CCA709F9AC9EF888007266
+
+Executable SHA256:
+5CA74519C93D05E4666BF0E05AA9739E452525DBCE2FCCA069C171DE23FA6A19
+
+Evidence:
+Evidence\JAD-First-Light-2026-08-24_203144.txt
+
+Fossil:
+Fossils\FIRST-LIGHT-2026-08-24_203520
+
+Current architectural boundary:
+JAD is a living native application shell only.
+
+No audio machinery has been introduced.
+
+Next frontier:
+Define the first internal JAD application architecture.
+
+Closed by:
+Fu — The Committer

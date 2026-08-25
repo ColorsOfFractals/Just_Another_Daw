@@ -1,0 +1,61 @@
+﻿JAD — EXPEDITION #013
+=====================
+
+WABBLE — JUCE ADMISSION SURVEY
+==============================
+
+CANDIDATE
+---------
+
+Name:
+JUCE
+
+Repository:
+https://github.com/juce-framework/JUCE.git
+
+Expected owner:
+juce-framework
+
+Latest semantic tag observed:
+9.0.1
+
+Master commit observed:
+7aae7d8e8deb8413bb01633d2795ef9974a181c5
+
+ADMISSION CHECKS
+----------------
+
+GitAvailable                    : True
+ExpectedRepositoryIdentity      : True
+RepositoryUsesHTTPS             : True
+RemoteReachable                 : True
+StableSemanticTagObserved       : True
+MasterCommitObserved            : True
+KingdomJustificationPresent     : True
+
+KINGDOM JUSTIFICATION
+---------------------
+
+JAD requires a native C++ application framework capable of
+supporting desktop GUI construction and future real-time audio,
+MIDI, device, plug-in-hosting, and DAW-oriented architecture.
+
+JUCE is being considered as the first external framework because
+it provides those capabilities while integrating with the CMake,
+MSVC, and Windows SDK foundation already proven by JAD.
+
+WABBLE DECISION
+---------------
+
+ALLOW
+
+BOUNDARY
+--------
+
+This expedition performed admission inspection only.
+
+JUCE was NOT cloned.
+JUCE was NOT added to JAD.
+No source was modified.
+No compilation occurred.
+No installation occurred.

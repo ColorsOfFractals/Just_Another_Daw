@@ -1,0 +1,105 @@
+﻿JAD — EXPEDITION #014
+=====================
+
+JUCE FOUNDATION
+---------------
+
+JUCE Tag:
+9.0.1
+
+JUCE Commit:
+e18f7f506c0b96f2c738a0bcd7fe6467a5005ad8
+
+JUCE Location:
+External\JUCE
+
+Main Source:
+Source\Main.cpp
+
+Main SHA256:
+0B16E521AAC74F19A53F72F799B9675100B74A0F50FD1A4844A5E2EA37915CD2
+
+CMake:
+CMakeLists.txt
+
+CMake SHA256:
+933F43B0C83648ECD56413434F810F8AEA9B496D4917F849BBB150CAEA3C249B
+
+BUILD
+-----
+
+Build exit:
+10
+
+Build succeeded:
+False
+
+Executable:
+
+
+Executable exists:
+False
+
+Executable SHA256:
+
+
+RUNTIME
+-------
+
+Runtime exit:
+
+
+Runtime succeeded:
+False
+
+STATE
+-----
+
+UNKNOWN
+
+FOSSIL
+------
+
+
+
+RAW BUILD OUTPUT
+----------------
+
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+============================================================
+JAD JUCE FOUNDATION BUILD
+============================================================
+
+=== CONFIGURE ===
+-- Building for: Visual Studio 18 2026
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- The CXX compiler identification is MSVC 19.51.36256.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- The C compiler identification is MSVC 19.51.36256.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+cmd.exe : CMake Error at External/JUCE/CMakeLists.txt:40 (message):
+At line:1 char:16
++ $BuildOutput = & cmd.exe /d /c "`"$BuildScript`"" 2>&1 | Out-String
++                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (CMake Error at ...t:40 (message): 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  A C compiler is required to build targets that depend on JUCE.  Add 'C' to
+  your project's LANGUAGES.
+
+
+-- Configuring incomplete, errors occurred!
+

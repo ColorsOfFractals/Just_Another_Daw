@@ -1,0 +1,31 @@
+﻿JAD — EXPEDITION #017
+=====================
+
+FIRST LIGHT
+===========
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+Executable SHA256:
+5CA74519C93D05E4666BF0E05AA9739E452525DBCE2FCCA069C171DE23FA6A19
+
+Runtime Exit:
+0
+
+Runtime:
+SUCCESS
+
+Observation:
+The JUCE-built JAD native Windows application was launched
+and returned normally after its window was closed.
+
+BOUNDARY
+========
+
+No additional framework was introduced.
+No new application architecture was added.
+No audio machinery was added.
+
+This expedition proved only that the current JAD/JUCE
+foundation exists as a runnable native Windows application.
