@@ -1,0 +1,59 @@
+﻿**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+============================================================
+JAD OWNERSHIP REPAIR BUILD
+============================================================
+
+=== RECONFIGURE ===
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (4.9s)
+-- Generating done (0.4s)
+-- Build files have been written to: C:/Users/benba/Tinkering/Just_Another_Daw/Build/JUCE-Foundation
+
+=== BUILD ===
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  Checking File Globs
+  JAD_rc_lib.vcxproj -> C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_rc_lib.dir\Debug\JAD_rc_lib.lib
+  Main.cpp
+  JADApplication.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\memory(3337,27): error C2027: use of undefined type 'JADApplication::MainWindow' [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+  (compiling source file '../../Source/Main.cpp')
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\App\JADApplication.h(18,11):
+      see declaration of 'JADApplication::MainWindow'
+      C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\memory(3337,27):
+      the template instantiation context (the oldest one first) is
+          C:\Users\benba\Tinkering\Just_Another_Daw\Source\App\JADApplication.h(21,33):
+          see reference to class template instantiation 'std::unique_ptr<JADApplication::MainWindow,std::default_delete<JADApplication::MainWindow>>' being compiled
+          C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\memory(3381,92):
+          see reference to class template instantiation 'std::default_delete<JADApplication::MainWindow>' being compiled
+          C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\memory(3336,23):
+          while compiling class template member function 'void std::default_delete<JADApplication::MainWindow>::operator ()(_Ty *) noexcept const'
+          with
+          [
+              _Ty=JADApplication::MainWindow
+          ]
+              C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\memory(3456,33):
+              see the first reference to 'std::default_delete<JADApplication::MainWindow>::operator ()' in 'std::unique_ptr<JADApplication::MainWindow,std::default_delete<JADApplication::MainWindow>>::~unique_ptr'
+              C:\Users\benba\Tinkering\Just_Another_Daw\Source\App\JADApplication.h(22,1):
+              see the first reference to 'std::unique_ptr<JADApplication::MainWindow,std::default_delete<JADApplication::MainWindow>>::~unique_ptr' in 'JADApplication::JADApplication'
+  
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\memory(3337,25): error C2338: static assertion failed: 'can't delete an incomplete type' [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+  (compiling source file '../../Source/Main.cpp')
+  
+C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Tools\MSVC\14.51.36231\include\memory(3338,9): warning C4150: deletion of pointer to incomplete type 'JADApplication::MainWindow'; no destructor called [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+  (compiling source file '../../Source/Main.cpp')
+      C:\Users\benba\Tinkering\Just_Another_Daw\Source\App\JADApplication.h(18,11):
+      see declaration of 'JADApplication::MainWindow'
+  
+  juce_data_structures.cpp
+  Generating Code...
+

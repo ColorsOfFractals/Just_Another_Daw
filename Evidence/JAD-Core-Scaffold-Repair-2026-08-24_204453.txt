@@ -1,0 +1,89 @@
+﻿JAD — EXPEDITION #021
+=====================
+
+CORE SCAFFOLD REPAIR
+====================
+
+Observed rock:
+Main.cpp could not resolve App/JADApplication.h.
+
+Repair:
+Added Source as a private include root for target JAD.
+
+Safety correction:
+Runtime testing is now forbidden when the current build fails.
+A stale executable must never prove fresh source.
+
+BUILD
+-----
+
+Success:
+False
+
+Exit:
+20
+
+Executable Exists:
+False
+
+Executable SHA256:
+
+
+RUNTIME
+-------
+
+Success:
+False
+
+Exit:
+
+
+STATE
+-----
+
+BUILD_FAILED
+
+RAW BUILD OUTPUT
+----------------
+
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+============================================================
+JAD CORE SCAFFOLD REPAIR BUILD
+============================================================
+
+=== RECONFIGURE ===
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (5.4s)
+-- Generating done (0.5s)
+-- Build files have been written to: C:/Users/benba/Tinkering/Just_Another_Daw/Build/JUCE-Foundation
+
+=== BUILD ===
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  Checking File Globs
+  JAD_rc_lib.vcxproj -> C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_rc_lib.dir\Debug\JAD_rc_lib.lib
+  Main.cpp
+  juce_gui_extra.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Main.cpp(1,10): error C1083: Cannot open include file: 'App/JADApplication.h': No such file or directory [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+  juce_gui_basics.cpp
+  juce_gui_basics_2.cpp
+  juce_gui_basics_3.cpp
+  juce_gui_basics_4.cpp
+  juce_gui_basics_5.cpp
+  juce_graphics.cpp
+  juce_graphics_Harfbuzz.cpp
+  juce_events.cpp
+  juce_core.cpp
+  juce_core_CompilationTime.cpp
+  juce_data_structures.cpp
+  Generating Code...
+

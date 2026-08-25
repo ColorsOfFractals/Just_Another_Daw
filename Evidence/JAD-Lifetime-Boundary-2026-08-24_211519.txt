@@ -1,0 +1,38 @@
+﻿JAD — EXPEDITION #025
+=====================
+
+COMPLETE OWNERSHIP BOUNDARY
+===========================
+
+Observed:
+MainWindow remained an incomplete nested type in the header.
+
+Previous repair:
+Moved JADApplication destruction out-of-line.
+
+Remaining issue:
+JADApplication's implicitly generated constructor was still
+instantiated in the header and required unique_ptr cleanup
+machinery involving MainWindow.
+
+Repair:
+Declared both constructor and destructor in the header.
+Defined both out-of-line after MainWindow's complete definition.
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+C965643F760A76CBF6F1029F6F666829FE478E2BBF7551B24BF4179F80DE0119
+
+State:
+CORE_SCAFFOLD_ALIVE

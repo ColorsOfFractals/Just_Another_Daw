@@ -1,0 +1,31 @@
+﻿**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+============================================================
+JAD CORE SCAFFOLD BUILD
+============================================================
+
+=== RECONFIGURE ===
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (6.2s)
+-- Generating done (0.6s)
+-- Build files have been written to: C:/Users/benba/Tinkering/Just_Another_Daw/Build/JUCE-Foundation
+
+=== INCREMENTAL BUILD ===
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  Checking File Globs
+  1>Checking Build System
+  Building Custom Rule C:/Users/benba/Tinkering/Just_Another_Daw/CMakeLists.txt
+  JAD_rc_lib.vcxproj -> C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_rc_lib.dir\Debug\JAD_rc_lib.lib
+  Building Custom Rule C:/Users/benba/Tinkering/Just_Another_Daw/CMakeLists.txt
+  Main.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Main.cpp(1,10): error C1083: Cannot open include file: 'App/JADApplication.h': No such file or directory [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+

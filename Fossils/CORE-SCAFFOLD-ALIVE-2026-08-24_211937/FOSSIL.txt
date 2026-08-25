@@ -1,0 +1,51 @@
+﻿JAD CORE SCAFFOLD FOSSIL
+========================
+
+State:
+CORE_SCAFFOLD_ALIVE
+
+Milestone:
+JAD successfully transitioned from a monolithic native JUCE
+shell into a modular application scaffold.
+
+Architecture:
+JADApplication
+    owns JADContext
+
+JADContext
+    owns AudioSystem
+    owns SessionState
+
+MainComponent
+    receives shared JADContext
+
+Modules:
+App
+Core
+Audio
+Model
+UI
+
+JUCE:
+9.0.1
+
+JUCE SHA:
+e18f7f506c0b96f2c738a0bcd7fe6467a5005ad8
+
+Executable SHA256:
+C965643F760A76CBF6F1029F6F666829FE478E2BBF7551B24BF4179F80DE0119
+
+Runtime:
+PASS
+
+Boundary:
+AudioSystem exists but performs no audio work.
+SessionState exists but contains no project data.
+No device discovery.
+No transport.
+No timeline.
+No mixer.
+No routing graph.
+
+Created:
+2026-08-24T21:19:37.7681492-07:00

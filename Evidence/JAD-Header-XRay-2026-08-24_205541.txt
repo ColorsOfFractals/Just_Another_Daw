@@ -1,0 +1,57 @@
+﻿JAD — EXPEDITION #022
+=====================
+
+HEADER PATH X-RAY
+=================
+
+PHYSICAL SOURCE
+---------------
+
+Main                    : True
+JADApplicationHeader    : False
+JADApplicationCpp       : False
+MainComponentHeader     : False
+MainComponentCpp        : False
+JADContextHeader        : True
+JADContextCpp           : True
+AudioSystemHeader       : True
+AudioSystemCpp          : True
+SessionStateHeader      : True
+SessionStateCpp         : True
+
+CMAKE
+-----
+
+Include declaration:
+True
+
+Expanded source manifest:
+False
+
+GENERATED PROJECT
+-----------------
+
+JAD.vcxproj:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj
+
+Exists:
+True
+
+Source include propagated:
+True
+
+MAIN.CPP OPENING
+----------------
+
+#include "App/JADApplication.h"
+
+START_JUCE_APPLICATION (JADApplication)
+
+STATE
+-----
+
+SOURCE_ARTIFACT_MISSING
+
+No files were modified.
+No compilation occurred.
+No executable was launched.

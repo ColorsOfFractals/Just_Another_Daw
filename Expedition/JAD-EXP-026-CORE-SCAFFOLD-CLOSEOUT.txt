@@ -1,0 +1,44 @@
+﻿JAD — EXPEDITION #026 CLOSEOUT
+==============================
+
+CORE SCAFFOLD
+=============
+
+Outcome:
+CORE_SCAFFOLD_ALIVE
+
+Established:
+- JAD remains a native JUCE Windows application.
+- Source architecture is modularized.
+- JADApplication owns shared application context.
+- JADContext owns AudioSystem and SessionState.
+- MainComponent receives shared reality without owning it.
+- Constructor/destructor lifetime boundaries are explicitly defined.
+- Current source builds successfully.
+- Current executable launches successfully.
+- Application exits normally.
+- Stale binaries may not prove current builds.
+
+JUCE:
+9.0.1
+
+JUCE SHA:
+e18f7f506c0b96f2c738a0bcd7fe6467a5005ad8
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+Executable SHA256:
+C965643F760A76CBF6F1029F6F666829FE478E2BBF7551B24BF4179F80DE0119
+
+Evidence:
+Evidence\JAD-Lifetime-Boundary-2026-08-24_211519.txt
+
+Fossil:
+Fossils\CORE-SCAFFOLD-ALIVE-2026-08-24_211937
+
+Current frontier:
+Audio device awareness.
+
+Closed by:
+Fu — The Committer

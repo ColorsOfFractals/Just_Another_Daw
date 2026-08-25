@@ -17,6 +17,27 @@ target_sources(
     JAD
     PRIVATE
         Source/Main.cpp
+
+        Source/App/JADApplication.cpp
+        Source/App/JADApplication.h
+
+        Source/Core/JADContext.cpp
+        Source/Core/JADContext.h
+
+        Source/Audio/AudioSystem.cpp
+        Source/Audio/AudioSystem.h
+
+        Source/Model/SessionState.cpp
+        Source/Model/SessionState.h
+
+        Source/UI/MainComponent.cpp
+        Source/UI/MainComponent.h
+)
+
+target_include_directories(
+    JAD
+    PRIVATE
+        Source
 )
 
 target_compile_features(
@@ -37,4 +58,7 @@ target_link_libraries(
     PRIVATE
         juce::juce_gui_extra
 )
+
+
+
 

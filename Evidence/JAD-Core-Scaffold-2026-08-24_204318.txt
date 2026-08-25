@@ -1,0 +1,105 @@
+﻿JAD — EXPEDITION #020
+=====================
+
+CORE SCAFFOLD
+=============
+
+Purpose:
+Establish stable application domains before introducing
+DAW behavior.
+
+OWNERSHIP
+---------
+
+JADApplication
+    owns JADContext
+
+JADContext
+    owns AudioSystem
+    owns SessionState
+
+MainComponent
+    receives JADContext by reference
+    does not own application reality
+
+BOUNDARY
+--------
+
+AudioSystem:
+Exists, but performs no audio work.
+
+SessionState:
+Exists, but contains no musical project data.
+
+MainComponent:
+Still renders the FIRST LIGHT interface.
+
+No audio devices opened.
+No audio processing performed.
+No transport introduced.
+No tracks introduced.
+No mixer introduced.
+
+BUILD
+-----
+
+Success:
+False
+
+Exit:
+20
+
+Executable:
+
+
+Executable SHA256:
+5CA74519C93D05E4666BF0E05AA9739E452525DBCE2FCCA069C171DE23FA6A19
+
+RUNTIME
+-------
+
+Success:
+True
+
+Exit:
+0
+
+STATE
+-----
+
+CORE_SCAFFOLD_ALIVE
+
+RAW BUILD OUTPUT
+----------------
+
+**********************************************************************
+** Visual Studio 2026 Developer Command Prompt v18.9.1
+** Copyright (c) 2026 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+============================================================
+JAD CORE SCAFFOLD BUILD
+============================================================
+
+=== RECONFIGURE ===
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Testing juceaide
+-- Finished setting up juceaide
+-- Configuring done (6.2s)
+-- Generating done (0.6s)
+-- Build files have been written to: C:/Users/benba/Tinkering/Just_Another_Daw/Build/JUCE-Foundation
+
+=== INCREMENTAL BUILD ===
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  Checking File Globs
+  1>Checking Build System
+  Building Custom Rule C:/Users/benba/Tinkering/Just_Another_Daw/CMakeLists.txt
+  JAD_rc_lib.vcxproj -> C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_rc_lib.dir\Debug\JAD_rc_lib.lib
+  Building Custom Rule C:/Users/benba/Tinkering/Just_Another_Daw/CMakeLists.txt
+  Main.cpp
+C:\Users\benba\Tinkering\Just_Another_Daw\Source\Main.cpp(1,10): error C1083: Cannot open include file: 'App/JADApplication.h': No such file or directory [C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD.vcxproj]
+
