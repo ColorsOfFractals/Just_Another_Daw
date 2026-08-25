@@ -1,0 +1,52 @@
+﻿JAD — EXPEDITION #032
+=====================
+
+FIRST SYNTH VOICE
+=================
+
+Audio callback:
+ACTIVE
+
+Oscillator:
+ACTIVE
+
+Waveforms:
+SINE
+SAW
+SQUARE
+
+Frequency:
+40 Hz - 2000 Hz
+Default 440 Hz
+
+Gain:
+0.000 - 0.200
+Default 0.050
+
+UI:
+VOICE toggle
+WAVEFORM selector
+FREQUENCY slider
+GAIN slider
+
+Thread boundary:
+UI publishes control state atomically.
+Audio callback consumes control state.
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+8911CBD99B1882740756C701C7F74F500A5013592B95DB5BCA1F4061B8ABFB43
+
+State:
+FIRST_SYNTH_VOICE_ALIVE

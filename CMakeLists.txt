@@ -53,11 +53,15 @@ target_compile_definitions(
         JUCE_USE_CURL=0
 )
 
-target_link_libraries(
-    JAD
+target_link_libraries(JAD
     PRIVATE
         juce::juce_gui_extra
+        juce::juce_audio_devices
+        juce::juce_audio_basics
 )
+
+
+
 
 
 

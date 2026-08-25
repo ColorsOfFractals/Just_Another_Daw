@@ -1,0 +1,38 @@
+﻿JAD — EXPEDITION #034 CLOSEOUT
+==============================
+
+FIRST SYNTH VOICE
+=================
+
+Outcome:
+FIRST_SYNTH_VOICE_ALIVE
+
+Proven reality:
+- JAD acquires the system audio device.
+- JAD participates in the real-time audio callback.
+- JAD generates oscillator samples.
+- Waveform can be selected between sine, saw, and square.
+- Frequency is user-controlled.
+- Gain is user-controlled.
+- Voice can be enabled and silenced.
+- Controls are visibly accessible.
+- Current executable builds and runs successfully.
+- Rock Theater exists for failed forge paths.
+
+Latest runtime evidence:
+Evidence\JAD-Control-Excavation-2026-08-24_220727.txt
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+Executable SHA256:
+84F741B6BE0D42C80F267D8AE63502CBB6C64B4EC103161689FA24C81FA60944
+
+Fossil:
+Fossils\FIRST-SYNTH-VOICE-ALIVE-2026-08-24_221615
+
+Next frontier:
+ADSR envelope / note-shaped voice.
+
+Closed by:
+Fu — The Committer

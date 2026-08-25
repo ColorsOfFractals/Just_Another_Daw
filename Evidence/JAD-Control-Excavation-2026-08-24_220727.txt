@@ -1,0 +1,34 @@
+﻿JAD — EXPEDITION #033
+=====================
+
+DIG UP THE CONTROLS
+===================
+
+Problem:
+GAIN and VOICE controls existed but were laid out below the
+visible component boundary.
+
+Repair:
+Expanded window height.
+Replaced flowing lower-panel geometry with explicit control bounds.
+
+Audio architecture:
+UNCHANGED
+
+Oscillator architecture:
+UNCHANGED
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+SHA256:
+84F741B6BE0D42C80F267D8AE63502CBB6C64B4EC103161689FA24C81FA60944
+
+State:
+CONTROLS_VISIBLE

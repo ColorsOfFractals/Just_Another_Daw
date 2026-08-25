@@ -1,0 +1,48 @@
+﻿JAD — EXPEDITION #027
+=====================
+
+FIRST EARS
+==========
+
+Starting checkpoint:
+438d6cf
+
+Capability introduced:
+JUCE AudioDeviceManager
+
+Ownership:
+JADContext
+    owns AudioSystem
+
+AudioSystem
+    owns AudioDeviceManager
+
+MainComponent
+    observes AudioSystem
+
+Audio generation:
+NONE
+
+Tracks:
+NONE
+
+Transport:
+NONE
+
+Build:
+PASS
+
+Runtime:
+PASS
+
+Exit:
+0
+
+Executable:
+C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+
+SHA256:
+7F53371EDDF5629378592AE184061779688463C4ABE391685234DB18B7338725
+
+State:
+FIRST_EARS

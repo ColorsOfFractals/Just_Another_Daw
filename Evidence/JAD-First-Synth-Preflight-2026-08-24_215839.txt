@@ -1,0 +1,19 @@
+﻿JAD EXP-032 PREFLIGHT
+
+HEAD:
+438d6cff692eb730b6c45c9ef99dff2ee6dc25c1
+
+STATUS:
+ M CMakeLists.txt  M Source/Audio/AudioSystem.cpp  M Source/Audio/AudioSystem.h  M Source/UI/MainComponent.cpp  M Source/UI/MainComponent.h ?? Evidence/JAD-First-Ears-2026-08-24_212528.cmd ?? Evidence/JAD-First-Ears-2026-08-24_212528.txt ?? Evidence/JAD-Real-Boulder-2026-08-24_215329.cmd ?? Evidence/JAD-Rock-Theater-2026-08-24_214721.txt ?? Evidence/JAD-Tone-Shaper-2026-08-24_214104.cmd ?? Tools/
+
+Purpose:
+Attempt first controllable synth voice.
+
+Planned mutation:
+- controllable oscillator frequency
+- controllable output gain
+- sine waveform
+- saw waveform
+- square waveform
+- UI controls
+- audio callback generation

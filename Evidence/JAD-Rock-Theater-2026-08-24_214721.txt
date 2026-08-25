@@ -1,0 +1,25 @@
+﻿JAD — EXPEDITION #030
+=====================
+
+ROCK THEATER
+============
+
+Purpose:
+Provide a standard visual and diagnostic boundary for failed JAD
+construction expeditions.
+
+Behavior:
+- Receives raw forge output.
+- Classifies recognizable failure families.
+- Extracts useful diagnostic lines.
+- Displays a whimsical geological interruption.
+- Preserves the real technical inscription.
+- Does not repair automatically.
+- Does not commit automatically.
+- Fu remains outside failed construction boundaries.
+
+Module:
+C:\Users\benba\Tinkering\Just_Another_Daw\Tools\JAD-RockTheater.ps1
+
+State:
+ROCK_THEATER_ALIVE
