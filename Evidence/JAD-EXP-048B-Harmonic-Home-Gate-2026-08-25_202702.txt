@@ -1,0 +1,49 @@
+﻿JAD EXP-048B — HARMONIC HOME GATE
+=================================
+
+State:
+HARMONIC_HOME_GATE_COMPILED
+
+ExitCode:
+0
+
+Startup:
+ANIMATED
+
+Sequence:
+DARK GLASS
+-> PHASED WAVETABLE
+-> HARMONIC FRACTAL BRANCHES
+-> GRAND STAFF
+-> HOME CARD
+
+Home:
+CREATE A NEW PROJECT
+ENTER CURRENT SESSION
+
+CreateNewProject:
+- stops transport
+- exits recording state
+- returns transport to zero
+- all synth notes off
+- clears seed tracks/clips
+- sets project title to Untitled JAD Project
+- resets timeline viewport
+- rebinds SessionState into AudioSystem
+- enters existing workspace
+
+Architecture:
+OVERLAY ON LIVING MAINCOMPONENT
+NO SECOND SESSION MODEL
+
+Build:
+0
+
+ExeSHA:
+3F5D60CAB3BE769EC3AE131E26A6993CFE337E7B9E869DFBE5BCC1EF898482A3
+
+Backup:
+
+
+Created:
+2026-08-25T20:27:15.0348784-07:00

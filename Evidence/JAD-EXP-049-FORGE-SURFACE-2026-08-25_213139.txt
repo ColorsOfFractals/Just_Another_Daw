@@ -1,0 +1,976 @@
+﻿============================================================
+ JAD EXP-049 — CONSOLE FORGE SURFACE
+============================================================
+
+############################################################
+# FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.h
+############################################################
+    1: #pragma once
+    2: 
+    3: #include <juce_gui_basics/juce_gui_basics.h>
+    4: 
+    5: #include "../Core/JADContext.h"
+    6: 
+    7: #include "JADLookAndFeel.h"
+    8: #include "SessionOverviewPanel.h"
+    9: #include "StartupOverlay.h"
+   10: #include "SynthVoicePanel.h"
+   11: #include "TimelineViewportState.h"
+   12: #include "TransportPanel.h"
+   13: #include "VirtualKeyboardPanel.h"
+   14: 
+   15: class MainComponent :
+   16:     public juce::Component,
+   17:     private juce::Timer
+   18: {
+   19: public:
+   20:     explicit MainComponent (
+   21:         JADContext& contextToUse
+   22:     );
+   23: 
+   24:     ~MainComponent() override;
+   25: 
+   26:     void paint (
+   27:         juce::Graphics&
+   28:     ) override;
+   29: 
+   30:     void resized() override;
+   31: 
+   32:     void mouseDown (
+   33:         const juce::MouseEvent&
+   34:     ) override;
+   35: 
+   36:     void mouseDrag (
+   37:         const juce::MouseEvent&
+   38:     ) override;
+   39: 
+   40:     void mouseUp (
+   41:         const juce::MouseEvent&
+   42:     ) override;
+   43: 
+   44: private:
+   45:     enum class DockPage
+   46:     {
+   47:         keyboard = 0,
+   48:         synth,
+   49:         mixer
+   50:     };
+   51: 
+   52:     enum class DragMode
+   53:     {
+   54:         none = 0,
+   55:         moveClip,
+   56:         resizeClip,
+   57:         trackGain,
+   58:         trackPan
+   59:     };
+   60: 
+   61:     void timerCallback() override;
+   62: 
+   63:     void addTrack();
+   64:     void deleteSelectedTrack();
+   65: 
+   66:     void selectTrack (
+   67:         int index
+   68:     );
+   69: 
+   70:     void clearClipSelection();
+   71: 
+   72:     void setDockPage (
+   73:         DockPage page
+   74:     );
+   75: 
+   76:     void refreshWorkspace();
+   77: 
+   78:     void drawPanel (
+   79:         juce::Graphics&,
+   80:         juce::Rectangle<int>,
+   81:         const juce::String& title,
+   82:         juce::Colour accent,
+   83:         float alpha = 0.16f
+   84:     );
+   85: 
+   86:     void drawTrackRack (
+   87:         juce::Graphics&,
+   88:         juce::Rectangle<int>
+   89:     );
+   90: 
+   91:     void drawArrangement (
+   92:         juce::Graphics&,
+   93:         juce::Rectangle<int>
+   94:     );
+   95: 
+   96:     void drawInspector (
+   97:         juce::Graphics&,
+   98:         juce::Rectangle<int>
+   99:     );
+  100: 
+  101:     void drawDock (
+  102:         juce::Graphics&,
+  103:         juce::Rectangle<int>
+  104:     );
+  105: 
+  106:     juce::Rectangle<int>
+  107:     getTrackRowBounds (
+  108:         int trackIndex
+  109:     ) const;
+  110: 
+  111:     juce::Rectangle<int>
+  112:     getTrackGainBounds (
+  113:         int trackIndex
+  114:     ) const;
+  115: 
+  116:     juce::Rectangle<int>
+  117:     getTrackPanBounds (
+  118:         int trackIndex
+  119:     ) const;
+  120: 
+  121:     juce::Rectangle<int>
+  122:     getTimelineBounds() const;
+  123: 
+  124:     juce::Rectangle<int>
+  125:     getLaneBounds (
+  126:         int trackIndex
+  127:     ) const;
+  128: 
+  129:     juce::Rectangle<int>
+  130:     getClipBounds (
+  131:         int trackIndex,
+  132:         int clipIndex
+  133:     ) const;
+  134: 
+  135:     int beatToX (
+  136:         double beat
+  137:     ) const;
+  138: 
+  139:     double xToBeat (
+  140:         int x
+  141:     ) const;
+  142: 
+  143:     void seekTransport (
+  144:         double beat
+  145:     );
+  146: 
+  147:     void beginClipInteraction (
+  148:         int trackIndex,
+  149:         int clipIndex,
+  150:         int mouseX,
+  151:         bool resize
+  152:     );
+  153: 
+  154:     JADContext& context;
+  155: 
+  156:     JADLookAndFeel jadLookAndFeel;
+  157: 
+  158:     TransportPanel transportPanel;
+  159:     SessionOverviewPanel sessionOverviewPanel;
+  160:     StartupOverlay startupOverlay;
+  161:     SynthVoicePanel synthVoicePanel;
+  162:     VirtualKeyboardPanel keyboardPanel;
+  163: 
+  164:     TimelineViewportState timelineViewport;
+  165: 
+  166:     juce::Label projectLabel;
+  167:     juce::Label statusLabel;
+  168: 
+  169:     juce::TextButton addTrackButton {
+  170:         "+ TRACK"
+  171:     };
+  172: 
+  173:     juce::TextButton deleteTrackButton {
+  174:         "- TRACK"
+  175:     };
+  176: 
+  177:     juce::TextButton scrollLeftButton {
+  178:         "<<"
+  179:     };
+  180: 
+  181:     juce::TextButton scrollRightButton {
+  182:         ">>"
+  183:     };
+  184: 
+  185:     juce::TextButton zoomOutButton {
+  186:         "ZOOM -"
+  187:     };
+  188: 
+  189:     juce::TextButton zoomInButton {
+  190:         "ZOOM +"
+  191:     };
+  192: 
+  193:     juce::TextButton snapButton {
+  194:         "SNAP"
+  195:     };
+  196: 
+  197:     juce::TextButton keyboardTabButton {
+  198:         "KEYBOARD"
+  199:     };
+  200: 
+  201:     juce::TextButton synthTabButton {
+  202:         "SYNTH"
+  203:     };
+  204: 
+  205:     juce::TextButton mixerTabButton {
+  206:         "MIXER"
+  207:     };
+  208: 
+  209:     int selectedTrackIndex = 0;
+  210: 
+  211:     int selectedClipTrackIndex = -1;
+  212:     int selectedClipIndex = -1;
+  213: 
+  214:     DockPage dockPage =
+  215:         DockPage::keyboard;
+  216: 
+  217:     DragMode dragMode =
+  218:         DragMode::none;
+  219: 
+  220:     int dragTrackIndex = -1;
+  221:     int dragClipIndex = -1;
+  222: 
+  223:     int dragAnchorX = 0;
+  224: 
+  225:     double dragInitialStartBeat = 0.0;
+  226:     double dragInitialLengthBeats = 0.0;
+  227: 
+  228:     juce::Rectangle<int> cachedTrackRack;
+  229:     juce::Rectangle<int> cachedArrangement;
+  230:     juce::Rectangle<int> cachedInspector;
+  231:     juce::Rectangle<int> cachedDock;
+  232: 
+  233:     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
+  234:         MainComponent
+  235:     )
+  236: };
+
+############################################################
+# FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\TransportPanel.h
+############################################################
+    1: #pragma once
+    2: 
+    3: #include <juce_gui_basics/juce_gui_basics.h>
+    4: #include <juce_events/juce_events.h>
+    5: 
+    6: #include "../Model/TransportState.h"
+    7: 
+    8: class TransportPanel :
+    9:     public juce::Component,
+   10:     private juce::Timer
+   11: {
+   12: public:
+   13:     explicit TransportPanel (
+   14:         TransportState& transportState
+   15:     );
+   16: 
+   17:     ~TransportPanel() override;
+   18: 
+   19:     void paint (
+   20:         juce::Graphics& g
+   21:     ) override;
+   22: 
+   23:     void resized() override;
+   24: 
+   25: private:
+   26:     void timerCallback() override;
+   27:     void refreshState();
+   28: 
+   29:     TransportState& transport;
+   30: 
+   31:     juce::TextButton stopButton { "STOP" };
+   32:     juce::TextButton playButton { "PLAY" };
+   33:     juce::TextButton recordButton { "REC" };
+   34:     juce::TextButton loopButton { "LOOP" };
+   35: 
+   36:     juce::Slider tempoSlider;
+   37: 
+   38:     juce::Label tempoLabel;
+   39:     juce::Label positionLabel;
+   40:     juce::Label meterLabel;
+   41: 
+   42:     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
+   43:         TransportPanel
+   44:     )
+   45: };
+
+############################################################
+# FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\TransportPanel.cpp
+############################################################
+    1: #include "TransportPanel.h"
+    2: 
+    3: #include <cmath>
+    4: 
+    5: TransportPanel::TransportPanel (
+    6:     TransportState& transportState)
+    7:     : transport (transportState)
+    8: {
+    9:     addAndMakeVisible (stopButton);
+   10:     addAndMakeVisible (playButton);
+   11:     addAndMakeVisible (recordButton);
+   12:     addAndMakeVisible (loopButton);
+   13: 
+   14:     stopButton.onClick = [this]
+   15:     {
+   16:         transport.stop();
+   17:         refreshState();
+   18:     };
+   19: 
+   20:     playButton.onClick = [this]
+   21:     {
+   22:         transport.play();
+   23:         refreshState();
+   24:     };
+   25: 
+   26:     recordButton.setClickingTogglesState (
+   27:         true
+   28:     );
+   29: 
+   30:     recordButton.onClick = [this]
+   31:     {
+   32:         if (recordButton.getToggleState())
+   33:             transport.beginRecording();
+   34: 
+   35:         if (! recordButton.getToggleState())
+   36:             transport.endRecording();
+   37: 
+   38:         refreshState();
+   39:     };
+   40: 
+   41:     loopButton.setClickingTogglesState (
+   42:         true
+   43:     );
+   44: 
+   45:     loopButton.setToggleState (
+   46:         transport.isLoopEnabled(),
+   47:         juce::dontSendNotification
+   48:     );
+   49: 
+   50:     loopButton.onClick = [this]
+   51:     {
+   52:         transport.setLoopEnabled (
+   53:             loopButton.getToggleState()
+   54:         );
+   55: 
+   56:         repaint();
+   57:     };
+   58: 
+   59:     tempoSlider.setRange (
+   60:         20.0,
+   61:         400.0,
+   62:         0.1
+   63:     );
+   64: 
+   65:     tempoSlider.setValue (
+   66:         transport.getTempo(),
+   67:         juce::dontSendNotification
+   68:     );
+   69: 
+   70:     tempoSlider.setSliderStyle (
+   71:         juce::Slider::LinearHorizontal
+   72:     );
+   73: 
+   74:     tempoSlider.setTextBoxStyle (
+   75:         juce::Slider::TextBoxRight,
+   76:         false,
+   77:         72,
+   78:         24
+   79:     );
+   80: 
+   81:     tempoSlider.onValueChange = [this]
+   82:     {
+   83:         transport.setTempo (
+   84:             tempoSlider.getValue()
+   85:         );
+   86:     };
+   87: 
+   88:     addAndMakeVisible (
+   89:         tempoSlider
+   90:     );
+   91: 
+   92:     tempoLabel.setText (
+   93:         "BPM",
+   94:         juce::dontSendNotification
+   95:     );
+   96: 
+   97:     tempoLabel.setJustificationType (
+   98:         juce::Justification::centred
+   99:     );
+  100: 
+  101:     addAndMakeVisible (
+  102:         tempoLabel
+  103:     );
+  104: 
+  105:     positionLabel.setJustificationType (
+  106:         juce::Justification::centred
+  107:     );
+  108: 
+  109:     meterLabel.setJustificationType (
+  110:         juce::Justification::centred
+  111:     );
+  112: 
+  113:     addAndMakeVisible (
+  114:         positionLabel
+  115:     );
+  116: 
+  117:     addAndMakeVisible (
+  118:         meterLabel
+  119:     );
+  120: 
+  121:     startTimerHz (30);
+  122: 
+  123:     refreshState();
+  124: }
+  125: 
+  126: TransportPanel::~TransportPanel()
+  127: {
+  128:     stopTimer();
+  129: }
+  130: 
+  131: void TransportPanel::refreshState()
+  132: {
+  133:     playButton.setButtonText (
+  134:         transport.isPlaying()
+  135:             ? "PLAYING"
+  136:             : "PLAY"
+  137:     );
+  138: 
+  139:     recordButton.setToggleState (
+  140:         transport.isRecording(),
+  141:         juce::dontSendNotification
+  142:     );
+  143: 
+  144:     const auto beats =
+  145:         transport.getPositionInBeats();
+  146: 
+  147:     const auto numerator =
+  148:         juce::jmax (
+  149:             1,
+  150:             transport.getTimeSignatureNumerator()
+  151:         );
+  152: 
+  153:     const auto wholeBeat =
+  154:         static_cast<int> (
+  155:             std::floor (beats)
+  156:         );
+  157: 
+  158:     const auto bar =
+  159:         wholeBeat / numerator + 1;
+  160: 
+  161:     const auto beat =
+  162:         wholeBeat % numerator + 1;
+  163: 
+  164:     const auto fraction =
+  165:         static_cast<int> (
+  166:             std::floor (
+  167:                 (
+  168:                     beats
+  169:                     - std::floor (beats)
+  170:                 )
+  171:                 * 1000.0
+  172:             )
+  173:         );
+  174: 
+  175:     positionLabel.setText (
+  176:         juce::String (bar)
+  177:             + " | "
+  178:             + juce::String (beat)
+  179:             + " | "
+  180:             + juce::String (fraction)
+  181:                 .paddedLeft ('0', 3),
+  182:         juce::dontSendNotification
+  183:     );
+  184: 
+  185:     meterLabel.setText (
+  186:         juce::String (
+  187:             transport.getTimeSignatureNumerator()
+  188:         )
+  189:         + " / "
+  190:         + juce::String (
+  191:             transport.getTimeSignatureDenominator()
+  192:         ),
+  193:         juce::dontSendNotification
+  194:     );
+  195: 
+  196:     repaint();
+  197: }
+  198: 
+  199: void TransportPanel::timerCallback()
+  200: {
+  201:     refreshState();
+  202: }
+  203: 
+  204: void TransportPanel::paint (
+  205:     juce::Graphics& g)
+  206: {
+  207:     auto bounds =
+  208:         getLocalBounds().toFloat();
+  209: 
+  210:     juce::ColourGradient gradient (
+  211:         juce::Colour::fromRGB (
+  212:             8,
+  213:             8,
+  214:             10
+  215:         ),
+  216:         bounds.getX(),
+  217:         bounds.getCentreY(),
+  218: 
+  219:         juce::Colour::fromRGB (
+  220:             90,
+  221:             0,
+  222:             8
+  223:         ),
+  224:         bounds.getCentreX(),
+  225:         bounds.getCentreY(),
+  226: 
+  227:         false
+  228:     );
+  229: 
+  230:     gradient.addColour (
+  231:         0.72,
+  232:         juce::Colour::fromRGB (
+  233:             28,
+  234:             0,
+  235:             4
+  236:         )
+  237:     );
+  238: 
+  239:     gradient.addColour (
+  240:         1.0,
+  241:         juce::Colour::fromRGB (
+  242:             5,
+  243:             5,
+  244:             7
+  245:         )
+  246:     );
+  247: 
+  248:     g.setGradientFill (
+  249:         gradient
+  250:     );
+  251: 
+  252:     g.fillRoundedRectangle (
+  253:         bounds,
+  254:         10.0f
+  255:     );
+  256: 
+  257:     g.setColour (
+  258:         juce::Colour::fromRGB (
+  259:             180,
+  260:             25,
+  261:             35
+  262:         )
+  263:     );
+  264: 
+  265:     g.drawRoundedRectangle (
+  266:         bounds.reduced (1.0f),
+  267:         10.0f,
+  268:         1.4f
+  269:     );
+  270: 
+  271:     if (transport.isPlaying())
+  272:     {
+  273:         g.setColour (
+  274:             juce::Colour::fromRGB (
+  275:                 255,
+  276:                 55,
+  277:                 65
+  278:             )
+  279:             .withAlpha (0.12f)
+  280:         );
+  281: 
+  282:         g.fillRoundedRectangle (
+  283:             bounds.reduced (5.0f),
+  284:             7.0f
+  285:         );
+  286:     }
+  287: }
+  288: 
+  289: void TransportPanel::resized()
+  290: {
+  291:     auto area =
+  292:         getLocalBounds().reduced (14);
+  293: 
+  294:     const int buttonWidth =
+  295:         86;
+  296: 
+  297:     stopButton.setBounds (
+  298:         area.removeFromLeft (
+  299:             buttonWidth
+  300:         )
+  301:     );
+  302: 
+  303:     area.removeFromLeft (8);
+  304: 
+  305:     playButton.setBounds (
+  306:         area.removeFromLeft (
+  307:             buttonWidth
+  308:         )
+  309:     );
+  310: 
+  311:     area.removeFromLeft (8);
+  312: 
+  313:     recordButton.setBounds (
+  314:         area.removeFromLeft (
+  315:             buttonWidth
+  316:         )
+  317:     );
+  318: 
+  319:     area.removeFromLeft (8);
+  320: 
+  321:     loopButton.setBounds (
+  322:         area.removeFromLeft (
+  323:             buttonWidth
+  324:         )
+  325:     );
+  326: 
+  327:     area.removeFromLeft (24);
+  328: 
+  329:     tempoLabel.setBounds (
+  330:         area.removeFromLeft (42)
+  331:     );
+  332: 
+  333:     tempoSlider.setBounds (
+  334:         area.removeFromLeft (190)
+  335:     );
+  336: 
+  337:     area.removeFromLeft (18);
+  338: 
+  339:     meterLabel.setBounds (
+  340:         area.removeFromLeft (75)
+  341:     );
+  342: 
+  343:     area.removeFromLeft (18);
+  344: 
+  345:     positionLabel.setBounds (
+  346:         area
+  347:     );
+  348: }
+
+############################################################
+# FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\Model\SessionState.h
+############################################################
+    1: #pragma once
+    2: 
+    3: #include "MasterBusState.h"
+    4: #include "ProjectState.h"
+    5: #include "TrackModel.h"
+    6: #include "TransportState.h"
+    7: 
+    8: #include <cstddef>
+    9: #include <memory>
+   10: #include <string>
+   11: #include <vector>
+   12: 
+   13: class SessionState
+   14: {
+   15: public:
+   16:     SessionState();
+   17: 
+   18:     bool isAlive() const noexcept
+   19:     {
+   20:         return true;
+   21:     }
+   22: 
+   23:     TransportState& getTransportState() noexcept
+   24:     {
+   25:         return transportState;
+   26:     }
+   27: 
+   28:     const TransportState& getTransportState() const noexcept
+   29:     {
+   30:         return transportState;
+   31:     }
+   32: 
+   33:     MasterBusState& getMasterBusState() noexcept
+   34:     {
+   35:         return masterBusState;
+   36:     }
+   37: 
+   38:     const MasterBusState& getMasterBusState() const noexcept
+   39:     {
+   40:         return masterBusState;
+   41:     }
+   42: 
+   43:     ProjectState& getProjectState() noexcept
+   44:     {
+   45:         return projectState;
+   46:     }
+   47: 
+   48:     const ProjectState& getProjectState() const noexcept
+   49:     {
+   50:         return projectState;
+   51:     }
+   52: 
+   53:     TrackModel& addTrack (
+   54:         std::string name = {}
+   55:     );
+   56: 
+   57:     bool removeTrack (
+   58:         TrackModel::TrackId trackId
+   59:     );
+   60: 
+   61:     void clearTracks();
+   62: 
+   63:     std::size_t getTrackCount() const noexcept;
+   64: 
+   65:     TrackModel* getTrack (
+   66:         std::size_t index
+   67:     ) noexcept;
+   68: 
+   69:     const TrackModel* getTrack (
+   70:         std::size_t index
+   71:     ) const noexcept;
+   72: 
+   73:     TrackModel* findTrackById (
+   74:         TrackModel::TrackId trackId
+   75:     ) noexcept;
+   76: 
+   77:     const TrackModel* findTrackById (
+   78:         TrackModel::TrackId trackId
+   79:     ) const noexcept;
+   80: 
+   81: private:
+   82:     TransportState transportState;
+   83:     MasterBusState masterBusState;
+   84:     ProjectState projectState;
+   85: 
+   86:     std::vector<
+   87:         std::unique_ptr<TrackModel>
+   88:     > tracks;
+   89: 
+   90:     TrackModel::TrackId nextTrackId { 1 };
+   91: };
+
+############################################################
+# FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\Model\TrackModel.h
+############################################################
+    1: #pragma once
+    2: 
+    3: #include "ClipModel.h"
+    4: 
+    5: #include <atomic>
+    6: #include <cstddef>
+    7: #include <cstdint>
+    8: #include <memory>
+    9: #include <string>
+   10: #include <vector>
+   11: 
+   12: class TrackModel
+   13: {
+   14: public:
+   15:     using TrackId = std::uint64_t;
+   16: 
+   17:     explicit TrackModel (
+   18:         TrackId trackId = 1,
+   19:         std::string trackName = "Track 1"
+   20:     );
+   21: 
+   22:     TrackId getId() const noexcept;
+   23: 
+   24:     void setName (std::string newName);
+   25:     const std::string& getName() const noexcept;
+   26: 
+   27:     void setGain (float linearGain) noexcept;
+   28:     float getGain() const noexcept;
+   29: 
+   30:     void setPan (float panPosition) noexcept;
+   31:     float getPan() const noexcept;
+   32: 
+   33:     void setMuted (bool shouldBeMuted) noexcept;
+   34:     bool isMuted() const noexcept;
+   35: 
+   36:     void setSolo (bool shouldBeSolo) noexcept;
+   37:     bool isSolo() const noexcept;
+   38: 
+   39:     void setRecordArmed (bool shouldBeArmed) noexcept;
+   40:     bool isRecordArmed() const noexcept;
+   41: 
+   42:     // ------------------------------------------------------------
+   43:     // CLIPS
+   44:     // ------------------------------------------------------------
+   45: 
+   46:     ClipModel& addClip (
+   47:         std::string name,
+   48:         double startBeat,
+   49:         double lengthBeats
+   50:     );
+   51: 
+   52:     bool removeClip (
+   53:         ClipModel::ClipId clipId
+   54:     );
+   55: 
+   56:     std::size_t getClipCount() const noexcept;
+   57: 
+   58:     ClipModel* getClip (
+   59:         std::size_t index
+   60:     ) noexcept;
+   61: 
+   62:     const ClipModel* getClip (
+   63:         std::size_t index
+   64:     ) const noexcept;
+   65: 
+   66: private:
+   67:     TrackId id;
+   68:     std::string name;
+   69: 
+   70:     std::atomic<float> gain { 1.0f };
+   71:     std::atomic<float> pan  { 0.0f };
+   72: 
+   73:     std::atomic<bool> muted { false };
+   74:     std::atomic<bool> solo { false };
+   75:     std::atomic<bool> recordArmed { false };
+   76: 
+   77:     std::vector<
+   78:         std::unique_ptr<ClipModel>
+   79:     > clips;
+   80: 
+   81:     ClipModel::ClipId nextClipId { 1 };
+   82: };
+
+############################################################
+# FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\Model\MasterBusState.h
+############################################################
+    1: #pragma once
+    2: 
+    3: #include <atomic>
+    4: 
+    5: class MasterBusState
+    6: {
+    7: public:
+    8:     void setGain (float linearGain) noexcept;
+    9:     float getGain() const noexcept;
+   10: 
+   11:     void setMuted (bool shouldBeMuted) noexcept;
+   12:     bool isMuted() const noexcept;
+   13: 
+   14: private:
+   15:     std::atomic<float> gain { 1.0f };
+   16:     std::atomic<bool> muted { false };
+   17: };
+
+############################################################
+# FILE: C:\Users\benba\Tinkering\Just_Another_Daw\CMakeLists.txt
+############################################################
+    1: cmake_minimum_required(VERSION 3.22)
+    2: 
+    3: project(
+    4:     JAD
+    5:     VERSION 0.0.1
+    6:     LANGUAGES C CXX
+    7: )
+    8: 
+    9: add_subdirectory(External/JUCE)
+   10: 
+   11: juce_add_gui_app(
+   12:     JAD
+   13:     PRODUCT_NAME "JAD"
+   14: )
+   15: 
+   16: target_sources(
+   17:     JAD
+   18:     PRIVATE
+   19:         Source/Main.cpp
+   20: 
+   21:         Source/App/JADApplication.cpp
+   22:         Source/App/JADApplication.h
+   23: 
+   24:         Source/Core/JADContext.cpp
+   25:         Source/Core/JADContext.h
+   26: 
+   27:         Source/Audio/AudioSystem.cpp
+   28:         Source/Audio/MidiSystem.h
+   29:         Source/Audio/MidiSystem.cpp
+   30:         Source/Audio/AudioSource.h
+   31:         Source/Audio/SynthSource.cpp
+   32:         Source/Audio/SynthSource.h
+   33:         Source/Audio/TrackProcessor.cpp
+   34:         Source/Audio/TrackProcessor.h
+   35:         Source/Audio/AudioSystem.h
+   36: 
+   37:         Source/Model/SessionState.cpp
+   38: 
+   39:         Source/Model/TransportState.cpp
+   40: 
+   41: 
+   42:         Source/Model/TrackModel.cpp
+   43:         Source/Model/ProjectState.h
+   44:         Source/Model/ProjectState.cpp
+   45:         Source/Model/MasterBusState.h
+   46:         Source/Model/MasterBusState.cpp
+   47:         Source/Model/ClipModel.h
+   48:         Source/Model/ClipModel.cpp
+   49: 
+   50:         Source/Model/TrackModel.h
+   51:         Source/Model/TransportState.h
+   52:         Source/Model/SessionState.h
+   53: 
+   54:         Source/UI/MainComponent.cpp
+   55:         Source/UI/StartupOverlay.cpp
+   56:         Source/UI/VirtualKeyboardPanel.h
+   57:         Source/UI/VirtualKeyboardPanel.cpp
+   58:         Source/UI/JADLookAndFeel.h
+   59:         Source/UI/JADLookAndFeel.cpp
+   60: 
+   61:         Source/UI/SynthVoicePanel.cpp
+   62:         Source/UI/TransportPanel.cpp
+   63:         Source/UI/TransportPanel.h
+   64:         Source/UI/SessionOverviewPanel.h
+   65:         Source/UI/SessionOverviewPanel.cpp
+   66: 
+   67:         Source/UI/SynthVoicePanel.h
+   68:         Source/UI/MainComponent.h
+   69:         Source/UI/StartupOverlay.h
+   70: )
+   71: 
+   72: target_include_directories(
+   73:     JAD
+   74:     PRIVATE
+   75:         Source
+   76: )
+   77: 
+   78: target_compile_features(
+   79:     JAD
+   80:     PRIVATE
+   81:         cxx_std_17
+   82: )
+   83: 
+   84: target_compile_definitions(
+   85:     JAD
+   86:     PRIVATE
+   87:         JUCE_WEB_BROWSER=0
+   88:         JUCE_USE_CURL=0
+   89: )
+   90: 
+   91: target_link_libraries(JAD
+   92:     PRIVATE
+   93:         juce::juce_gui_extra
+   94:         juce::juce_audio_devices
+   95:         juce::juce_audio_basics
+   96:         juce::juce_audio_utils
+   97: )
+   98: 
+   99: 
+  100: 
+  101: 
+  102: 
+  103: 
+  104: 
+  105: 
+  106: 
+  107: 
+  108: 
+  109: 
+  110: 
+  111: 
+  112: 
+  113: 
+  114: 
+  115: 
+  116: 
+  117: 
+  118: 
+  119: 
+  120: # JAD_MSVC_PARALLEL_COMPILE
+  121: if (MSVC)
+  122:     target_compile_options(JAD PRIVATE /MP)
+  123: endif()
+  124: 
+  125: 
+

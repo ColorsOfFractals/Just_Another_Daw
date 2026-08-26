@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+﻿cmake_minimum_required(VERSION 3.22)
 
 project(
     JAD
@@ -52,9 +52,6 @@ target_sources(
         Source/Model/SessionState.h
 
         Source/UI/MainComponent.cpp
-        Source/UI/MixerConsolePanel.cpp
-        Source/UI/MixerConsolePanel.h
-        Source/UI/StartupOverlay.cpp
         Source/UI/VirtualKeyboardPanel.h
         Source/UI/VirtualKeyboardPanel.cpp
         Source/UI/JADLookAndFeel.h
@@ -68,7 +65,6 @@ target_sources(
 
         Source/UI/SynthVoicePanel.h
         Source/UI/MainComponent.h
-        Source/UI/StartupOverlay.h
 )
 
 target_include_directories(

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -6,7 +6,6 @@
 
 #include "JADLookAndFeel.h"
 #include "SessionOverviewPanel.h"
-#include "StartupOverlay.h"
 #include "SynthVoicePanel.h"
 #include "TimelineViewportState.h"
 #include "TransportPanel.h"
@@ -157,7 +156,6 @@ private:
 
     TransportPanel transportPanel;
     SessionOverviewPanel sessionOverviewPanel;
-    StartupOverlay startupOverlay;
     SynthVoicePanel synthVoicePanel;
     VirtualKeyboardPanel keyboardPanel;
 

@@ -1,0 +1,8028 @@
+JAD EXP-048 — BASELINE DAW EXCAVATION
+=====================================
+
+Captured   : 2026-08-25T20:09:51.1882961-07:00
+Repository : C:\Users\benba\Tinkering\Just_Another_Daw
+Branch     : main
+HEAD       : 62d29b1
+RepoState  : CLEAN
+ExeState   : PRESENT
+ExeBytes   : 27686912
+ExeTime    : 8/25/2026 3:57:16 AM
+ExeSHA256  : 3F5D60CAB3BE769EC3AE131E26A6993CFE337E7B9E869DFBE5BCC1EF898482A3
+
+EXP-048 MISSION
+===============
+Build a coherent baseline DAW circuit on top of the living EXP-047 workspace.
+
+TARGET:
+Reach a genuinely useful "baseline DAW" state without copying another DAW's
+identity or UI. Establish the common fundamental capabilities expected from a
+general-purpose DAW.
+
+AUDIO I/O
+- Enumerate/select audio device
+- Sample rate
+- Buffer size
+- Physical input channels
+- Physical output channels
+- Input/output routing
+- Device recovery
+
+MIC / AUDIO RECORDING
+- Enumerate physical audio inputs
+- Select microphone / interface input
+- Audio track arm
+- Input monitoring
+- Live input metering
+- Capture live input
+- Stream recording safely to disk
+- Stop/finalize recording
+- Materialize recording as timeline clip
+- Playback through ordinary track path
+- Recording must not be a special fake mic subsystem
+- Mic/interface/line input use the same physical-input routing contract
+
+MIDI
+- Enumerate/select hardware MIDI input
+- Virtual keyboard emits real MIDI note-on/note-off
+- Mouse/key release emits note-off
+- Velocity
+- Octave
+- Armed/selected instrument targeting
+- Hardware and virtual MIDI share the same downstream route
+- Panic / all-notes-off
+
+CONTAINED SYNTH
+- Polyphonic voice path
+- Oscillator
+- Envelope
+- Basic tone/filter controls
+- Instrument gain
+- Synth output enters ordinary track/mixer path
+- Keep synth state contained behind a coherent instrument boundary
+
+AUDIO FILES
+- Import common JUCE-supported audio files
+- File-backed clip source
+- Playback
+- Source offset
+- Clip gain
+- Waveform representation/cache
+- Missing-source awareness
+
+ARRANGEMENT
+- Create/delete/rename tracks
+- Audio/instrument track identity
+- Select/move/resize clips
+- Split/duplicate/delete clips
+- Snap
+- Playhead
+- Loop region
+- Zoom/scroll
+
+MIXER / ROUTING
+- One authoritative track state
+- Gain
+- Pan
+- Mute
+- Solo
+- Arm
+- Monitor
+- Input selector
+- Output selector
+- Track metering
+- Master bus
+- Master metering
+- Safe master output gain
+- Avoid duplicate fake mixer state
+
+PROJECT
+- New
+- Open
+- Save
+- Save As
+- Dirty state
+- Serialize session state
+- Restore session state
+- Project-relative media references
+- Missing-media awareness
+
+UNDO
+- Establish UndoManager/state mutation boundary early
+- Editing operations should become reversible transactions
+
+EXPORT
+- Offline render through the actual session/mix path
+- WAV baseline export
+
+LAUNCH HORIZON
+- NEW EMPTY PROJECT becomes semantically real
+- An empty project should create a real session, not merely clear the screen
+
+END-TO-END BASELINE CIRCUITS
+
+MIC:
+Mic -> Physical Input -> Armed Audio Track -> Recorder -> Disk
+    -> Timeline Clip -> Track Processor -> Mixer -> Master -> Output
+
+VIRTUAL INSTRUMENT:
+Virtual Keyboard / Hardware MIDI -> MIDI Route -> Instrument Track
+    -> Synth -> Track Processor -> Mixer -> Master -> Output
+
+AUDIO FILE:
+File -> Audio Source -> Timeline Clip -> Track Processor
+    -> Mixer -> Master -> Output
+
+PROJECT:
+Session State -> Save -> Disk -> Open -> Restored Session State
+
+EXPORT:
+Session -> Actual Mix Path -> Offline Render -> WAV
+
+RULE:
+Do not create parallel fake systems where living JAD systems already exist.
+
+Extend existing engine/model/UI contracts.
+
+Prefer one authoritative state object over synchronized duplicate state.
+
+The objective is not feature polish.
+
+The objective is to give JAD a massive coherent alphabet from which deeper
+features can later be composed.
+
+LIVING SOURCE TREE
+==================
+Source\App\JADApplication.cpp
+Source\App\JADApplication.h
+Source\Audio\AudioSource.h
+Source\Audio\AudioSystem.cpp
+Source\Audio\AudioSystem.h
+Source\Audio\MidiSystem.cpp
+Source\Audio\MidiSystem.h
+Source\Audio\SynthSource.cpp
+Source\Audio\SynthSource.h
+Source\Audio\TrackProcessor.cpp
+Source\Audio\TrackProcessor.h
+Source\Core\JADContext.cpp
+Source\Core\JADContext.h
+Source\Main.cpp
+Source\Model\ClipModel.cpp
+Source\Model\ClipModel.h
+Source\Model\MasterBusState.cpp
+Source\Model\MasterBusState.h
+Source\Model\ProjectState.cpp
+Source\Model\ProjectState.h
+Source\Model\SessionState.cpp
+Source\Model\SessionState.h
+Source\Model\TrackModel.cpp
+Source\Model\TrackModel.h
+Source\Model\TransportState.cpp
+Source\Model\TransportState.h
+Source\UI\JADLookAndFeel.cpp
+Source\UI\JADLookAndFeel.h
+Source\UI\MainComponent.cpp
+Source\UI\MainComponent.h
+Source\UI\SessionOverviewPanel.cpp
+Source\UI\SessionOverviewPanel.h
+Source\UI\SynthVoicePanel.cpp
+Source\UI\SynthVoicePanel.h
+Source\UI\TimelineViewportState.h
+Source\UI\TransportPanel.cpp
+Source\UI\TransportPanel.h
+Source\UI\VirtualKeyboardPanel.cpp
+Source\UI\VirtualKeyboardPanel.h
+
+CMAKE CONTRACT
+==============
+cmake_minimum_required(VERSION 3.22)
+
+project(
+    JAD
+    VERSION 0.0.1
+    LANGUAGES C CXX
+)
+
+add_subdirectory(External/JUCE)
+
+juce_add_gui_app(
+    JAD
+    PRODUCT_NAME "JAD"
+)
+
+target_sources(
+    JAD
+    PRIVATE
+        Source/Main.cpp
+
+        Source/App/JADApplication.cpp
+        Source/App/JADApplication.h
+
+        Source/Core/JADContext.cpp
+        Source/Core/JADContext.h
+
+        Source/Audio/AudioSystem.cpp
+        Source/Audio/MidiSystem.h
+        Source/Audio/MidiSystem.cpp
+        Source/Audio/AudioSource.h
+        Source/Audio/SynthSource.cpp
+        Source/Audio/SynthSource.h
+        Source/Audio/TrackProcessor.cpp
+        Source/Audio/TrackProcessor.h
+        Source/Audio/AudioSystem.h
+
+        Source/Model/SessionState.cpp
+
+        Source/Model/TransportState.cpp
+
+
+        Source/Model/TrackModel.cpp
+        Source/Model/ProjectState.h
+        Source/Model/ProjectState.cpp
+        Source/Model/MasterBusState.h
+        Source/Model/MasterBusState.cpp
+        Source/Model/ClipModel.h
+        Source/Model/ClipModel.cpp
+
+        Source/Model/TrackModel.h
+        Source/Model/TransportState.h
+        Source/Model/SessionState.h
+
+        Source/UI/MainComponent.cpp
+        Source/UI/VirtualKeyboardPanel.h
+        Source/UI/VirtualKeyboardPanel.cpp
+        Source/UI/JADLookAndFeel.h
+        Source/UI/JADLookAndFeel.cpp
+
+        Source/UI/SynthVoicePanel.cpp
+        Source/UI/TransportPanel.cpp
+        Source/UI/TransportPanel.h
+        Source/UI/SessionOverviewPanel.h
+        Source/UI/SessionOverviewPanel.cpp
+
+        Source/UI/SynthVoicePanel.h
+        Source/UI/MainComponent.h
+)
+
+target_include_directories(
+    JAD
+    PRIVATE
+        Source
+)
+
+target_compile_features(
+    JAD
+    PRIVATE
+        cxx_std_17
+)
+
+target_compile_definitions(
+    JAD
+    PRIVATE
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+)
+
+target_link_libraries(JAD
+    PRIVATE
+        juce::juce_gui_extra
+        juce::juce_audio_devices
+        juce::juce_audio_basics
+        juce::juce_audio_utils
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# JAD_MSVC_PARALLEL_COMPILE
+if (MSVC)
+    target_compile_options(JAD PRIVATE /MP)
+endif()
+
+
+
+
+ARCHITECTURE SYMBOL MAP
+=======================
+Source\App\JADApplication.cpp:4: class JADApplication::MainWindow : public juce::DocumentWindow
+Source\App\JADApplication.h:6: class JADApplication : public juce::JUCEApplication
+Source\App\JADApplication.h:19: class MainWindow;
+Source\Audio\AudioSource.h:5: class AudioSource
+Source\Audio\AudioSource.h:8: virtual ~AudioSource() = default;
+Source\Audio\AudioSystem.cpp:4: #include "../Model/SessionState.h"
+Source\Audio\AudioSystem.cpp:116: void AudioSystem::setSessionState (
+Source\Audio\AudioSystem.cpp:117: SessionState* sessionStateToUse
+Source\Audio\AudioSystem.cpp:120: sessionState =
+Source\Audio\AudioSystem.cpp:121: sessionStateToUse;
+Source\Audio\AudioSystem.cpp:189: trackProcessors
+Source\Audio\AudioSystem.cpp:201: if (sessionState == nullptr)
+Source\Audio\AudioSystem.cpp:206: sessionState->getTrackCount(),
+Source\Audio\AudioSystem.cpp:207: trackProcessors.size()
+Source\Audio\AudioSystem.cpp:216: trackProcessors[index].setModel (
+Source\Audio\AudioSystem.cpp:217: sessionState->getTrack (index)
+Source\Audio\AudioSystem.cpp:222: trackProcessors[0].setSource (
+Source\Audio\AudioSystem.cpp:233: trackProcessors
+Source\Audio\AudioSystem.cpp:245: juce::AudioIODevice* device
+Source\Audio\AudioSystem.cpp:286: trackProcessors
+Source\Audio\AudioSystem.cpp:304: const juce::AudioIODeviceCallbackContext&
+Source\Audio\AudioSystem.cpp:357: if (sessionState != nullptr)
+Source\Audio\AudioSystem.cpp:361: sessionState->getTrackCount(),
+Source\Audio\AudioSystem.cpp:362: trackProcessors.size()
+Source\Audio\AudioSystem.cpp:372: sessionState->getTrack (
+Source\Audio\AudioSystem.cpp:389: trackProcessors
+Source\Audio\AudioSystem.h:4: #include "TrackProcessor.h"
+Source\Audio\AudioSystem.h:11: class SessionState;
+Source\Audio\AudioSystem.h:12: class TransportState;
+Source\Audio\AudioSystem.h:13: class MasterBusState;
+Source\Audio\AudioSystem.h:15: class AudioSystem : private juce::AudioIODeviceCallback
+Source\Audio\AudioSystem.h:38: void setSessionState (
+Source\Audio\AudioSystem.h:39: SessionState* sessionStateToUse
+Source\Audio\AudioSystem.h:75: const juce::AudioIODeviceCallbackContext& context
+Source\Audio\AudioSystem.h:79: juce::AudioIODevice* device
+Source\Audio\AudioSystem.h:86: SessionState* sessionState = nullptr;
+Source\Audio\AudioSystem.h:95: TrackProcessor,
+Source\Audio\AudioSystem.h:97: > trackProcessors;
+Source\Audio\MidiSystem.cpp:21: juce::MidiKeyboardState&
+Source\Audio\MidiSystem.cpp:30: juce::MidiInput::getAvailableDevices();
+Source\Audio\MidiSystem.cpp:75: juce::MidiInput::openDevice (
+Source\Audio\MidiSystem.cpp:118: juce::MidiMessage::noteOn (
+Source\Audio\MidiSystem.cpp:137: juce::MidiMessage::noteOff (
+Source\Audio\MidiSystem.cpp:151: void MidiSystem::handleIncomingMidiMessage (
+Source\Audio\MidiSystem.cpp:152: juce::MidiInput*,
+Source\Audio\MidiSystem.cpp:153: const juce::MidiMessage& message)
+Source\Audio\MidiSystem.cpp:165: const juce::MidiMessage& message)
+Source\Audio\MidiSystem.h:10: class AudioSystem;
+Source\Audio\MidiSystem.h:12: class MidiSystem :
+Source\Audio\MidiSystem.h:13: private juce::MidiInputCallback
+Source\Audio\MidiSystem.h:22: juce::MidiKeyboardState& getKeyboardState() noexcept;
+Source\Audio\MidiSystem.h:53: void handleIncomingMidiMessage (
+Source\Audio\MidiSystem.h:54: juce::MidiInput*,
+Source\Audio\MidiSystem.h:55: const juce::MidiMessage&
+Source\Audio\MidiSystem.h:59: const juce::MidiMessage&
+Source\Audio\MidiSystem.h:64: juce::MidiKeyboardState keyboardState;
+Source\Audio\MidiSystem.h:71: juce::MidiInput
+Source\Audio\SynthSource.h:3: #include "AudioSource.h"
+Source\Audio\SynthSource.h:9: class SynthSource : public AudioSource
+Source\Audio\SynthSource.h:12: enum class Waveform
+Source\Audio\TrackProcessor.cpp:1: #include "TrackProcessor.h"
+Source\Audio\TrackProcessor.cpp:8: void TrackProcessor::setModel (
+Source\Audio\TrackProcessor.cpp:15: void TrackProcessor::setSource (
+Source\Audio\TrackProcessor.cpp:16: AudioSource* sourceToUse
+Source\Audio\TrackProcessor.cpp:22: void TrackProcessor::prepare (
+Source\Audio\TrackProcessor.cpp:46: void TrackProcessor::reset()
+Source\Audio\TrackProcessor.cpp:54: void TrackProcessor::process (
+Source\Audio\TrackProcessor.h:3: #include "AudioSource.h"
+Source\Audio\TrackProcessor.h:7: class TrackModel;
+Source\Audio\TrackProcessor.h:9: class TrackProcessor
+Source\Audio\TrackProcessor.h:12: TrackProcessor() = default;
+Source\Audio\TrackProcessor.h:19: AudioSource* sourceToUse
+Source\Audio\TrackProcessor.h:37: AudioSource* source = nullptr;
+Source\Core\JADContext.cpp:5: audioSystem.setSessionState (
+Source\Core\JADContext.cpp:6: &sessionState
+Source\Core\JADContext.cpp:10: &sessionState.getTransportState()
+Source\Core\JADContext.cpp:14: &sessionState.getMasterBusState()
+Source\Core\JADContext.cpp:23: SessionState& JADContext::getSessionState() noexcept
+Source\Core\JADContext.cpp:25: return sessionState;
+Source\Core\JADContext.cpp:31: && sessionState.isAlive();
+Source\Core\JADContext.h:4: #include "../Model/SessionState.h"
+Source\Core\JADContext.h:6: class JADContext
+Source\Core\JADContext.h:12: SessionState& getSessionState() noexcept;
+Source\Core\JADContext.h:18: SessionState sessionState;
+Source\Model\ClipModel.h:7: class ClipModel
+Source\Model\MasterBusState.h:5: class MasterBusState
+Source\Model\ProjectState.h:6: class ProjectState
+Source\Model\SessionState.cpp:1: #include "SessionState.h"
+Source\Model\SessionState.cpp:6: SessionState::SessionState()
+Source\Model\SessionState.cpp:44: TrackModel& SessionState::addTrack (
+Source\Model\SessionState.cpp:75: bool SessionState::removeTrack (
+Source\Model\SessionState.cpp:104: void SessionState::clearTracks()
+Source\Model\SessionState.cpp:110: std::size_t SessionState::getTrackCount() const noexcept
+Source\Model\SessionState.cpp:115: TrackModel* SessionState::getTrack (
+Source\Model\SessionState.cpp:124: const TrackModel* SessionState::getTrack (
+Source\Model\SessionState.cpp:133: TrackModel* SessionState::findTrackById (
+Source\Model\SessionState.cpp:150: const TrackModel* SessionState::findTrackById (
+Source\Model\SessionState.h:13: class SessionState
+Source\Model\SessionState.h:16: SessionState();
+Source\Model\TrackModel.h:12: class TrackModel
+Source\Model\TransportState.h:6: class TransportState
+Source\UI\JADLookAndFeel.h:5: class JADLookAndFeel :
+Source\UI\MainComponent.cpp:11: context.getSessionState()
+Source\UI\MainComponent.cpp:15: context.getSessionState()
+Source\UI\MainComponent.cpp:240: context.getSessionState();
+Source\UI\MainComponent.cpp:304: context.getSessionState();
+Source\UI\MainComponent.cpp:328: context.getSessionState();
+Source\UI\MainComponent.cpp:374: context.getSessionState()
+Source\UI\MainComponent.cpp:592: context.getSessionState()
+Source\UI\MainComponent.cpp:700: context.getSessionState()
+Source\UI\MainComponent.cpp:797: context.getSessionState();
+Source\UI\MainComponent.cpp:1189: context.getSessionState();
+Source\UI\MainComponent.cpp:1377: context.getSessionState()
+Source\UI\MainComponent.cpp:1457: context.getSessionState();
+Source\UI\MainComponent.cpp:1690: context.getSessionState();
+Source\UI\MainComponent.cpp:2118: context.getSessionState()
+Source\UI\MainComponent.cpp:2162: context.getSessionState()
+Source\UI\MainComponent.cpp:2221: context.getSessionState();
+Source\UI\MainComponent.cpp:2459: context.getSessionState();
+Source\UI\MainComponent.h:14: class MainComponent :
+Source\UI\MainComponent.h:44: enum class DockPage
+Source\UI\MainComponent.h:51: enum class DragMode
+Source\UI\SessionOverviewPanel.cpp:4: SessionState& sessionState)
+Source\UI\SessionOverviewPanel.cpp:5: : session (sessionState)
+Source\UI\SessionOverviewPanel.h:5: #include "../Model/SessionState.h"
+Source\UI\SessionOverviewPanel.h:7: class SessionOverviewPanel :
+Source\UI\SessionOverviewPanel.h:12: SessionState& sessionState
+Source\UI\SessionOverviewPanel.h:20: SessionState& session;
+Source\UI\SynthVoicePanel.h:7: class SynthVoicePanel : public juce::Component
+Source\UI\TimelineViewportState.h:7: class TimelineViewportState
+Source\UI\TransportPanel.h:8: class TransportPanel :
+Source\UI\VirtualKeyboardPanel.cpp:19: juce::MidiKeyboardComponent::horizontalKeyboard
+Source\UI\VirtualKeyboardPanel.cpp:257: juce::MidiKeyboardComponent::whiteNoteColourId,
+Source\UI\VirtualKeyboardPanel.cpp:266: juce::MidiKeyboardComponent::blackNoteColourId,
+Source\UI\VirtualKeyboardPanel.cpp:275: juce::MidiKeyboardComponent::keySeparatorLineColourId,
+Source\UI\VirtualKeyboardPanel.cpp:280: juce::MidiKeyboardComponent::mouseOverKeyOverlayColourId,
+Source\UI\VirtualKeyboardPanel.cpp:285: juce::MidiKeyboardComponent::keyDownOverlayColourId,
+Source\UI\VirtualKeyboardPanel.cpp:290: juce::MidiKeyboardComponent::textLabelColourId,
+Source\UI\VirtualKeyboardPanel.h:9: class JADLookAndFeel;
+Source\UI\VirtualKeyboardPanel.h:11: class VirtualKeyboardPanel :
+Source\UI\VirtualKeyboardPanel.h:38: juce::MidiKeyboardComponent keyboard;
+
+FULL LIVING SOURCE
+==================
+
+============================================================
+FILE: Source\App\JADApplication.cpp
+============================================================
+
+#include "JADApplication.h"
+#include "../UI/MainComponent.h"
+
+class JADApplication::MainWindow : public juce::DocumentWindow
+{
+public:
+    explicit MainWindow (JADContext& context)
+        : DocumentWindow (
+            "JAD",
+            juce::Colour::fromRGB (18, 18, 24),
+            DocumentWindow::allButtons
+        )
+    {
+        setUsingNativeTitleBar (true);
+        setContentOwned (new MainComponent (context), true);
+        centreWithSize (getWidth(), getHeight());
+        setVisible (true);
+    }
+
+    void closeButtonPressed() override
+    {
+        juce::JUCEApplication::getInstance()->systemRequestedQuit();
+    }
+};
+
+JADApplication::JADApplication() = default;
+JADApplication::~JADApplication() = default;
+
+const juce::String JADApplication::getApplicationName()
+{
+    return "JAD";
+}
+
+const juce::String JADApplication::getApplicationVersion()
+{
+    return "0.0.2";
+}
+
+void JADApplication::initialise (const juce::String&)
+{
+    mainWindow = std::make_unique<MainWindow> (context);
+}
+
+void JADApplication::shutdown()
+{
+    mainWindow.reset();
+}
+
+
+
+
+============================================================
+FILE: Source\App\JADApplication.h
+============================================================
+
+#pragma once
+
+#include <juce_gui_extra/juce_gui_extra.h>
+#include "../Core/JADContext.h"
+
+class JADApplication : public juce::JUCEApplication
+{
+public:
+    JADApplication();
+    ~JADApplication() override;
+
+    const juce::String getApplicationName() override;
+    const juce::String getApplicationVersion() override;
+
+    void initialise (const juce::String&) override;
+    void shutdown() override;
+
+private:
+    class MainWindow;
+
+    JADContext context;
+    std::unique_ptr<MainWindow> mainWindow;
+};
+
+
+
+
+============================================================
+FILE: Source\Audio\AudioSource.h
+============================================================
+
+#pragma once
+
+#include <juce_audio_basics/juce_audio_basics.h>
+
+class AudioSource
+{
+public:
+    virtual ~AudioSource() = default;
+
+    virtual void prepare (
+        double sampleRate,
+        int maximumBlockSize
+    ) = 0;
+
+    virtual void reset() = 0;
+
+    virtual void render (
+        juce::AudioBuffer<float>& destination,
+        int numSamples
+    ) = 0;
+};
+
+
+============================================================
+FILE: Source\Audio\AudioSystem.cpp
+============================================================
+
+#include "AudioSystem.h"
+
+#include "../Model/MasterBusState.h"
+#include "../Model/SessionState.h"
+#include "../Model/TrackModel.h"
+#include "../Model/TransportState.h"
+
+#include <algorithm>
+
+AudioSystem::AudioSystem()
+{
+    alive = true;
+
+    const auto error =
+        deviceManager.initialiseWithDefaultDevices (
+            2,
+            2
+        );
+
+    ready =
+        error.isEmpty()
+        && deviceManager.getCurrentAudioDevice()
+            != nullptr;
+
+    if (ready)
+        deviceManager.addAudioCallback (this);
+}
+
+AudioSystem::~AudioSystem()
+{
+    synthSource.setGate (false);
+
+    deviceManager.removeAudioCallback (this);
+    deviceManager.closeAudioDevice();
+
+    ready = false;
+    alive = false;
+}
+
+bool AudioSystem::isAlive() const noexcept
+{
+    return alive;
+}
+
+bool AudioSystem::isReady() const noexcept
+{
+    return ready;
+}
+
+juce::String AudioSystem::getOutputDeviceName() const
+{
+    if (
+        auto* device =
+            deviceManager.getCurrentAudioDevice()
+    )
+    {
+        return device->getName();
+    }
+
+    return "No output device";
+}
+
+juce::String AudioSystem::getInputDeviceName() const
+{
+    if (
+        auto* device =
+            deviceManager.getCurrentAudioDevice()
+    )
+    {
+        return device->getName();
+    }
+
+    return "No input device";
+}
+
+double AudioSystem::getSampleRate() const noexcept
+{
+    if (
+        auto* device =
+            deviceManager.getCurrentAudioDevice()
+    )
+    {
+        return device->getCurrentSampleRate();
+    }
+
+    return 0.0;
+}
+
+int AudioSystem::getBufferSize() const noexcept
+{
+    if (
+        auto* device =
+            deviceManager.getCurrentAudioDevice()
+    )
+    {
+        return device->getCurrentBufferSizeSamples();
+    }
+
+    return 0;
+}
+
+void AudioSystem::setTestToneEnabled (
+    bool enabled
+) noexcept
+{
+    synthSource.setGate (
+        enabled
+    );
+}
+
+bool AudioSystem::isTestToneEnabled() const noexcept
+{
+    return synthSource.isGateEnabled();
+}
+
+void AudioSystem::setSessionState (
+    SessionState* sessionStateToUse
+) noexcept
+{
+    sessionState =
+        sessionStateToUse;
+
+    rebuildTrackRoutes();
+}
+
+void AudioSystem::setTransportState (
+    TransportState* transportStateToUse
+) noexcept
+{
+    transportState =
+        transportStateToUse;
+}
+
+void AudioSystem::setMasterBusState (
+    MasterBusState* masterBusStateToUse
+) noexcept
+{
+    masterBusState =
+        masterBusStateToUse;
+}
+
+void AudioSystem::setFrequency (
+    double frequencyHz
+) noexcept
+{
+    synthSource.setFrequency (
+        frequencyHz
+    );
+}
+
+double AudioSystem::getFrequency() const noexcept
+{
+    return synthSource.getFrequency();
+}
+
+void AudioSystem::setGain (
+    float newGain
+) noexcept
+{
+    synthSource.setGain (
+        newGain
+    );
+}
+
+float AudioSystem::getGain() const noexcept
+{
+    return synthSource.getGain();
+}
+
+void AudioSystem::setWaveform (
+    Waveform newWaveform
+) noexcept
+{
+    synthSource.setWaveform (
+        newWaveform
+    );
+}
+
+AudioSystem::Waveform
+AudioSystem::getWaveform() const noexcept
+{
+    return synthSource.getWaveform();
+}
+
+void AudioSystem::rebuildTrackRoutes()
+{
+    for (
+        auto& processor :
+        trackProcessors
+    )
+    {
+        processor.setModel (
+            nullptr
+        );
+
+        processor.setSource (
+            nullptr
+        );
+    }
+
+    if (sessionState == nullptr)
+        return;
+
+    const auto count =
+        std::min<std::size_t> (
+            sessionState->getTrackCount(),
+            trackProcessors.size()
+        );
+
+    for (
+        std::size_t index = 0;
+        index < count;
+        ++index
+    )
+    {
+        trackProcessors[index].setModel (
+            sessionState->getTrack (index)
+        );
+    }
+
+    // First real source enters the track fleet.
+    trackProcessors[0].setSource (
+        &synthSource
+    );
+
+    if (
+        currentSampleRate > 0.0
+        && currentBlockSize > 0
+    )
+    {
+        for (
+            auto& processor :
+            trackProcessors
+        )
+        {
+            processor.prepare (
+                currentSampleRate,
+                currentBlockSize
+            );
+        }
+    }
+}
+
+void AudioSystem::audioDeviceAboutToStart (
+    juce::AudioIODevice* device
+)
+{
+    currentSampleRate =
+        device != nullptr
+            ? device->getCurrentSampleRate()
+            : 0.0;
+
+    currentBlockSize =
+        device != nullptr
+            ? device->getCurrentBufferSizeSamples()
+            : 0;
+
+    masterMixBuffer.setSize (
+        2,
+        std::max (
+            1,
+            currentBlockSize
+        ),
+        false,
+        true,
+        true
+    );
+
+    masterMixBuffer.clear();
+
+    synthSource.prepare (
+        currentSampleRate,
+        currentBlockSize
+    );
+
+    rebuildTrackRoutes();
+}
+
+void AudioSystem::audioDeviceStopped()
+{
+    synthSource.setGate (false);
+    synthSource.reset();
+
+    for (
+        auto& processor :
+        trackProcessors
+    )
+    {
+        processor.reset();
+    }
+
+    masterMixBuffer.clear();
+
+    currentSampleRate = 0.0;
+    currentBlockSize = 0;
+}
+
+void AudioSystem::audioDeviceIOCallbackWithContext (
+    const float* const*,
+    int,
+    float* const* outputChannelData,
+    int numOutputChannels,
+    int numSamples,
+    const juce::AudioIODeviceCallbackContext&
+)
+{
+    for (
+        int channel = 0;
+        channel < numOutputChannels;
+        ++channel
+    )
+    {
+        if (
+            outputChannelData[channel]
+            != nullptr
+        )
+        {
+            juce::FloatVectorOperations::clear (
+                outputChannelData[channel],
+                numSamples
+            );
+        }
+    }
+
+    if (currentSampleRate <= 0.0)
+        return;
+
+    if (numSamples <= 0)
+        return;
+
+    if (
+        masterMixBuffer.getNumSamples()
+        < numSamples
+    )
+    {
+        masterMixBuffer.setSize (
+            2,
+            numSamples,
+            false,
+            false,
+            true
+        );
+    }
+
+    masterMixBuffer.clear();
+
+    if (transportState != nullptr)
+    {
+        transportState->advanceSamples (
+            numSamples,
+            currentSampleRate
+        );
+    }
+
+    bool anyTrackSoloed = false;
+
+    if (sessionState != nullptr)
+    {
+        const auto count =
+            std::min<std::size_t> (
+                sessionState->getTrackCount(),
+                trackProcessors.size()
+            );
+
+        for (
+            std::size_t index = 0;
+            index < count;
+            ++index
+        )
+        {
+            const auto* track =
+                sessionState->getTrack (
+                    index
+                );
+
+            if (
+                track != nullptr
+                && track->isSolo()
+            )
+            {
+                anyTrackSoloed = true;
+                break;
+            }
+        }
+    }
+
+    for (
+        auto& processor :
+        trackProcessors
+    )
+    {
+        processor.process (
+            masterMixBuffer,
+            numSamples,
+            anyTrackSoloed
+        );
+    }
+
+    const auto masterGain =
+        masterBusState != nullptr
+            ? masterBusState->getGain()
+            : 1.0f;
+
+    const auto masterMuted =
+        masterBusState != nullptr
+            ? masterBusState->isMuted()
+            : false;
+
+    const auto effectiveMasterGain =
+        masterMuted
+            ? 0.0f
+            : masterGain;
+
+    masterMixBuffer.applyGain (
+        effectiveMasterGain
+    );
+
+    const auto channelsToCopy =
+        std::min (
+            numOutputChannels,
+            masterMixBuffer.getNumChannels()
+        );
+
+    for (
+        int channel = 0;
+        channel < channelsToCopy;
+        ++channel
+    )
+    {
+        if (
+            outputChannelData[channel]
+            == nullptr
+        )
+        {
+            continue;
+        }
+
+        juce::FloatVectorOperations::copy (
+            outputChannelData[channel],
+            masterMixBuffer.getReadPointer (
+                channel
+            ),
+            numSamples
+        );
+    }
+}
+
+
+============================================================
+FILE: Source\Audio\AudioSystem.h
+============================================================
+
+#pragma once
+
+#include "SynthSource.h"
+#include "TrackProcessor.h"
+
+#include <juce_audio_basics/juce_audio_basics.h>
+#include <juce_audio_devices/juce_audio_devices.h>
+
+#include <array>
+
+class SessionState;
+class TransportState;
+class MasterBusState;
+
+class AudioSystem : private juce::AudioIODeviceCallback
+{
+public:
+    using Waveform = SynthSource::Waveform;
+
+    AudioSystem();
+    ~AudioSystem() override;
+
+    bool isAlive() const noexcept;
+    bool isReady() const noexcept;
+
+    juce::String getOutputDeviceName() const;
+    juce::String getInputDeviceName() const;
+
+    double getSampleRate() const noexcept;
+    int getBufferSize() const noexcept;
+
+    void setTestToneEnabled (
+        bool enabled
+    ) noexcept;
+
+    bool isTestToneEnabled() const noexcept;
+
+    void setSessionState (
+        SessionState* sessionStateToUse
+    ) noexcept;
+
+    void setTransportState (
+        TransportState* transportStateToUse
+    ) noexcept;
+
+    void setMasterBusState (
+        MasterBusState* masterBusStateToUse
+    ) noexcept;
+
+    void setFrequency (
+        double frequencyHz
+    ) noexcept;
+
+    double getFrequency() const noexcept;
+
+    void setGain (
+        float newGain
+    ) noexcept;
+
+    float getGain() const noexcept;
+
+    void setWaveform (
+        Waveform newWaveform
+    ) noexcept;
+
+    Waveform getWaveform() const noexcept;
+
+private:
+    void audioDeviceIOCallbackWithContext (
+        const float* const* inputChannelData,
+        int numInputChannels,
+        float* const* outputChannelData,
+        int numOutputChannels,
+        int numSamples,
+        const juce::AudioIODeviceCallbackContext& context
+    ) override;
+
+    void audioDeviceAboutToStart (
+        juce::AudioIODevice* device
+    ) override;
+
+    void audioDeviceStopped() override;
+
+    void rebuildTrackRoutes();
+
+    SessionState* sessionState = nullptr;
+    TransportState* transportState = nullptr;
+    MasterBusState* masterBusState = nullptr;
+
+    juce::AudioDeviceManager deviceManager;
+
+    SynthSource synthSource;
+
+    std::array<
+        TrackProcessor,
+        4
+    > trackProcessors;
+
+    juce::AudioBuffer<float> masterMixBuffer;
+
+    double currentSampleRate = 0.0;
+    int currentBlockSize = 0;
+
+    bool alive = false;
+    bool ready = false;
+};
+
+
+============================================================
+FILE: Source\Audio\MidiSystem.cpp
+============================================================
+
+#include "MidiSystem.h"
+
+#include "AudioSystem.h"
+
+#include <cmath>
+
+MidiSystem::MidiSystem (
+    AudioSystem& audioSystemToUse)
+    : audioSystem (
+        audioSystemToUse
+    )
+{
+    refreshDevices();
+}
+
+MidiSystem::~MidiSystem()
+{
+    closeDevice();
+}
+
+juce::MidiKeyboardState&
+MidiSystem::getKeyboardState() noexcept
+{
+    return keyboardState;
+}
+
+void MidiSystem::refreshDevices()
+{
+    const auto devices =
+        juce::MidiInput::getAvailableDevices();
+
+    availableInputs.assign (
+        devices.begin(),
+        devices.end()
+    );
+}
+
+int MidiSystem::getDeviceCount() const noexcept
+{
+    return static_cast<int> (
+        availableInputs.size()
+    );
+}
+
+juce::String MidiSystem::getDeviceName (
+    int index) const
+{
+    if (
+        index < 0
+        || index >= getDeviceCount()
+    )
+    {
+        return {};
+    }
+
+    return availableInputs[
+        static_cast<std::size_t> (index)
+    ].name;
+}
+
+bool MidiSystem::openDevice (
+    int index)
+{
+    closeDevice();
+
+    if (
+        index < 0
+        || index >= getDeviceCount()
+    )
+    {
+        return false;
+    }
+
+    openInput =
+        juce::MidiInput::openDevice (
+            availableInputs[
+                static_cast<std::size_t> (index)
+            ].identifier,
+            this
+        );
+
+    if (openInput == nullptr)
+        return false;
+
+    openInput->start();
+
+    return true;
+}
+
+void MidiSystem::closeDevice()
+{
+    if (openInput != nullptr)
+        openInput->stop();
+
+    openInput.reset();
+}
+
+bool MidiSystem::isDeviceOpen() const noexcept
+{
+    return openInput != nullptr;
+}
+
+int MidiSystem::getLastNote() const noexcept
+{
+    return lastNote.load();
+}
+
+float MidiSystem::getLastVelocity() const noexcept
+{
+    return lastVelocity.load();
+}
+
+void MidiSystem::playVirtualNote (
+    int midiNote,
+    float velocity)
+{
+    const auto message =
+        juce::MidiMessage::noteOn (
+            1,
+            midiNote,
+            velocity
+        );
+
+    keyboardState.processNextMidiEvent (
+        message
+    );
+
+    applyMessage (
+        message
+    );
+}
+
+void MidiSystem::releaseVirtualNote (
+    int midiNote)
+{
+    const auto message =
+        juce::MidiMessage::noteOff (
+            1,
+            midiNote
+        );
+
+    keyboardState.processNextMidiEvent (
+        message
+    );
+
+    applyMessage (
+        message
+    );
+}
+
+void MidiSystem::handleIncomingMidiMessage (
+    juce::MidiInput*,
+    const juce::MidiMessage& message)
+{
+    keyboardState.processNextMidiEvent (
+        message
+    );
+
+    applyMessage (
+        message
+    );
+}
+
+void MidiSystem::applyMessage (
+    const juce::MidiMessage& message)
+{
+    if (message.isNoteOn())
+    {
+        const auto note =
+            message.getNoteNumber();
+
+        const auto velocity =
+            message.getFloatVelocity();
+
+        lastNote.store (
+            note
+        );
+
+        lastVelocity.store (
+            velocity
+        );
+
+        const auto frequency =
+            440.0
+            * std::pow (
+                2.0,
+                (
+                    static_cast<double> (note)
+                    - 69.0
+                ) / 12.0
+            );
+
+        audioSystem.setFrequency (
+            frequency
+        );
+
+        audioSystem.setTestToneEnabled (
+            true
+        );
+    }
+
+    if (message.isNoteOff())
+    {
+        lastNote.store (-1);
+        lastVelocity.store (0.0f);
+
+        audioSystem.setTestToneEnabled (
+            false
+        );
+    }
+}
+
+
+============================================================
+FILE: Source\Audio\MidiSystem.h
+============================================================
+
+#pragma once
+
+#include <juce_audio_devices/juce_audio_devices.h>
+#include <juce_audio_basics/juce_audio_basics.h>
+
+#include <atomic>
+#include <memory>
+#include <vector>
+
+class AudioSystem;
+
+class MidiSystem :
+    private juce::MidiInputCallback
+{
+public:
+    explicit MidiSystem (
+        AudioSystem& audioSystemToUse
+    );
+
+    ~MidiSystem() override;
+
+    juce::MidiKeyboardState& getKeyboardState() noexcept;
+
+    void refreshDevices();
+
+    int getDeviceCount() const noexcept;
+
+    juce::String getDeviceName (
+        int index
+    ) const;
+
+    bool openDevice (
+        int index
+    );
+
+    void closeDevice();
+
+    bool isDeviceOpen() const noexcept;
+
+    int getLastNote() const noexcept;
+    float getLastVelocity() const noexcept;
+
+    void playVirtualNote (
+        int midiNote,
+        float velocity
+    );
+
+    void releaseVirtualNote (
+        int midiNote
+    );
+
+private:
+    void handleIncomingMidiMessage (
+        juce::MidiInput*,
+        const juce::MidiMessage&
+    ) override;
+
+    void applyMessage (
+        const juce::MidiMessage&
+    );
+
+    AudioSystem& audioSystem;
+
+    juce::MidiKeyboardState keyboardState;
+
+    std::vector<
+        juce::MidiDeviceInfo
+    > availableInputs;
+
+    std::unique_ptr<
+        juce::MidiInput
+    > openInput;
+
+    std::atomic<int> lastNote { -1 };
+    std::atomic<float> lastVelocity { 0.0f };
+};
+
+
+============================================================
+FILE: Source\Audio\SynthSource.cpp
+============================================================
+
+#include "SynthSource.h"
+
+#include <cmath>
+
+void SynthSource::prepare (
+    double sampleRate,
+    int
+)
+{
+    currentSampleRate = sampleRate;
+
+    phase = 0.0;
+    appliedGate = false;
+
+    envelope.reset();
+
+    if (currentSampleRate > 0.0)
+        envelope.setSampleRate (currentSampleRate);
+
+    juce::ADSR::Parameters parameters;
+
+    parameters.attack  = 0.08f;
+    parameters.decay   = 0.22f;
+    parameters.sustain = 0.65f;
+    parameters.release = 0.55f;
+
+    envelope.setParameters (
+        parameters
+    );
+}
+
+void SynthSource::reset()
+{
+    requestedGate.store (false);
+
+    appliedGate = false;
+
+    envelope.reset();
+
+    phase = 0.0;
+}
+
+void SynthSource::setGate (
+    bool enabled
+) noexcept
+{
+    requestedGate.store (
+        enabled
+    );
+}
+
+bool SynthSource::isGateEnabled() const noexcept
+{
+    return requestedGate.load();
+}
+
+void SynthSource::setFrequency (
+    double newFrequency
+) noexcept
+{
+    frequencyHz.store (
+        juce::jlimit (
+            40.0,
+            2000.0,
+            newFrequency
+        )
+    );
+}
+
+double SynthSource::getFrequency() const noexcept
+{
+    return frequencyHz.load();
+}
+
+void SynthSource::setGain (
+    float newGain
+) noexcept
+{
+    outputGain.store (
+        juce::jlimit (
+            0.0f,
+            0.20f,
+            newGain
+        )
+    );
+}
+
+float SynthSource::getGain() const noexcept
+{
+    return outputGain.load();
+}
+
+void SynthSource::setWaveform (
+    Waveform newWaveform
+) noexcept
+{
+    waveform.store (
+        static_cast<int> (
+            newWaveform
+        )
+    );
+}
+
+SynthSource::Waveform
+SynthSource::getWaveform() const noexcept
+{
+    return static_cast<Waveform> (
+        waveform.load()
+    );
+}
+
+void SynthSource::updateEnvelopeGate() noexcept
+{
+    const auto requested =
+        requestedGate.load();
+
+    if (requested == appliedGate)
+        return;
+
+    if (requested)
+        envelope.noteOn();
+
+    if (! requested)
+        envelope.noteOff();
+
+    appliedGate = requested;
+}
+
+float SynthSource::renderOscillatorSample() noexcept
+{
+    const auto selected =
+        static_cast<Waveform> (
+            waveform.load()
+        );
+
+    if (selected == Waveform::saw)
+    {
+        return static_cast<float> (
+            (phase
+                / juce::MathConstants<double>::pi)
+            - 1.0
+        );
+    }
+
+    if (selected == Waveform::square)
+    {
+        return phase
+            < juce::MathConstants<double>::pi
+                ? 1.0f
+                : -1.0f;
+    }
+
+    return static_cast<float> (
+        std::sin (phase)
+    );
+}
+
+void SynthSource::render (
+    juce::AudioBuffer<float>& destination,
+    int numSamples
+)
+{
+    if (currentSampleRate <= 0.0)
+        return;
+
+    if (numSamples <= 0)
+        return;
+
+    updateEnvelopeGate();
+
+    const auto frequency =
+        frequencyHz.load();
+
+    const auto gain =
+        outputGain.load();
+
+    const auto phaseIncrement =
+        juce::MathConstants<double>::twoPi
+        * frequency
+        / currentSampleRate;
+
+    const auto channels =
+        std::min (
+            2,
+            destination.getNumChannels()
+        );
+
+    for (
+        int sample = 0;
+        sample < numSamples;
+        ++sample
+    )
+    {
+        const auto envelopeLevel =
+            envelope.getNextSample();
+
+        const auto value =
+            renderOscillatorSample()
+            * gain
+            * envelopeLevel;
+
+        for (
+            int channel = 0;
+            channel < channels;
+            ++channel
+        )
+        {
+            destination.setSample (
+                channel,
+                sample,
+                value
+            );
+        }
+
+        phase += phaseIncrement;
+
+        while (
+            phase
+            >= juce::MathConstants<double>::twoPi
+        )
+        {
+            phase -=
+                juce::MathConstants<double>::twoPi;
+        }
+    }
+}
+
+
+============================================================
+FILE: Source\Audio\SynthSource.h
+============================================================
+
+#pragma once
+
+#include "AudioSource.h"
+
+#include <juce_audio_basics/juce_audio_basics.h>
+
+#include <atomic>
+
+class SynthSource : public AudioSource
+{
+public:
+    enum class Waveform
+    {
+        sine = 0,
+        saw,
+        square
+    };
+
+    void prepare (
+        double sampleRate,
+        int maximumBlockSize
+    ) override;
+
+    void reset() override;
+
+    void render (
+        juce::AudioBuffer<float>& destination,
+        int numSamples
+    ) override;
+
+    void setGate (
+        bool enabled
+    ) noexcept;
+
+    bool isGateEnabled() const noexcept;
+
+    void setFrequency (
+        double frequencyHz
+    ) noexcept;
+
+    double getFrequency() const noexcept;
+
+    void setGain (
+        float newGain
+    ) noexcept;
+
+    float getGain() const noexcept;
+
+    void setWaveform (
+        Waveform newWaveform
+    ) noexcept;
+
+    Waveform getWaveform() const noexcept;
+
+private:
+    void updateEnvelopeGate() noexcept;
+    float renderOscillatorSample() noexcept;
+
+    juce::ADSR envelope;
+
+    std::atomic<bool> requestedGate { false };
+
+    std::atomic<double> frequencyHz { 440.0 };
+    std::atomic<float> outputGain { 0.05f };
+
+    std::atomic<int> waveform {
+        static_cast<int> (Waveform::sine)
+    };
+
+    double currentSampleRate = 0.0;
+    double phase = 0.0;
+
+    bool appliedGate = false;
+};
+
+
+============================================================
+FILE: Source\Audio\TrackProcessor.cpp
+============================================================
+
+#include "TrackProcessor.h"
+
+#include "../Model/TrackModel.h"
+
+#include <algorithm>
+#include <cmath>
+
+void TrackProcessor::setModel (
+    TrackModel* modelToUse
+) noexcept
+{
+    model = modelToUse;
+}
+
+void TrackProcessor::setSource (
+    AudioSource* sourceToUse
+) noexcept
+{
+    source = sourceToUse;
+}
+
+void TrackProcessor::prepare (
+    double sampleRate,
+    int maximumBlockSize
+)
+{
+    workingBuffer.setSize (
+        2,
+        std::max (1, maximumBlockSize),
+        false,
+        true,
+        true
+    );
+
+    workingBuffer.clear();
+
+    if (source != nullptr)
+    {
+        source->prepare (
+            sampleRate,
+            maximumBlockSize
+        );
+    }
+}
+
+void TrackProcessor::reset()
+{
+    workingBuffer.clear();
+
+    if (source != nullptr)
+        source->reset();
+}
+
+void TrackProcessor::process (
+    juce::AudioBuffer<float>& mixBuffer,
+    int numSamples,
+    bool anyTrackSoloed
+)
+{
+    if (model == nullptr)
+        return;
+
+    if (source == nullptr)
+        return;
+
+    if (numSamples <= 0)
+        return;
+
+    const auto muted =
+        model->isMuted();
+
+    const auto soloed =
+        model->isSolo();
+
+    if (muted)
+        return;
+
+    if (anyTrackSoloed && ! soloed)
+        return;
+
+    if (
+        workingBuffer.getNumSamples()
+        < numSamples
+    )
+    {
+        workingBuffer.setSize (
+            2,
+            numSamples,
+            false,
+            false,
+            true
+        );
+    }
+
+    workingBuffer.clear();
+
+    source->render (
+        workingBuffer,
+        numSamples
+    );
+
+    const auto gain =
+        model->getGain();
+
+    const auto pan =
+        model->getPan();
+
+    const auto angle =
+        static_cast<float> (
+            (pan + 1.0f)
+            * (juce::MathConstants<float>::pi * 0.25f)
+        );
+
+    const auto leftGain =
+        gain * std::cos (angle);
+
+    const auto rightGain =
+        gain * std::sin (angle);
+
+    workingBuffer.applyGain (
+        0,
+        0,
+        numSamples,
+        leftGain
+    );
+
+    workingBuffer.applyGain (
+        1,
+        0,
+        numSamples,
+        rightGain
+    );
+
+    const auto channels =
+        std::min (
+            2,
+            mixBuffer.getNumChannels()
+        );
+
+    for (
+        int channel = 0;
+        channel < channels;
+        ++channel
+    )
+    {
+        mixBuffer.addFrom (
+            channel,
+            0,
+            workingBuffer,
+            channel,
+            0,
+            numSamples
+        );
+    }
+}
+
+
+============================================================
+FILE: Source\Audio\TrackProcessor.h
+============================================================
+
+#pragma once
+
+#include "AudioSource.h"
+
+#include <juce_audio_basics/juce_audio_basics.h>
+
+class TrackModel;
+
+class TrackProcessor
+{
+public:
+    TrackProcessor() = default;
+
+    void setModel (
+        TrackModel* modelToUse
+    ) noexcept;
+
+    void setSource (
+        AudioSource* sourceToUse
+    ) noexcept;
+
+    void prepare (
+        double sampleRate,
+        int maximumBlockSize
+    );
+
+    void reset();
+
+    void process (
+        juce::AudioBuffer<float>& mixBuffer,
+        int numSamples,
+        bool anyTrackSoloed
+    );
+
+private:
+    TrackModel* model = nullptr;
+    AudioSource* source = nullptr;
+
+    juce::AudioBuffer<float> workingBuffer;
+};
+
+
+============================================================
+FILE: Source\Core\JADContext.cpp
+============================================================
+
+#include "JADContext.h"
+
+JADContext::JADContext()
+{
+    audioSystem.setSessionState (
+        &sessionState
+    );
+
+    audioSystem.setTransportState (
+        &sessionState.getTransportState()
+    );
+
+    audioSystem.setMasterBusState (
+        &sessionState.getMasterBusState()
+    );
+}
+
+AudioSystem& JADContext::getAudioSystem() noexcept
+{
+    return audioSystem;
+}
+
+SessionState& JADContext::getSessionState() noexcept
+{
+    return sessionState;
+}
+
+bool JADContext::isAlive() const noexcept
+{
+    return audioSystem.isAlive()
+        && sessionState.isAlive();
+}
+
+
+
+
+============================================================
+FILE: Source\Core\JADContext.h
+============================================================
+
+#pragma once
+
+#include "../Audio/AudioSystem.h"
+#include "../Model/SessionState.h"
+
+class JADContext
+{
+public:
+    JADContext();
+
+    AudioSystem& getAudioSystem() noexcept;
+    SessionState& getSessionState() noexcept;
+
+    bool isAlive() const noexcept;
+
+private:
+    AudioSystem audioSystem;
+    SessionState sessionState;
+};
+
+
+============================================================
+FILE: Source\Main.cpp
+============================================================
+
+#include "App/JADApplication.h"
+
+START_JUCE_APPLICATION (JADApplication)
+
+
+============================================================
+FILE: Source\Model\ClipModel.cpp
+============================================================
+
+#include "ClipModel.h"
+
+#include <algorithm>
+#include <utility>
+
+ClipModel::ClipModel (
+    ClipId clipId,
+    std::string clipName,
+    double initialStartBeat,
+    double initialLengthBeats)
+    : id (clipId),
+      name (std::move (clipName))
+{
+    setStartBeat (initialStartBeat);
+    setLengthBeats (initialLengthBeats);
+}
+
+ClipModel::ClipId ClipModel::getId() const noexcept
+{
+    return id;
+}
+
+const std::string& ClipModel::getName() const noexcept
+{
+    return name;
+}
+
+void ClipModel::setName (std::string newName)
+{
+    name = std::move (newName);
+}
+
+double ClipModel::getStartBeat() const noexcept
+{
+    return startBeat.load();
+}
+
+void ClipModel::setStartBeat (double beat) noexcept
+{
+    startBeat.store (
+        std::max (0.0, beat)
+    );
+}
+
+double ClipModel::getLengthBeats() const noexcept
+{
+    return lengthBeats.load();
+}
+
+void ClipModel::setLengthBeats (double beats) noexcept
+{
+    lengthBeats.store (
+        std::max (0.001, beats)
+    );
+}
+
+bool ClipModel::isMuted() const noexcept
+{
+    return muted.load();
+}
+
+void ClipModel::setMuted (bool shouldBeMuted) noexcept
+{
+    muted.store (shouldBeMuted);
+}
+
+
+============================================================
+FILE: Source\Model\ClipModel.h
+============================================================
+
+#pragma once
+
+#include <atomic>
+#include <cstdint>
+#include <string>
+
+class ClipModel
+{
+public:
+    using ClipId = std::uint64_t;
+
+    ClipModel (
+        ClipId clipId,
+        std::string clipName,
+        double startBeat,
+        double lengthBeats
+    );
+
+    ClipId getId() const noexcept;
+
+    const std::string& getName() const noexcept;
+    void setName (std::string newName);
+
+    double getStartBeat() const noexcept;
+    void setStartBeat (double beat) noexcept;
+
+    double getLengthBeats() const noexcept;
+    void setLengthBeats (double beats) noexcept;
+
+    bool isMuted() const noexcept;
+    void setMuted (bool shouldBeMuted) noexcept;
+
+private:
+    ClipId id;
+    std::string name;
+
+    std::atomic<double> startBeat { 0.0 };
+    std::atomic<double> lengthBeats { 1.0 };
+    std::atomic<bool> muted { false };
+};
+
+
+============================================================
+FILE: Source\Model\MasterBusState.cpp
+============================================================
+
+#include "MasterBusState.h"
+
+#include <algorithm>
+
+void MasterBusState::setGain (
+    float linearGain) noexcept
+{
+    gain.store (
+        std::clamp (
+            linearGain,
+            0.0f,
+            2.0f
+        )
+    );
+}
+
+float MasterBusState::getGain() const noexcept
+{
+    return gain.load();
+}
+
+void MasterBusState::setMuted (
+    bool shouldBeMuted) noexcept
+{
+    muted.store (shouldBeMuted);
+}
+
+bool MasterBusState::isMuted() const noexcept
+{
+    return muted.load();
+}
+
+
+============================================================
+FILE: Source\Model\MasterBusState.h
+============================================================
+
+#pragma once
+
+#include <atomic>
+
+class MasterBusState
+{
+public:
+    void setGain (float linearGain) noexcept;
+    float getGain() const noexcept;
+
+    void setMuted (bool shouldBeMuted) noexcept;
+    bool isMuted() const noexcept;
+
+private:
+    std::atomic<float> gain { 1.0f };
+    std::atomic<bool> muted { false };
+};
+
+
+============================================================
+FILE: Source\Model\ProjectState.cpp
+============================================================
+
+#include "ProjectState.h"
+
+#include <utility>
+
+ProjectState::ProjectState() = default;
+
+const std::string& ProjectState::getTitle() const noexcept
+{
+    return title;
+}
+
+void ProjectState::setTitle (
+    std::string newTitle)
+{
+    title = std::move (newTitle);
+    markDirty();
+}
+
+bool ProjectState::isDirty() const noexcept
+{
+    return dirty;
+}
+
+void ProjectState::markDirty() noexcept
+{
+    dirty = true;
+    ++revision;
+}
+
+void ProjectState::markSaved() noexcept
+{
+    dirty = false;
+}
+
+std::uint64_t ProjectState::getRevision() const noexcept
+{
+    return revision;
+}
+
+
+============================================================
+FILE: Source\Model\ProjectState.h
+============================================================
+
+#pragma once
+
+#include <cstdint>
+#include <string>
+
+class ProjectState
+{
+public:
+    ProjectState();
+
+    const std::string& getTitle() const noexcept;
+    void setTitle (std::string newTitle);
+
+    bool isDirty() const noexcept;
+    void markDirty() noexcept;
+    void markSaved() noexcept;
+
+    std::uint64_t getRevision() const noexcept;
+
+private:
+    std::string title { "Untitled JAD Session" };
+
+    bool dirty = false;
+    std::uint64_t revision = 1;
+};
+
+
+============================================================
+FILE: Source\Model\SessionState.cpp
+============================================================
+
+#include "SessionState.h"
+
+#include <algorithm>
+#include <utility>
+
+SessionState::SessionState()
+{
+    projectState.setTitle (
+        "First JAD Session"
+    );
+
+    projectState.markSaved();
+
+    auto& track1 = addTrack ("Track 1");
+    auto& track2 = addTrack ("Track 2");
+    auto& track3 = addTrack ("Track 3");
+    auto& track4 = addTrack ("Track 4");
+
+    track1.addClip (
+        "Seed A",
+        0.0,
+        4.0
+    );
+
+    track2.addClip (
+        "Seed B",
+        4.0,
+        4.0
+    );
+
+    track3.addClip (
+        "Seed C",
+        8.0,
+        4.0
+    );
+
+    track4.addClip (
+        "Seed D",
+        12.0,
+        4.0
+    );
+}
+
+TrackModel& SessionState::addTrack (
+    std::string name)
+{
+    const auto id =
+        nextTrackId++;
+
+    if (name.empty())
+    {
+        name =
+            "Track "
+            + std::to_string (id);
+    }
+
+    auto track =
+        std::make_unique<TrackModel> (
+            id,
+            std::move (name)
+        );
+
+    auto& reference =
+        *track;
+
+    tracks.push_back (
+        std::move (track)
+    );
+
+    projectState.markDirty();
+
+    return reference;
+}
+
+bool SessionState::removeTrack (
+    TrackModel::TrackId trackId)
+{
+    const auto previousSize =
+        tracks.size();
+
+    tracks.erase (
+        std::remove_if (
+            tracks.begin(),
+            tracks.end(),
+            [trackId] (
+                const std::unique_ptr<TrackModel>& track)
+            {
+                return track != nullptr
+                    && track->getId() == trackId;
+            }
+        ),
+        tracks.end()
+    );
+
+    const auto removed =
+        tracks.size() != previousSize;
+
+    if (removed)
+        projectState.markDirty();
+
+    return removed;
+}
+
+void SessionState::clearTracks()
+{
+    tracks.clear();
+    projectState.markDirty();
+}
+
+std::size_t SessionState::getTrackCount() const noexcept
+{
+    return tracks.size();
+}
+
+TrackModel* SessionState::getTrack (
+    std::size_t index) noexcept
+{
+    if (index >= tracks.size())
+        return nullptr;
+
+    return tracks[index].get();
+}
+
+const TrackModel* SessionState::getTrack (
+    std::size_t index) const noexcept
+{
+    if (index >= tracks.size())
+        return nullptr;
+
+    return tracks[index].get();
+}
+
+TrackModel* SessionState::findTrackById (
+    TrackModel::TrackId trackId) noexcept
+{
+    for (auto& track : tracks)
+    {
+        if (
+            track != nullptr
+            && track->getId() == trackId
+        )
+        {
+            return track.get();
+        }
+    }
+
+    return nullptr;
+}
+
+const TrackModel* SessionState::findTrackById (
+    TrackModel::TrackId trackId) const noexcept
+{
+    for (const auto& track : tracks)
+    {
+        if (
+            track != nullptr
+            && track->getId() == trackId
+        )
+        {
+            return track.get();
+        }
+    }
+
+    return nullptr;
+}
+
+
+============================================================
+FILE: Source\Model\SessionState.h
+============================================================
+
+#pragma once
+
+#include "MasterBusState.h"
+#include "ProjectState.h"
+#include "TrackModel.h"
+#include "TransportState.h"
+
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <vector>
+
+class SessionState
+{
+public:
+    SessionState();
+
+    bool isAlive() const noexcept
+    {
+        return true;
+    }
+
+    TransportState& getTransportState() noexcept
+    {
+        return transportState;
+    }
+
+    const TransportState& getTransportState() const noexcept
+    {
+        return transportState;
+    }
+
+    MasterBusState& getMasterBusState() noexcept
+    {
+        return masterBusState;
+    }
+
+    const MasterBusState& getMasterBusState() const noexcept
+    {
+        return masterBusState;
+    }
+
+    ProjectState& getProjectState() noexcept
+    {
+        return projectState;
+    }
+
+    const ProjectState& getProjectState() const noexcept
+    {
+        return projectState;
+    }
+
+    TrackModel& addTrack (
+        std::string name = {}
+    );
+
+    bool removeTrack (
+        TrackModel::TrackId trackId
+    );
+
+    void clearTracks();
+
+    std::size_t getTrackCount() const noexcept;
+
+    TrackModel* getTrack (
+        std::size_t index
+    ) noexcept;
+
+    const TrackModel* getTrack (
+        std::size_t index
+    ) const noexcept;
+
+    TrackModel* findTrackById (
+        TrackModel::TrackId trackId
+    ) noexcept;
+
+    const TrackModel* findTrackById (
+        TrackModel::TrackId trackId
+    ) const noexcept;
+
+private:
+    TransportState transportState;
+    MasterBusState masterBusState;
+    ProjectState projectState;
+
+    std::vector<
+        std::unique_ptr<TrackModel>
+    > tracks;
+
+    TrackModel::TrackId nextTrackId { 1 };
+};
+
+
+============================================================
+FILE: Source\Model\TrackModel.cpp
+============================================================
+
+#include "TrackModel.h"
+
+#include <algorithm>
+#include <utility>
+
+TrackModel::TrackModel (
+    TrackId trackId,
+    std::string trackName)
+    : id (trackId),
+      name (std::move (trackName))
+{
+}
+
+TrackModel::TrackId TrackModel::getId() const noexcept
+{
+    return id;
+}
+
+void TrackModel::setName (
+    std::string newName)
+{
+    name = std::move (newName);
+}
+
+const std::string& TrackModel::getName() const noexcept
+{
+    return name;
+}
+
+void TrackModel::setGain (
+    float linearGain) noexcept
+{
+    gain.store (
+        std::clamp (
+            linearGain,
+            0.0f,
+            2.0f
+        )
+    );
+}
+
+float TrackModel::getGain() const noexcept
+{
+    return gain.load();
+}
+
+void TrackModel::setPan (
+    float panPosition) noexcept
+{
+    pan.store (
+        std::clamp (
+            panPosition,
+            -1.0f,
+            1.0f
+        )
+    );
+}
+
+float TrackModel::getPan() const noexcept
+{
+    return pan.load();
+}
+
+void TrackModel::setMuted (
+    bool shouldBeMuted) noexcept
+{
+    muted.store (shouldBeMuted);
+}
+
+bool TrackModel::isMuted() const noexcept
+{
+    return muted.load();
+}
+
+void TrackModel::setSolo (
+    bool shouldBeSolo) noexcept
+{
+    solo.store (shouldBeSolo);
+}
+
+bool TrackModel::isSolo() const noexcept
+{
+    return solo.load();
+}
+
+void TrackModel::setRecordArmed (
+    bool shouldBeArmed) noexcept
+{
+    recordArmed.store (shouldBeArmed);
+}
+
+bool TrackModel::isRecordArmed() const noexcept
+{
+    return recordArmed.load();
+}
+
+ClipModel& TrackModel::addClip (
+    std::string clipName,
+    double startBeat,
+    double lengthBeats)
+{
+    auto clip =
+        std::make_unique<ClipModel> (
+            nextClipId++,
+            std::move (clipName),
+            startBeat,
+            lengthBeats
+        );
+
+    auto& reference = *clip;
+
+    clips.push_back (
+        std::move (clip)
+    );
+
+    return reference;
+}
+
+bool TrackModel::removeClip (
+    ClipModel::ClipId clipId)
+{
+    const auto before =
+        clips.size();
+
+    clips.erase (
+        std::remove_if (
+            clips.begin(),
+            clips.end(),
+            [clipId] (
+                const std::unique_ptr<ClipModel>& clip)
+            {
+                return clip != nullptr
+                    && clip->getId() == clipId;
+            }
+        ),
+        clips.end()
+    );
+
+    return clips.size() != before;
+}
+
+std::size_t TrackModel::getClipCount() const noexcept
+{
+    return clips.size();
+}
+
+ClipModel* TrackModel::getClip (
+    std::size_t index) noexcept
+{
+    if (index >= clips.size())
+        return nullptr;
+
+    return clips[index].get();
+}
+
+const ClipModel* TrackModel::getClip (
+    std::size_t index) const noexcept
+{
+    if (index >= clips.size())
+        return nullptr;
+
+    return clips[index].get();
+}
+
+
+============================================================
+FILE: Source\Model\TrackModel.h
+============================================================
+
+#pragma once
+
+#include "ClipModel.h"
+
+#include <atomic>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
+class TrackModel
+{
+public:
+    using TrackId = std::uint64_t;
+
+    explicit TrackModel (
+        TrackId trackId = 1,
+        std::string trackName = "Track 1"
+    );
+
+    TrackId getId() const noexcept;
+
+    void setName (std::string newName);
+    const std::string& getName() const noexcept;
+
+    void setGain (float linearGain) noexcept;
+    float getGain() const noexcept;
+
+    void setPan (float panPosition) noexcept;
+    float getPan() const noexcept;
+
+    void setMuted (bool shouldBeMuted) noexcept;
+    bool isMuted() const noexcept;
+
+    void setSolo (bool shouldBeSolo) noexcept;
+    bool isSolo() const noexcept;
+
+    void setRecordArmed (bool shouldBeArmed) noexcept;
+    bool isRecordArmed() const noexcept;
+
+    // ------------------------------------------------------------
+    // CLIPS
+    // ------------------------------------------------------------
+
+    ClipModel& addClip (
+        std::string name,
+        double startBeat,
+        double lengthBeats
+    );
+
+    bool removeClip (
+        ClipModel::ClipId clipId
+    );
+
+    std::size_t getClipCount() const noexcept;
+
+    ClipModel* getClip (
+        std::size_t index
+    ) noexcept;
+
+    const ClipModel* getClip (
+        std::size_t index
+    ) const noexcept;
+
+private:
+    TrackId id;
+    std::string name;
+
+    std::atomic<float> gain { 1.0f };
+    std::atomic<float> pan  { 0.0f };
+
+    std::atomic<bool> muted { false };
+    std::atomic<bool> solo { false };
+    std::atomic<bool> recordArmed { false };
+
+    std::vector<
+        std::unique_ptr<ClipModel>
+    > clips;
+
+    ClipModel::ClipId nextClipId { 1 };
+};
+
+
+============================================================
+FILE: Source\Model\TransportState.cpp
+============================================================
+
+#include "TransportState.h"
+
+#include <algorithm>
+
+void TransportState::play() noexcept
+{
+    playing.store (true);
+}
+
+void TransportState::stop() noexcept
+{
+    playing.store (false);
+    recording.store (false);
+}
+
+void TransportState::beginRecording() noexcept
+{
+    recording.store (true);
+    playing.store (true);
+}
+
+void TransportState::endRecording() noexcept
+{
+    recording.store (false);
+}
+
+void TransportState::returnToStart() noexcept
+{
+    positionBeats.store (0.0);
+    positionSamples.store (0);
+}
+
+void TransportState::setTempo (
+    double beatsPerMinute) noexcept
+{
+    tempoBpm.store (
+        std::clamp (
+            beatsPerMinute,
+            20.0,
+            400.0
+        )
+    );
+}
+
+double TransportState::getTempo() const noexcept
+{
+    return tempoBpm.load();
+}
+
+void TransportState::setPositionInBeats (
+    double beats) noexcept
+{
+    positionBeats.store (
+        std::max (
+            0.0,
+            beats
+        )
+    );
+}
+
+double TransportState::getPositionInBeats() const noexcept
+{
+    return positionBeats.load();
+}
+
+void TransportState::setPositionInSamples (
+    std::int64_t samples) noexcept
+{
+    positionSamples.store (
+        std::max<std::int64_t> (
+            0,
+            samples
+        )
+    );
+}
+
+std::int64_t TransportState::getPositionInSamples() const noexcept
+{
+    return positionSamples.load();
+}
+
+void TransportState::advanceSamples (
+    int numSamples,
+    double sampleRate) noexcept
+{
+    if (! playing.load())
+        return;
+
+    if (numSamples <= 0)
+        return;
+
+    if (sampleRate <= 0.0)
+        return;
+
+    const auto samples =
+        static_cast<std::int64_t> (
+            numSamples
+        );
+
+    positionSamples.fetch_add (
+        samples
+    );
+
+    const auto seconds =
+        static_cast<double> (
+            numSamples
+        )
+        / sampleRate;
+
+    const auto beatsPerSecond =
+        tempoBpm.load()
+        / 60.0;
+
+    auto nextBeat =
+        positionBeats.load()
+        + seconds
+        * beatsPerSecond;
+
+    if (loopEnabled.load())
+    {
+        const auto start =
+            loopStartBeat.load();
+
+        const auto end =
+            loopEndBeat.load();
+
+        if (end > start)
+        {
+            const auto length =
+                end - start;
+
+            while (nextBeat >= end)
+                nextBeat -= length;
+        }
+    }
+
+    positionBeats.store (
+        nextBeat
+    );
+}
+
+bool TransportState::isPlaying() const noexcept
+{
+    return playing.load();
+}
+
+bool TransportState::isRecording() const noexcept
+{
+    return recording.load();
+}
+
+void TransportState::setTimeSignature (
+    int numerator,
+    int denominator) noexcept
+{
+    timeSignatureNumerator.store (
+        std::max (
+            1,
+            numerator
+        )
+    );
+
+    timeSignatureDenominator.store (
+        std::max (
+            1,
+            denominator
+        )
+    );
+}
+
+int TransportState::getTimeSignatureNumerator() const noexcept
+{
+    return timeSignatureNumerator.load();
+}
+
+int TransportState::getTimeSignatureDenominator() const noexcept
+{
+    return timeSignatureDenominator.load();
+}
+
+void TransportState::setLoopEnabled (
+    bool enabled) noexcept
+{
+    loopEnabled.store (
+        enabled
+    );
+}
+
+bool TransportState::isLoopEnabled() const noexcept
+{
+    return loopEnabled.load();
+}
+
+void TransportState::setLoopRange (
+    double startBeat,
+    double endBeat) noexcept
+{
+    startBeat =
+        std::max (
+            0.0,
+            startBeat
+        );
+
+    endBeat =
+        std::max (
+            startBeat,
+            endBeat
+        );
+
+    loopStartBeat.store (
+        startBeat
+    );
+
+    loopEndBeat.store (
+        endBeat
+    );
+}
+
+double TransportState::getLoopStartBeat() const noexcept
+{
+    return loopStartBeat.load();
+}
+
+double TransportState::getLoopEndBeat() const noexcept
+{
+    return loopEndBeat.load();
+}
+
+
+============================================================
+FILE: Source\Model\TransportState.h
+============================================================
+
+#pragma once
+
+#include <atomic>
+#include <cstdint>
+
+class TransportState
+{
+public:
+    TransportState() = default;
+
+    // ------------------------------------------------------------
+    // TRANSPORT COMMANDS
+    // ------------------------------------------------------------
+
+    void play() noexcept;
+    void stop() noexcept;
+
+    void beginRecording() noexcept;
+    void endRecording() noexcept;
+
+    void returnToStart() noexcept;
+
+    // ------------------------------------------------------------
+    // CLOCK
+    // ------------------------------------------------------------
+
+    void setTempo (double beatsPerMinute) noexcept;
+    double getTempo() const noexcept;
+
+    void setPositionInBeats (double beats) noexcept;
+    double getPositionInBeats() const noexcept;
+
+    void setPositionInSamples (std::int64_t samples) noexcept;
+    std::int64_t getPositionInSamples() const noexcept;
+
+    void advanceSamples (
+        int numSamples,
+        double sampleRate
+    ) noexcept;
+
+    // ------------------------------------------------------------
+    // STATE
+    // ------------------------------------------------------------
+
+    bool isPlaying() const noexcept;
+    bool isRecording() const noexcept;
+
+    // ------------------------------------------------------------
+    // MUSICAL GRID
+    // ------------------------------------------------------------
+
+    void setTimeSignature (
+        int numerator,
+        int denominator
+    ) noexcept;
+
+    int getTimeSignatureNumerator() const noexcept;
+    int getTimeSignatureDenominator() const noexcept;
+
+    // ------------------------------------------------------------
+    // LOOP TERRITORY
+    // ------------------------------------------------------------
+
+    void setLoopEnabled (bool enabled) noexcept;
+    bool isLoopEnabled() const noexcept;
+
+    void setLoopRange (
+        double startBeat,
+        double endBeat
+    ) noexcept;
+
+    double getLoopStartBeat() const noexcept;
+    double getLoopEndBeat() const noexcept;
+
+private:
+    std::atomic<bool> playing   { false };
+    std::atomic<bool> recording { false };
+
+    std::atomic<double> tempoBpm { 120.0 };
+
+    std::atomic<double> positionBeats { 0.0 };
+    std::atomic<std::int64_t> positionSamples { 0 };
+
+    std::atomic<int> timeSignatureNumerator   { 4 };
+    std::atomic<int> timeSignatureDenominator { 4 };
+
+    std::atomic<bool> loopEnabled { false };
+    std::atomic<double> loopStartBeat { 0.0 };
+    std::atomic<double> loopEndBeat   { 4.0 };
+};
+
+
+============================================================
+FILE: Source\UI\JADLookAndFeel.cpp
+============================================================
+
+#include "JADLookAndFeel.h"
+
+#include <cmath>
+
+JADLookAndFeel::JADLookAndFeel()
+{
+    setColour (
+        juce::Label::textColourId,
+        juce::Colours::white
+    );
+
+    setColour (
+        juce::ComboBox::textColourId,
+        juce::Colours::white
+    );
+
+    setColour (
+        juce::ComboBox::backgroundColourId,
+        juce::Colour::fromRGB (22, 18, 40)
+    );
+
+    setColour (
+        juce::ComboBox::outlineColourId,
+        juce::Colour::fromRGB (130, 80, 255)
+    );
+
+    setColour (
+        juce::Slider::textBoxTextColourId,
+        juce::Colours::white
+    );
+
+    setColour (
+        juce::Slider::textBoxBackgroundColourId,
+        juce::Colour::fromRGB (20, 15, 34)
+    );
+
+    setColour (
+        juce::Slider::textBoxOutlineColourId,
+        juce::Colours::transparentBlack
+    );
+}
+
+void JADLookAndFeel::setPaletteIndex (
+    int newIndex) noexcept
+{
+    paletteIndex =
+        juce::jlimit (
+            0,
+            3,
+            newIndex
+        );
+}
+
+int JADLookAndFeel::getPaletteIndex() const noexcept
+{
+    return paletteIndex;
+}
+
+juce::Colour JADLookAndFeel::colourA() const
+{
+    if (paletteIndex == 1)
+        return juce::Colour::fromRGB (255, 92, 40);
+
+    if (paletteIndex == 2)
+        return juce::Colour::fromRGB (0, 220, 255);
+
+    if (paletteIndex == 3)
+        return juce::Colour::fromRGB (85, 255, 155);
+
+    return juce::Colour::fromRGB (255, 35, 125);
+}
+
+juce::Colour JADLookAndFeel::colourB() const
+{
+    if (paletteIndex == 1)
+        return juce::Colour::fromRGB (255, 205, 55);
+
+    if (paletteIndex == 2)
+        return juce::Colour::fromRGB (80, 110, 255);
+
+    if (paletteIndex == 3)
+        return juce::Colour::fromRGB (35, 210, 190);
+
+    return juce::Colour::fromRGB (155, 55, 255);
+}
+
+juce::Colour JADLookAndFeel::colourC() const
+{
+    if (paletteIndex == 1)
+        return juce::Colour::fromRGB (255, 55, 90);
+
+    if (paletteIndex == 2)
+        return juce::Colour::fromRGB (200, 75, 255);
+
+    if (paletteIndex == 3)
+        return juce::Colour::fromRGB (120, 255, 80);
+
+    return juce::Colour::fromRGB (40, 125, 255);
+}
+
+juce::Colour JADLookAndFeel::colourD() const
+{
+    if (paletteIndex == 1)
+        return juce::Colour::fromRGB (255, 120, 30);
+
+    if (paletteIndex == 2)
+        return juce::Colour::fromRGB (0, 245, 210);
+
+    if (paletteIndex == 3)
+        return juce::Colour::fromRGB (0, 180, 255);
+
+    return juce::Colour::fromRGB (0, 225, 245);
+}
+
+juce::Colour JADLookAndFeel::trackColour (
+    int trackIndex) const
+{
+    switch (trackIndex % 4)
+    {
+        case 0: return colourA();
+        case 1: return juce::Colour::fromRGB (255, 155, 45);
+        case 2: return colourD();
+        default: return colourB();
+    }
+}
+
+void JADLookAndFeel::drawButtonBackground (
+    juce::Graphics& g,
+    juce::Button& button,
+    const juce::Colour&,
+    bool highlighted,
+    bool down)
+{
+    auto bounds =
+        button.getLocalBounds()
+            .toFloat()
+            .reduced (1.0f);
+
+    auto top =
+        colourA()
+            .withAlpha (
+                down ? 0.95f : 0.72f
+            );
+
+    auto bottom =
+        colourB()
+            .withAlpha (
+                highlighted ? 0.90f : 0.58f
+            );
+
+    juce::ColourGradient gradient (
+        top,
+        bounds.getTopLeft(),
+        bottom,
+        bounds.getBottomRight(),
+        false
+    );
+
+    g.setGradientFill (gradient);
+
+    g.fillRoundedRectangle (
+        bounds,
+        10.0f
+    );
+
+    g.setColour (
+        colourD()
+            .withAlpha (
+                highlighted ? 0.90f : 0.35f
+            )
+    );
+
+    g.drawRoundedRectangle (
+        bounds,
+        10.0f,
+        highlighted ? 2.0f : 1.0f
+    );
+}
+
+void JADLookAndFeel::drawRotarySlider (
+    juce::Graphics& g,
+    int x,
+    int y,
+    int width,
+    int height,
+    float sliderPos,
+    float rotaryStartAngle,
+    float rotaryEndAngle,
+    juce::Slider&)
+{
+    auto bounds =
+        juce::Rectangle<float> (
+            static_cast<float> (x),
+            static_cast<float> (y),
+            static_cast<float> (width),
+            static_cast<float> (height)
+        )
+        .reduced (7.0f);
+
+    const auto radius =
+        juce::jmin (
+            bounds.getWidth(),
+            bounds.getHeight()
+        ) * 0.5f;
+
+    const auto centre =
+        bounds.getCentre();
+
+    const auto angle =
+        rotaryStartAngle
+        + sliderPos
+        * (rotaryEndAngle - rotaryStartAngle);
+
+    juce::ColourGradient glow (
+        colourA(),
+        bounds.getTopLeft(),
+        colourD(),
+        bounds.getBottomRight(),
+        false
+    );
+
+    g.setGradientFill (glow);
+
+    g.fillEllipse (
+        bounds.reduced (3.0f)
+    );
+
+    g.setColour (
+        juce::Colour::fromRGB (
+            12,
+            10,
+            25
+        )
+    );
+
+    g.fillEllipse (
+        bounds.reduced (8.0f)
+    );
+
+    juce::Path pointer;
+
+    pointer.addRoundedRectangle (
+        -2.0f,
+        -radius + 13.0f,
+        4.0f,
+        radius * 0.48f,
+        2.0f
+    );
+
+    g.setColour (
+        juce::Colours::white
+    );
+
+    g.fillPath (
+        pointer,
+        juce::AffineTransform::rotation (
+            angle
+        )
+        .translated (
+            centre.x,
+            centre.y
+        )
+    );
+}
+
+
+============================================================
+FILE: Source\UI\JADLookAndFeel.h
+============================================================
+
+#pragma once
+
+#include <juce_gui_basics/juce_gui_basics.h>
+
+class JADLookAndFeel :
+    public juce::LookAndFeel_V4
+{
+public:
+    JADLookAndFeel();
+
+    void setPaletteIndex (
+        int newIndex
+    ) noexcept;
+
+    int getPaletteIndex() const noexcept;
+
+    juce::Colour colourA() const;
+    juce::Colour colourB() const;
+    juce::Colour colourC() const;
+    juce::Colour colourD() const;
+
+    juce::Colour trackColour (
+        int trackIndex
+    ) const;
+
+    void drawButtonBackground (
+        juce::Graphics&,
+        juce::Button&,
+        const juce::Colour&,
+        bool highlighted,
+        bool down
+    ) override;
+
+    void drawRotarySlider (
+        juce::Graphics&,
+        int x,
+        int y,
+        int width,
+        int height,
+        float sliderPos,
+        float rotaryStartAngle,
+        float rotaryEndAngle,
+        juce::Slider&
+    ) override;
+
+private:
+    int paletteIndex = 0;
+};
+
+
+============================================================
+FILE: Source\UI\MainComponent.cpp
+============================================================
+
+#include "MainComponent.h"
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+
+MainComponent::MainComponent (
+    JADContext& contextToUse)
+    : context (contextToUse),
+      transportPanel (
+          context.getSessionState()
+              .getTransportState()
+      ),
+      sessionOverviewPanel (
+          context.getSessionState()
+      ),
+      synthVoicePanel (
+          context.getAudioSystem()
+      ),
+      keyboardPanel (
+          context.getAudioSystem(),
+          jadLookAndFeel
+      )
+{
+    setLookAndFeel (
+        &jadLookAndFeel
+    );
+
+    setSize (
+        1540,
+        980
+    );
+
+    setWantsKeyboardFocus (
+        true
+    );
+
+    projectLabel.setText (
+        "FIRST JAD SESSION",
+        juce::dontSendNotification
+    );
+
+    projectLabel.setFont (
+        juce::FontOptions (15.0f)
+            .withStyle ("Bold")
+    );
+
+    projectLabel.setJustificationType (
+        juce::Justification::centredLeft
+    );
+
+    statusLabel.setText (
+        "PROJECT • LIVE",
+        juce::dontSendNotification
+    );
+
+    statusLabel.setFont (
+        juce::FontOptions (11.0f)
+    );
+
+    statusLabel.setJustificationType (
+        juce::Justification::centredRight
+    );
+
+    addTrackButton.onClick =
+        [this]
+        {
+            addTrack();
+        };
+
+    deleteTrackButton.onClick =
+        [this]
+        {
+            deleteSelectedTrack();
+        };
+
+    scrollLeftButton.onClick =
+        [this]
+        {
+            timelineViewport.scrollLeft();
+            repaint();
+        };
+
+    scrollRightButton.onClick =
+        [this]
+        {
+            timelineViewport.scrollRight();
+            repaint();
+        };
+
+    zoomOutButton.onClick =
+        [this]
+        {
+            timelineViewport.zoomOut();
+            repaint();
+        };
+
+    zoomInButton.onClick =
+        [this]
+        {
+            timelineViewport.zoomIn();
+            repaint();
+        };
+
+    snapButton.setClickingTogglesState (
+        true
+    );
+
+    snapButton.setToggleState (
+        timelineViewport.isSnapEnabled(),
+        juce::dontSendNotification
+    );
+
+    snapButton.onClick =
+        [this]
+        {
+            timelineViewport.setSnapEnabled (
+                snapButton.getToggleState()
+            );
+
+            repaint();
+        };
+
+    keyboardTabButton.onClick =
+        [this]
+        {
+            setDockPage (
+                DockPage::keyboard
+            );
+        };
+
+    synthTabButton.onClick =
+        [this]
+        {
+            setDockPage (
+                DockPage::synth
+            );
+        };
+
+    mixerTabButton.onClick =
+        [this]
+        {
+            setDockPage (
+                DockPage::mixer
+            );
+        };
+
+    addAndMakeVisible (
+        transportPanel
+    );
+
+    addAndMakeVisible (
+        sessionOverviewPanel
+    );
+
+    addAndMakeVisible (
+        synthVoicePanel
+    );
+
+    addAndMakeVisible (
+        keyboardPanel
+    );
+
+    addAndMakeVisible (
+        projectLabel
+    );
+
+    addAndMakeVisible (
+        statusLabel
+    );
+
+    addAndMakeVisible (
+        addTrackButton
+    );
+
+    addAndMakeVisible (
+        deleteTrackButton
+    );
+
+    addAndMakeVisible (
+        scrollLeftButton
+    );
+
+    addAndMakeVisible (
+        scrollRightButton
+    );
+
+    addAndMakeVisible (
+        zoomOutButton
+    );
+
+    addAndMakeVisible (
+        zoomInButton
+    );
+
+    addAndMakeVisible (
+        snapButton
+    );
+
+    addAndMakeVisible (
+        keyboardTabButton
+    );
+
+    addAndMakeVisible (
+        synthTabButton
+    );
+
+    addAndMakeVisible (
+        mixerTabButton
+    );
+
+    sessionOverviewPanel.setVisible (
+        false
+    );
+
+    setDockPage (
+        DockPage::keyboard
+    );
+
+    startTimerHz (30);
+}
+
+MainComponent::~MainComponent()
+{
+    stopTimer();
+
+    setLookAndFeel (
+        nullptr
+    );
+}
+
+void MainComponent::timerCallback()
+{
+    refreshWorkspace();
+}
+
+void MainComponent::refreshWorkspace()
+{
+    auto& session =
+        context.getSessionState();
+
+    const auto count =
+        static_cast<int> (
+            session.getTrackCount()
+        );
+
+    if (count <= 0)
+        selectedTrackIndex = -1;
+
+    if (
+        count > 0
+        && selectedTrackIndex < 0
+    )
+    {
+        selectedTrackIndex = 0;
+    }
+
+    if (
+        count > 0
+        && selectedTrackIndex >= count
+    )
+    {
+        selectedTrackIndex =
+            count - 1;
+    }
+
+    if (
+        selectedClipTrackIndex
+        >= count
+    )
+    {
+        clearClipSelection();
+    }
+
+    statusLabel.setText (
+        "TRACKS "
+            + juce::String (count)
+            + "  •  "
+            + (
+                timelineViewport.isSnapEnabled()
+                    ? "SNAP 1/4"
+                    : "SNAP OFF"
+            )
+            + "  •  "
+            + juce::String (
+                timelineViewport.getVisibleBeats(),
+                1
+            )
+            + " BEATS  •  AUDIO "
+            + (
+                context.getAudioSystem().isReady()
+                    ? "ONLINE"
+                    : "OFFLINE"
+            ),
+        juce::dontSendNotification
+    );
+
+    repaint();
+}
+
+void MainComponent::addTrack()
+{
+    auto& session =
+        context.getSessionState();
+
+    auto& track =
+        session.addTrack();
+
+    track.addClip (
+        "NEW CLIP",
+        timelineViewport.getStartBeat(),
+        4.0
+    );
+
+    selectedTrackIndex =
+        static_cast<int> (
+            session.getTrackCount()
+        ) - 1;
+
+    clearClipSelection();
+
+    refreshWorkspace();
+}
+
+void MainComponent::deleteSelectedTrack()
+{
+    auto& session =
+        context.getSessionState();
+
+    if (selectedTrackIndex < 0)
+        return;
+
+    auto* track =
+        session.getTrack (
+            static_cast<std::size_t> (
+                selectedTrackIndex
+            )
+        );
+
+    if (track == nullptr)
+        return;
+
+    session.removeTrack (
+        track->getId()
+    );
+
+    clearClipSelection();
+
+    const auto count =
+        static_cast<int> (
+            session.getTrackCount()
+        );
+
+    if (count <= 0)
+        selectedTrackIndex = -1;
+
+    if (
+        count > 0
+        && selectedTrackIndex >= count
+    )
+    {
+        selectedTrackIndex =
+            count - 1;
+    }
+
+    refreshWorkspace();
+}
+
+void MainComponent::selectTrack (
+    int index)
+{
+    const auto count =
+        static_cast<int> (
+            context.getSessionState()
+                .getTrackCount()
+        );
+
+    if (
+        index < 0
+        || index >= count
+    )
+    {
+        return;
+    }
+
+    selectedTrackIndex = index;
+
+    if (
+        selectedClipTrackIndex
+        != selectedTrackIndex
+    )
+    {
+        clearClipSelection();
+    }
+
+    repaint();
+}
+
+void MainComponent::clearClipSelection()
+{
+    selectedClipTrackIndex = -1;
+    selectedClipIndex = -1;
+}
+
+void MainComponent::setDockPage (
+    DockPage page)
+{
+    dockPage = page;
+
+    keyboardPanel.setVisible (
+        dockPage == DockPage::keyboard
+    );
+
+    synthVoicePanel.setVisible (
+        dockPage == DockPage::synth
+    );
+
+    keyboardTabButton.setToggleState (
+        dockPage == DockPage::keyboard,
+        juce::dontSendNotification
+    );
+
+    synthTabButton.setToggleState (
+        dockPage == DockPage::synth,
+        juce::dontSendNotification
+    );
+
+    mixerTabButton.setToggleState (
+        dockPage == DockPage::mixer,
+        juce::dontSendNotification
+    );
+
+    resized();
+    repaint();
+}
+
+void MainComponent::drawPanel (
+    juce::Graphics& g,
+    juce::Rectangle<int> area,
+    const juce::String& title,
+    juce::Colour accent,
+    float alpha)
+{
+    if (area.isEmpty())
+        return;
+
+    const auto bounds =
+        area.toFloat();
+
+    juce::ColourGradient glass (
+        accent.withAlpha (
+            alpha + 0.08f
+        ),
+        bounds.getTopLeft(),
+        jadLookAndFeel.colourB()
+            .withAlpha (
+                alpha * 0.45f
+            ),
+        bounds.getBottomRight(),
+        false
+    );
+
+    g.setGradientFill (
+        glass
+    );
+
+    g.fillRoundedRectangle (
+        bounds,
+        14.0f
+    );
+
+    g.setColour (
+        accent.withAlpha (0.50f)
+    );
+
+    g.drawRoundedRectangle (
+        bounds.reduced (0.75f),
+        14.0f,
+        1.2f
+    );
+
+    if (title.isEmpty())
+        return;
+
+    auto titleArea =
+        area.removeFromTop (28)
+            .reduced (10, 0);
+
+    g.setColour (
+        juce::Colours::white
+            .withAlpha (0.78f)
+    );
+
+    g.setFont (
+        juce::FontOptions (11.0f)
+            .withStyle ("Bold")
+    );
+
+    g.drawText (
+        title,
+        titleArea,
+        juce::Justification::centredLeft
+    );
+}
+
+juce::Rectangle<int>
+MainComponent::getTrackRowBounds (
+    int trackIndex) const
+{
+    auto body =
+        cachedTrackRack.reduced (8);
+
+    body.removeFromTop (30);
+
+    constexpr int rowHeight = 72;
+    constexpr int gap = 5;
+
+    const auto y =
+        body.getY()
+        + trackIndex
+        * (rowHeight + gap);
+
+    return {
+        body.getX(),
+        y,
+        body.getWidth(),
+        rowHeight
+    };
+}
+
+juce::Rectangle<int>
+MainComponent::getTrackGainBounds (
+    int trackIndex) const
+{
+    auto row =
+        getTrackRowBounds (
+            trackIndex
+        )
+        .reduced (8, 5);
+
+    row.removeFromTop (28);
+
+    auto gain =
+        row.removeFromTop (15);
+
+    gain.removeFromLeft (82);
+
+    return gain;
+}
+
+juce::Rectangle<int>
+MainComponent::getTrackPanBounds (
+    int trackIndex) const
+{
+    auto row =
+        getTrackRowBounds (
+            trackIndex
+        )
+        .reduced (8, 5);
+
+    row.removeFromTop (45);
+
+    auto pan =
+        row.removeFromTop (15);
+
+    pan.removeFromLeft (82);
+
+    return pan;
+}
+
+juce::Rectangle<int>
+MainComponent::getTimelineBounds() const
+{
+    auto body =
+        cachedArrangement.reduced (8);
+
+    body.removeFromTop (28);
+    body.removeFromTop (30);
+
+    return body;
+}
+
+juce::Rectangle<int>
+MainComponent::getLaneBounds (
+    int trackIndex) const
+{
+    auto timeline =
+        getTimelineBounds();
+
+    const auto count =
+        static_cast<int> (
+            context.getSessionState()
+                .getTrackCount()
+        );
+
+    if (
+        count <= 0
+        || trackIndex < 0
+        || trackIndex >= count
+    )
+    {
+        return {};
+    }
+
+    constexpr int gap = 5;
+
+    const auto available =
+        timeline.getHeight()
+        - gap * juce::jmax (
+            0,
+            count - 1
+        );
+
+    const auto laneHeight =
+        juce::jmax (
+            28,
+            available
+                / juce::jmax (
+                    1,
+                    count
+                )
+        );
+
+    const auto y =
+        timeline.getY()
+        + trackIndex
+        * (laneHeight + gap);
+
+    return {
+        timeline.getX(),
+        y,
+        timeline.getWidth(),
+        laneHeight
+    };
+}
+
+int MainComponent::beatToX (
+    double beat) const
+{
+    const auto timeline =
+        getTimelineBounds();
+
+    if (timeline.getWidth() <= 0)
+        return timeline.getX();
+
+    const auto fraction =
+        (
+            beat
+            - timelineViewport.getStartBeat()
+        )
+        / timelineViewport.getVisibleBeats();
+
+    return timeline.getX()
+        + static_cast<int> (
+            fraction
+            * timeline.getWidth()
+        );
+}
+
+double MainComponent::xToBeat (
+    int x) const
+{
+    const auto timeline =
+        getTimelineBounds();
+
+    if (timeline.getWidth() <= 0)
+        return timelineViewport.getStartBeat();
+
+    const auto fraction =
+        juce::jlimit (
+            0.0,
+            1.0,
+            static_cast<double> (
+                x - timeline.getX()
+            )
+            / static_cast<double> (
+                timeline.getWidth()
+            )
+        );
+
+    return timelineViewport.getStartBeat()
+        + fraction
+        * timelineViewport.getVisibleBeats();
+}
+
+juce::Rectangle<int>
+MainComponent::getClipBounds (
+    int trackIndex,
+    int clipIndex) const
+{
+    const auto lane =
+        getLaneBounds (
+            trackIndex
+        );
+
+    if (lane.isEmpty())
+        return {};
+
+    auto* track =
+        context.getSessionState()
+            .getTrack (
+                static_cast<std::size_t> (
+                    trackIndex
+                )
+            );
+
+    if (track == nullptr)
+        return {};
+
+    if (
+        clipIndex < 0
+        || clipIndex
+            >= static_cast<int> (
+                track->getClipCount()
+            )
+    )
+    {
+        return {};
+    }
+
+    auto* clip =
+        track->getClip (
+            static_cast<std::size_t> (
+                clipIndex
+            )
+        );
+
+    if (clip == nullptr)
+        return {};
+
+    const auto visibleStart =
+        timelineViewport.getStartBeat();
+
+    const auto visibleEnd =
+        timelineViewport.getEndBeat();
+
+    const auto clipStart =
+        clip->getStartBeat();
+
+    const auto clipEnd =
+        clipStart
+        + clip->getLengthBeats();
+
+    if (
+        clipEnd <= visibleStart
+        || clipStart >= visibleEnd
+    )
+    {
+        return {};
+    }
+
+    const auto start =
+        juce::jmax (
+            visibleStart,
+            clipStart
+        );
+
+    const auto end =
+        juce::jmin (
+            visibleEnd,
+            clipEnd
+        );
+
+    const auto x1 =
+        beatToX (start);
+
+    const auto x2 =
+        beatToX (end);
+
+    return {
+        x1 + 3,
+        lane.getY() + 5,
+        juce::jmax (
+            8,
+            x2 - x1 - 6
+        ),
+        juce::jmax (
+            8,
+            lane.getHeight() - 10
+        )
+    };
+}
+
+void MainComponent::drawTrackRack (
+    juce::Graphics& g,
+    juce::Rectangle<int> area)
+{
+    drawPanel (
+        g,
+        area,
+        "TRACK RACK",
+        jadLookAndFeel.colourA(),
+        0.16f
+    );
+
+    auto& session =
+        context.getSessionState();
+
+    const auto count =
+        static_cast<int> (
+            session.getTrackCount()
+        );
+
+    if (count <= 0)
+        return;
+
+    for (
+        int index = 0;
+        index < count;
+        ++index
+    )
+    {
+        const auto row =
+            getTrackRowBounds (
+                index
+            );
+
+        if (
+            row.getBottom()
+            > cachedTrackRack.getBottom()
+        )
+        {
+            break;
+        }
+
+        auto* track =
+            session.getTrack (
+                static_cast<std::size_t> (
+                    index
+                )
+            );
+
+        if (track == nullptr)
+            continue;
+
+        const auto colour =
+            jadLookAndFeel.trackColour (
+                index
+            );
+
+        const auto selected =
+            index
+            == selectedTrackIndex;
+
+        juce::ColourGradient gradient (
+            colour.withAlpha (
+                selected ? 0.72f : 0.28f
+            ),
+            row.getTopLeft().toFloat(),
+            jadLookAndFeel.colourB()
+                .withAlpha (
+                    selected ? 0.30f : 0.10f
+                ),
+            row.getBottomRight().toFloat(),
+            false
+        );
+
+        g.setGradientFill (
+            gradient
+        );
+
+        g.fillRoundedRectangle (
+            row.toFloat(),
+            9.0f
+        );
+
+        g.setColour (
+            colour.withAlpha (
+                selected ? 0.96f : 0.38f
+            )
+        );
+
+        g.drawRoundedRectangle (
+            row.toFloat(),
+            9.0f,
+            selected ? 2.0f : 1.0f
+        );
+
+        auto inner =
+            row.reduced (8, 5);
+
+        auto title =
+            inner.removeFromTop (25);
+
+        g.setColour (
+            juce::Colours::white
+        );
+
+        g.setFont (
+            juce::FontOptions (12.0f)
+                .withStyle ("Bold")
+        );
+
+        g.drawText (
+            juce::String (
+                track->getName()
+            ),
+            title,
+            juce::Justification::centredLeft
+        );
+
+        auto controlLine =
+            inner.removeFromTop (17);
+
+        auto mute =
+            controlLine.removeFromLeft (23);
+
+        controlLine.removeFromLeft (3);
+
+        auto solo =
+            controlLine.removeFromLeft (23);
+
+        controlLine.removeFromLeft (3);
+
+        auto arm =
+            controlLine.removeFromLeft (23);
+
+        const auto drawToggle =
+            [&g, colour] (
+                juce::Rectangle<int> bounds,
+                const juce::String& text,
+                bool enabled)
+            {
+                g.setColour (
+                    enabled
+                        ? colour.withAlpha (0.90f)
+                        : juce::Colours::black
+                            .withAlpha (0.34f)
+                );
+
+                g.fillRoundedRectangle (
+                    bounds.toFloat(),
+                    4.0f
+                );
+
+                g.setColour (
+                    juce::Colours::white
+                        .withAlpha (
+                            enabled
+                                ? 1.0f
+                                : 0.56f
+                        )
+                );
+
+                g.setFont (
+                    juce::FontOptions (9.0f)
+                        .withStyle ("Bold")
+                );
+
+                g.drawText (
+                    text,
+                    bounds,
+                    juce::Justification::centred
+                );
+            };
+
+        drawToggle (
+            mute,
+            "M",
+            track->isMuted()
+        );
+
+        drawToggle (
+            solo,
+            "S",
+            track->isSolo()
+        );
+
+        drawToggle (
+            arm,
+            "R",
+            track->isRecordArmed()
+        );
+
+        const auto gainBounds =
+            getTrackGainBounds (
+                index
+            );
+
+        const auto panBounds =
+            getTrackPanBounds (
+                index
+            );
+
+        g.setColour (
+            juce::Colours::black
+                .withAlpha (0.42f)
+        );
+
+        g.fillRoundedRectangle (
+            gainBounds.toFloat(),
+            3.0f
+        );
+
+        g.fillRoundedRectangle (
+            panBounds.toFloat(),
+            3.0f
+        );
+
+        const auto gainFraction =
+            juce::jlimit (
+                0.0f,
+                1.0f,
+                track->getGain()
+                    / 2.0f
+            );
+
+        auto gainFill =
+            gainBounds;
+
+        gainFill.setWidth (
+            static_cast<int> (
+                gainBounds.getWidth()
+                * gainFraction
+            )
+        );
+
+        g.setColour (
+            colour.withAlpha (0.82f)
+        );
+
+        g.fillRoundedRectangle (
+            gainFill.toFloat(),
+            3.0f
+        );
+
+        const auto panFraction =
+            (
+                track->getPan()
+                + 1.0f
+            ) * 0.5f;
+
+        const auto panX =
+            panBounds.getX()
+            + static_cast<int> (
+                panFraction
+                * panBounds.getWidth()
+            );
+
+        g.setColour (
+            juce::Colours::white
+                .withAlpha (0.86f)
+        );
+
+        g.drawVerticalLine (
+            panX,
+            static_cast<float> (
+                panBounds.getY()
+            ),
+            static_cast<float> (
+                panBounds.getBottom()
+            )
+        );
+
+        g.setFont (7.5f);
+
+        g.setColour (
+            juce::Colours::white
+                .withAlpha (0.45f)
+        );
+
+        g.drawText (
+            "GAIN",
+            gainBounds.translated (
+                -38,
+                0
+            ),
+            juce::Justification::centredLeft
+        );
+
+        g.drawText (
+            "PAN",
+            panBounds.translated (
+                -38,
+                0
+            ),
+            juce::Justification::centredLeft
+        );
+    }
+}
+
+void MainComponent::drawArrangement (
+    juce::Graphics& g,
+    juce::Rectangle<int> area)
+{
+    drawPanel (
+        g,
+        area,
+        "ARRANGEMENT • CLICK TO SEEK • DRAG CLIPS • EDGE TO RESIZE",
+        jadLookAndFeel.colourD(),
+        0.11f
+    );
+
+    auto rulerBody =
+        area.reduced (8);
+
+    rulerBody.removeFromTop (28);
+
+    auto ruler =
+        rulerBody.removeFromTop (30);
+
+    const auto timeline =
+        getTimelineBounds();
+
+    g.setColour (
+        juce::Colours::black
+            .withAlpha (0.28f)
+    );
+
+    g.fillRoundedRectangle (
+        ruler.toFloat(),
+        7.0f
+    );
+
+    const auto firstBeat =
+        static_cast<int> (
+            std::floor (
+                timelineViewport.getStartBeat()
+            )
+        );
+
+    const auto lastBeat =
+        static_cast<int> (
+            std::ceil (
+                timelineViewport.getEndBeat()
+            )
+        );
+
+    for (
+        int beat = firstBeat;
+        beat <= lastBeat;
+        ++beat
+    )
+    {
+        const auto x =
+            beatToX (
+                static_cast<double> (
+                    beat
+                )
+            );
+
+        const auto bar =
+            beat % 4 == 0;
+
+        g.setColour (
+            (
+                bar
+                    ? jadLookAndFeel.colourD()
+                    : juce::Colours::white
+            )
+            .withAlpha (
+                bar ? 0.46f : 0.10f
+            )
+        );
+
+        g.drawVerticalLine (
+            x,
+            static_cast<float> (
+                ruler.getY()
+            ),
+            static_cast<float> (
+                timeline.getBottom()
+            )
+        );
+
+        if (! bar)
+            continue;
+
+        g.setColour (
+            juce::Colours::white
+                .withAlpha (0.70f)
+        );
+
+        g.setFont (9.5f);
+
+        g.drawText (
+            juce::String (
+                (beat / 4) + 1
+            ),
+            x + 4,
+            ruler.getY(),
+            38,
+            ruler.getHeight(),
+            juce::Justification::centredLeft
+        );
+    }
+
+    auto& session =
+        context.getSessionState();
+
+    const auto count =
+        static_cast<int> (
+            session.getTrackCount()
+        );
+
+    for (
+        int trackIndex = 0;
+        trackIndex < count;
+        ++trackIndex
+    )
+    {
+        const auto lane =
+            getLaneBounds (
+                trackIndex
+            );
+
+        if (lane.isEmpty())
+            continue;
+
+        const auto colour =
+            jadLookAndFeel.trackColour (
+                trackIndex
+            );
+
+        const auto selected =
+            trackIndex
+            == selectedTrackIndex;
+
+        g.setColour (
+            colour.withAlpha (
+                selected ? 0.18f : 0.07f
+            )
+        );
+
+        g.fillRoundedRectangle (
+            lane.toFloat(),
+            7.0f
+        );
+
+        g.setColour (
+            colour.withAlpha (
+                selected ? 0.48f : 0.18f
+            )
+        );
+
+        g.drawRoundedRectangle (
+            lane.toFloat(),
+            7.0f,
+            selected ? 1.5f : 0.8f
+        );
+
+        auto* track =
+            session.getTrack (
+                static_cast<std::size_t> (
+                    trackIndex
+                )
+            );
+
+        if (track == nullptr)
+            continue;
+
+        for (
+            int clipIndex = 0;
+            clipIndex
+                < static_cast<int> (
+                    track->getClipCount()
+                );
+            ++clipIndex
+        )
+        {
+            auto* clip =
+                track->getClip (
+                    static_cast<std::size_t> (
+                        clipIndex
+                    )
+                );
+
+            if (clip == nullptr)
+                continue;
+
+            const auto clipBounds =
+                getClipBounds (
+                    trackIndex,
+                    clipIndex
+                );
+
+            if (clipBounds.isEmpty())
+                continue;
+
+            const auto clipSelected =
+                trackIndex
+                    == selectedClipTrackIndex
+                && clipIndex
+                    == selectedClipIndex;
+
+            juce::ColourGradient clipGradient (
+                colour.withAlpha (
+                    clip->isMuted()
+                        ? 0.28f
+                        : 0.90f
+                ),
+                clipBounds
+                    .getTopLeft()
+                    .toFloat(),
+                jadLookAndFeel.colourB()
+                    .withAlpha (
+                        clip->isMuted()
+                            ? 0.16f
+                            : 0.54f
+                    ),
+                clipBounds
+                    .getBottomRight()
+                    .toFloat(),
+                false
+            );
+
+            g.setGradientFill (
+                clipGradient
+            );
+
+            g.fillRoundedRectangle (
+                clipBounds.toFloat(),
+                6.0f
+            );
+
+            if (clipSelected)
+            {
+                g.setColour (
+                    juce::Colours::white
+                );
+
+                g.drawRoundedRectangle (
+                    clipBounds
+                        .toFloat()
+                        .expanded (2.0f),
+                    7.0f,
+                    2.5f
+                );
+            }
+
+            auto resizeHandle =
+                clipBounds.withLeft (
+                    clipBounds.getRight() - 8
+                );
+
+            g.setColour (
+                juce::Colours::white
+                    .withAlpha (
+                        clipSelected
+                            ? 0.85f
+                            : 0.30f
+                    )
+            );
+
+            g.fillRoundedRectangle (
+                resizeHandle
+                    .reduced (2, 5)
+                    .toFloat(),
+                2.0f
+            );
+
+            g.setColour (
+                juce::Colours::white
+                    .withAlpha (
+                        clip->isMuted()
+                            ? 0.42f
+                            : 0.90f
+                    )
+            );
+
+            g.setFont (
+                juce::FontOptions (10.0f)
+                    .withStyle ("Bold")
+            );
+
+            g.drawText (
+                juce::String (
+                    clip->getName()
+                ),
+                clipBounds.reduced (7),
+                juce::Justification::centredLeft
+            );
+        }
+    }
+
+    const auto playheadBeat =
+        context.getSessionState()
+            .getTransportState()
+            .getPositionInBeats();
+
+    if (
+        playheadBeat
+            >= timelineViewport.getStartBeat()
+        && playheadBeat
+            <= timelineViewport.getEndBeat()
+    )
+    {
+        const auto x =
+            beatToX (
+                playheadBeat
+            );
+
+        g.setColour (
+            juce::Colours::white
+                .withAlpha (0.94f)
+        );
+
+        g.drawVerticalLine (
+            x,
+            static_cast<float> (
+                ruler.getY()
+            ),
+            static_cast<float> (
+                timeline.getBottom()
+            )
+        );
+
+        g.setColour (
+            jadLookAndFeel.colourA()
+        );
+
+        juce::Path head;
+
+        head.addTriangle (
+            static_cast<float> (
+                x - 5
+            ),
+            static_cast<float> (
+                ruler.getY()
+            ),
+            static_cast<float> (
+                x + 5
+            ),
+            static_cast<float> (
+                ruler.getY()
+            ),
+            static_cast<float> (x),
+            static_cast<float> (
+                ruler.getY() + 8
+            )
+        );
+
+        g.fillPath (
+            head
+        );
+    }
+}
+
+void MainComponent::drawInspector (
+    juce::Graphics& g,
+    juce::Rectangle<int> area)
+{
+    drawPanel (
+        g,
+        area,
+        "INSPECTOR",
+        jadLookAndFeel.colourB(),
+        0.15f
+    );
+
+    auto body =
+        area.reduced (14);
+
+    body.removeFromTop (34);
+
+    auto& session =
+        context.getSessionState();
+
+    if (selectedTrackIndex < 0)
+    {
+        g.setColour (
+            juce::Colours::white
+                .withAlpha (0.40f)
+        );
+
+        g.drawText (
+            "NO TRACK SELECTED",
+            body,
+            juce::Justification::centred
+        );
+
+        return;
+    }
+
+    auto* track =
+        session.getTrack (
+            static_cast<std::size_t> (
+                selectedTrackIndex
+            )
+        );
+
+    if (track == nullptr)
+        return;
+
+    const auto colour =
+        jadLookAndFeel.trackColour (
+            selectedTrackIndex
+        );
+
+    g.setColour (
+        colour
+    );
+
+    g.fillRoundedRectangle (
+        body.removeFromTop (5)
+            .toFloat(),
+        2.5f
+    );
+
+    body.removeFromTop (12);
+
+    g.setColour (
+        juce::Colours::white
+    );
+
+    g.setFont (
+        juce::FontOptions (16.0f)
+            .withStyle ("Bold")
+    );
+
+    g.drawText (
+        juce::String (
+            track->getName()
+        ),
+        body.removeFromTop (28),
+        juce::Justification::centredLeft
+    );
+
+    const auto drawValue =
+        [&g, &body, colour] (
+            const juce::String& label,
+            const juce::String& value)
+        {
+            auto row =
+                body.removeFromTop (30);
+
+            g.setColour (
+                juce::Colours::white
+                    .withAlpha (0.42f)
+            );
+
+            g.setFont (9.0f);
+
+            g.drawText (
+                label,
+                row.removeFromTop (12),
+                juce::Justification::centredLeft
+            );
+
+            g.setColour (
+                colour.withAlpha (0.94f)
+            );
+
+            g.setFont (
+                juce::FontOptions (12.0f)
+                    .withStyle ("Bold")
+            );
+
+            g.drawText (
+                value,
+                row,
+                juce::Justification::centredLeft
+            );
+
+            body.removeFromTop (5);
+        };
+
+    drawValue (
+        "GAIN",
+        juce::String (
+            track->getGain(),
+            2
+        )
+    );
+
+    drawValue (
+        "PAN",
+        juce::String (
+            track->getPan(),
+            2
+        )
+    );
+
+    juce::String trackState;
+
+    if (track->isMuted())
+        trackState += "MUTE ";
+
+    if (track->isSolo())
+        trackState += "SOLO ";
+
+    if (track->isRecordArmed())
+        trackState += "ARM ";
+
+    if (trackState.isEmpty())
+        trackState = "READY";
+
+    drawValue (
+        "TRACK STATE",
+        trackState.trim()
+    );
+
+    if (
+        selectedClipTrackIndex
+            != selectedTrackIndex
+        || selectedClipIndex < 0
+    )
+    {
+        drawValue (
+            "CLIPS",
+            juce::String (
+                static_cast<int> (
+                    track->getClipCount()
+                )
+            )
+        );
+
+        return;
+    }
+
+    auto* clip =
+        track->getClip (
+            static_cast<std::size_t> (
+                selectedClipIndex
+            )
+        );
+
+    if (clip == nullptr)
+        return;
+
+    body.removeFromTop (4);
+
+    g.setColour (
+        juce::Colours::white
+            .withAlpha (0.20f)
+    );
+
+    g.drawHorizontalLine (
+        body.getY(),
+        static_cast<float> (
+            body.getX()
+        ),
+        static_cast<float> (
+            body.getRight()
+        )
+    );
+
+    body.removeFromTop (10);
+
+    drawValue (
+        "SELECTED CLIP",
+        juce::String (
+            clip->getName()
+        )
+    );
+
+    drawValue (
+        "START BEAT",
+        juce::String (
+            clip->getStartBeat(),
+            2
+        )
+    );
+
+    drawValue (
+        "LENGTH",
+        juce::String (
+            clip->getLengthBeats(),
+            2
+        )
+    );
+}
+
+void MainComponent::drawDock (
+    juce::Graphics& g,
+    juce::Rectangle<int> area)
+{
+    drawPanel (
+        g,
+        area,
+        "",
+        jadLookAndFeel.colourC(),
+        0.10f
+    );
+
+    if (
+        dockPage
+        != DockPage::mixer
+    )
+    {
+        return;
+    }
+
+    auto body =
+        area.reduced (18);
+
+    body.removeFromTop (48);
+
+    auto& session =
+        context.getSessionState();
+
+    const auto count =
+        static_cast<int> (
+            session.getTrackCount()
+        );
+
+    if (count <= 0)
+        return;
+
+    constexpr int gap = 8;
+
+    const auto stripWidth =
+        juce::jmax (
+            62,
+            (
+                body.getWidth()
+                - gap
+                    * juce::jmax (
+                        0,
+                        count - 1
+                    )
+            )
+            / juce::jmax (
+                1,
+                count
+            )
+        );
+
+    for (
+        int index = 0;
+        index < count;
+        ++index
+    )
+    {
+        if (
+            body.getWidth()
+            < stripWidth
+        )
+        {
+            break;
+        }
+
+        auto strip =
+            body.removeFromLeft (
+                stripWidth
+            );
+
+        body.removeFromLeft (gap);
+
+        auto* track =
+            session.getTrack (
+                static_cast<std::size_t> (
+                    index
+                )
+            );
+
+        if (track == nullptr)
+            continue;
+
+        const auto colour =
+            jadLookAndFeel.trackColour (
+                index
+            );
+
+        g.setColour (
+            colour.withAlpha (0.15f)
+        );
+
+        g.fillRoundedRectangle (
+            strip.toFloat(),
+            8.0f
+        );
+
+        g.setColour (
+            colour.withAlpha (0.45f)
+        );
+
+        g.drawRoundedRectangle (
+            strip.toFloat(),
+            8.0f,
+            1.0f
+        );
+
+        auto text =
+            strip.reduced (8);
+
+        g.setColour (
+            juce::Colours::white
+                .withAlpha (0.86f)
+        );
+
+        g.setFont (
+            juce::FontOptions (10.0f)
+                .withStyle ("Bold")
+        );
+
+        g.drawText (
+            juce::String (
+                track->getName()
+            ),
+            text.removeFromTop (24),
+            juce::Justification::centred
+        );
+
+        auto meter =
+            text.reduced (
+                text.getWidth() / 3,
+                12
+            );
+
+        g.setColour (
+            juce::Colours::black
+                .withAlpha (0.45f)
+        );
+
+        g.fillRoundedRectangle (
+            meter.toFloat(),
+            4.0f
+        );
+
+        const auto gain =
+            juce::jlimit (
+                0.0f,
+                1.0f,
+                track->getGain()
+                    * 0.5f
+            );
+
+        auto fill =
+            meter;
+
+        fill.removeFromTop (
+            static_cast<int> (
+                fill.getHeight()
+                * (1.0f - gain)
+            )
+        );
+
+        g.setColour (
+            colour.withAlpha (0.86f)
+        );
+
+        g.fillRoundedRectangle (
+            fill.toFloat(),
+            4.0f
+        );
+    }
+}
+
+void MainComponent::paint (
+    juce::Graphics& g)
+{
+    const auto bounds =
+        getLocalBounds()
+            .toFloat();
+
+    g.fillAll (
+        juce::Colour::fromRGB (
+            5,
+            4,
+            14
+        )
+    );
+
+    juce::ColourGradient background (
+        jadLookAndFeel.colourA()
+            .withAlpha (0.31f),
+        bounds.getTopLeft(),
+        jadLookAndFeel.colourC()
+            .withAlpha (0.18f),
+        bounds.getBottomRight(),
+        false
+    );
+
+    background.addColour (
+        0.32,
+        jadLookAndFeel.colourB()
+            .withAlpha (0.20f)
+    );
+
+    background.addColour (
+        0.67,
+        jadLookAndFeel.colourD()
+            .withAlpha (0.16f)
+    );
+
+    background.addColour (
+        0.88,
+        juce::Colour::fromRGB (
+            8,
+            5,
+            22
+        )
+    );
+
+    g.setGradientFill (
+        background
+    );
+
+    g.fillRect (
+        bounds
+    );
+
+    auto header =
+        getLocalBounds()
+            .removeFromTop (66)
+            .reduced (18, 7);
+
+    juce::ColourGradient headerGradient (
+        jadLookAndFeel.colourA()
+            .withAlpha (0.82f),
+        header.getTopLeft().toFloat(),
+        jadLookAndFeel.colourD()
+            .withAlpha (0.48f),
+        header.getBottomRight().toFloat(),
+        false
+    );
+
+    g.setGradientFill (
+        headerGradient
+    );
+
+    g.fillRoundedRectangle (
+        header.toFloat(),
+        16.0f
+    );
+
+    g.setColour (
+        juce::Colours::white
+    );
+
+    g.setFont (
+        juce::FontOptions (25.0f)
+            .withStyle ("Bold")
+    );
+
+    g.drawText (
+        "JAD",
+        header.reduced (18),
+        juce::Justification::centredLeft
+    );
+
+    g.setFont (10.5f);
+
+    g.drawText (
+        "JUST ANOTHER DAW • HANDS ON TIMELINE • 047 SEED PLANTED",
+        header.reduced (18),
+        juce::Justification::centredRight
+    );
+
+    drawTrackRack (
+        g,
+        cachedTrackRack
+    );
+
+    drawArrangement (
+        g,
+        cachedArrangement
+    );
+
+    drawInspector (
+        g,
+        cachedInspector
+    );
+
+    drawDock (
+        g,
+        cachedDock
+    );
+}
+
+void MainComponent::resized()
+{
+    auto area =
+        getLocalBounds();
+
+    area.removeFromTop (68);
+
+    auto commandBar =
+        area.removeFromTop (46)
+            .reduced (18, 3);
+
+    projectLabel.setBounds (
+        commandBar.removeFromLeft (235)
+    );
+
+    commandBar.removeFromLeft (6);
+
+    addTrackButton.setBounds (
+        commandBar.removeFromLeft (82)
+            .reduced (2)
+    );
+
+    deleteTrackButton.setBounds (
+        commandBar.removeFromLeft (82)
+            .reduced (2)
+    );
+
+    commandBar.removeFromLeft (8);
+
+    scrollLeftButton.setBounds (
+        commandBar.removeFromLeft (42)
+            .reduced (2)
+    );
+
+    scrollRightButton.setBounds (
+        commandBar.removeFromLeft (42)
+            .reduced (2)
+    );
+
+    zoomOutButton.setBounds (
+        commandBar.removeFromLeft (78)
+            .reduced (2)
+    );
+
+    zoomInButton.setBounds (
+        commandBar.removeFromLeft (78)
+            .reduced (2)
+    );
+
+    snapButton.setBounds (
+        commandBar.removeFromLeft (66)
+            .reduced (2)
+    );
+
+    statusLabel.setBounds (
+        commandBar
+    );
+
+    auto transportArea =
+        area.removeFromTop (82)
+            .reduced (18, 4);
+
+    transportPanel.setBounds (
+        transportArea
+    );
+
+    area.reduce (
+        18,
+        7
+    );
+
+    const int dockHeight =
+        juce::jlimit (
+            210,
+            310,
+            area.getHeight() / 3
+        );
+
+    cachedDock =
+        area.removeFromBottom (
+            dockHeight
+        );
+
+    area.removeFromBottom (10);
+
+    const auto rackWidth =
+        juce::jlimit (
+            190,
+            260,
+            area.getWidth() / 5
+        );
+
+    const auto inspectorWidth =
+        juce::jlimit (
+            190,
+            260,
+            area.getWidth() / 5
+        );
+
+    cachedTrackRack =
+        area.removeFromLeft (
+            rackWidth
+        );
+
+    area.removeFromLeft (10);
+
+    cachedInspector =
+        area.removeFromRight (
+            inspectorWidth
+        );
+
+    area.removeFromRight (10);
+
+    cachedArrangement =
+        area;
+
+    auto dockControls =
+        cachedDock.reduced (12);
+
+    auto tabs =
+        dockControls.removeFromTop (38);
+
+    keyboardTabButton.setBounds (
+        tabs.removeFromLeft (110)
+            .reduced (2)
+    );
+
+    synthTabButton.setBounds (
+        tabs.removeFromLeft (90)
+            .reduced (2)
+    );
+
+    mixerTabButton.setBounds (
+        tabs.removeFromLeft (90)
+            .reduced (2)
+    );
+
+    dockControls.removeFromTop (4);
+
+    keyboardPanel.setBounds (
+        dockControls
+    );
+
+    synthVoicePanel.setBounds (
+        dockControls
+    );
+
+    sessionOverviewPanel.setBounds (
+        {}
+    );
+}
+
+void MainComponent::seekTransport (
+    double beat)
+{
+    auto& transport =
+        context.getSessionState()
+            .getTransportState();
+
+    const auto snapped =
+        timelineViewport.snapBeat (
+            beat
+        );
+
+    transport.setPositionInBeats (
+        snapped
+    );
+
+    const auto sampleRate =
+        context.getAudioSystem()
+            .getSampleRate();
+
+    if (sampleRate <= 0.0)
+        return;
+
+    const auto tempo =
+        transport.getTempo();
+
+    if (tempo <= 0.0)
+        return;
+
+    const auto seconds =
+        snapped
+        * 60.0
+        / tempo;
+
+    transport.setPositionInSamples (
+        static_cast<std::int64_t> (
+            seconds * sampleRate
+        )
+    );
+}
+
+void MainComponent::beginClipInteraction (
+    int trackIndex,
+    int clipIndex,
+    int mouseX,
+    bool resize)
+{
+    auto* track =
+        context.getSessionState()
+            .getTrack (
+                static_cast<std::size_t> (
+                    trackIndex
+                )
+            );
+
+    if (track == nullptr)
+        return;
+
+    auto* clip =
+        track->getClip (
+            static_cast<std::size_t> (
+                clipIndex
+            )
+        );
+
+    if (clip == nullptr)
+        return;
+
+    selectedTrackIndex =
+        trackIndex;
+
+    selectedClipTrackIndex =
+        trackIndex;
+
+    selectedClipIndex =
+        clipIndex;
+
+    dragTrackIndex =
+        trackIndex;
+
+    dragClipIndex =
+        clipIndex;
+
+    dragAnchorX =
+        mouseX;
+
+    dragInitialStartBeat =
+        clip->getStartBeat();
+
+    dragInitialLengthBeats =
+        clip->getLengthBeats();
+
+    dragMode =
+        resize
+            ? DragMode::resizeClip
+            : DragMode::moveClip;
+
+    repaint();
+}
+
+void MainComponent::mouseDown (
+    const juce::MouseEvent& event)
+{
+    const auto point =
+        event.getPosition();
+
+    auto& session =
+        context.getSessionState();
+
+    const auto count =
+        static_cast<int> (
+            session.getTrackCount()
+        );
+
+    if (
+        cachedTrackRack.contains (
+            point
+        )
+    )
+    {
+        for (
+            int index = 0;
+            index < count;
+            ++index
+        )
+        {
+            const auto row =
+                getTrackRowBounds (
+                    index
+                );
+
+            if (! row.contains (point))
+                continue;
+
+            selectTrack (
+                index
+            );
+
+            auto* track =
+                session.getTrack (
+                    static_cast<std::size_t> (
+                        index
+                    )
+                );
+
+            if (track == nullptr)
+                return;
+
+            auto controls =
+                row.reduced (8, 5);
+
+            controls.removeFromTop (25);
+
+            auto toggleLine =
+                controls.removeFromTop (17);
+
+            auto mute =
+                toggleLine.removeFromLeft (23);
+
+            toggleLine.removeFromLeft (3);
+
+            auto solo =
+                toggleLine.removeFromLeft (23);
+
+            toggleLine.removeFromLeft (3);
+
+            auto arm =
+                toggleLine.removeFromLeft (23);
+
+            if (mute.contains (point))
+            {
+                track->setMuted (
+                    ! track->isMuted()
+                );
+
+                repaint();
+                return;
+            }
+
+            if (solo.contains (point))
+            {
+                track->setSolo (
+                    ! track->isSolo()
+                );
+
+                repaint();
+                return;
+            }
+
+            if (arm.contains (point))
+            {
+                track->setRecordArmed (
+                    ! track->isRecordArmed()
+                );
+
+                repaint();
+                return;
+            }
+
+            const auto gain =
+                getTrackGainBounds (
+                    index
+                );
+
+            if (gain.contains (point))
+            {
+                dragMode =
+                    DragMode::trackGain;
+
+                dragTrackIndex =
+                    index;
+
+                mouseDrag (
+                    event
+                );
+
+                return;
+            }
+
+            const auto pan =
+                getTrackPanBounds (
+                    index
+                );
+
+            if (pan.contains (point))
+            {
+                dragMode =
+                    DragMode::trackPan;
+
+                dragTrackIndex =
+                    index;
+
+                mouseDrag (
+                    event
+                );
+
+                return;
+            }
+
+            return;
+        }
+
+        return;
+    }
+
+    const auto timeline =
+        getTimelineBounds();
+
+    if (! timeline.contains (point))
+        return;
+
+    for (
+        int trackIndex = 0;
+        trackIndex < count;
+        ++trackIndex
+    )
+    {
+        auto* track =
+            session.getTrack (
+                static_cast<std::size_t> (
+                    trackIndex
+                )
+            );
+
+        if (track == nullptr)
+            continue;
+
+        for (
+            int clipIndex = 0;
+            clipIndex
+                < static_cast<int> (
+                    track->getClipCount()
+                );
+            ++clipIndex
+        )
+        {
+            const auto clipBounds =
+                getClipBounds (
+                    trackIndex,
+                    clipIndex
+                );
+
+            if (
+                ! clipBounds.contains (
+                    point
+                )
+            )
+            {
+                continue;
+            }
+
+            const auto resize =
+                point.x
+                >= clipBounds.getRight()
+                    - 10;
+
+            beginClipInteraction (
+                trackIndex,
+                clipIndex,
+                point.x,
+                resize
+            );
+
+            return;
+        }
+    }
+
+    clearClipSelection();
+
+    for (
+        int trackIndex = 0;
+        trackIndex < count;
+        ++trackIndex
+    )
+    {
+        if (
+            getLaneBounds (
+                trackIndex
+            )
+            .contains (
+                point
+            )
+        )
+        {
+            selectTrack (
+                trackIndex
+            );
+
+            break;
+        }
+    }
+
+    seekTransport (
+        xToBeat (
+            point.x
+        )
+    );
+
+    repaint();
+}
+
+void MainComponent::mouseDrag (
+    const juce::MouseEvent& event)
+{
+    auto& session =
+        context.getSessionState();
+
+    if (
+        dragMode
+        == DragMode::trackGain
+    )
+    {
+        auto* track =
+            session.getTrack (
+                static_cast<std::size_t> (
+                    dragTrackIndex
+                )
+            );
+
+        if (track == nullptr)
+            return;
+
+        const auto bounds =
+            getTrackGainBounds (
+                dragTrackIndex
+            );
+
+        if (bounds.getWidth() <= 0)
+            return;
+
+        const auto fraction =
+            juce::jlimit (
+                0.0f,
+                1.0f,
+                static_cast<float> (
+                    event.x
+                    - bounds.getX()
+                )
+                / static_cast<float> (
+                    bounds.getWidth()
+                )
+            );
+
+        track->setGain (
+            fraction * 2.0f
+        );
+
+        repaint();
+        return;
+    }
+
+    if (
+        dragMode
+        == DragMode::trackPan
+    )
+    {
+        auto* track =
+            session.getTrack (
+                static_cast<std::size_t> (
+                    dragTrackIndex
+                )
+            );
+
+        if (track == nullptr)
+            return;
+
+        const auto bounds =
+            getTrackPanBounds (
+                dragTrackIndex
+            );
+
+        if (bounds.getWidth() <= 0)
+            return;
+
+        const auto fraction =
+            juce::jlimit (
+                0.0f,
+                1.0f,
+                static_cast<float> (
+                    event.x
+                    - bounds.getX()
+                )
+                / static_cast<float> (
+                    bounds.getWidth()
+                )
+            );
+
+        track->setPan (
+            fraction * 2.0f
+            - 1.0f
+        );
+
+        repaint();
+        return;
+    }
+
+    if (
+        dragMode
+            != DragMode::moveClip
+        && dragMode
+            != DragMode::resizeClip
+    )
+    {
+        return;
+    }
+
+    auto* track =
+        session.getTrack (
+            static_cast<std::size_t> (
+                dragTrackIndex
+            )
+        );
+
+    if (track == nullptr)
+        return;
+
+    auto* clip =
+        track->getClip (
+            static_cast<std::size_t> (
+                dragClipIndex
+            )
+        );
+
+    if (clip == nullptr)
+        return;
+
+    const auto timeline =
+        getTimelineBounds();
+
+    if (timeline.getWidth() <= 0)
+        return;
+
+    const auto deltaPixels =
+        event.x
+        - dragAnchorX;
+
+    const auto deltaBeats =
+        static_cast<double> (
+            deltaPixels
+        )
+        / static_cast<double> (
+            timeline.getWidth()
+        )
+        * timelineViewport.getVisibleBeats();
+
+    if (
+        dragMode
+        == DragMode::moveClip
+    )
+    {
+        clip->setStartBeat (
+            timelineViewport.snapBeat (
+                dragInitialStartBeat
+                + deltaBeats
+            )
+        );
+
+        repaint();
+        return;
+    }
+
+    const auto minimum =
+        timelineViewport.isSnapEnabled()
+            ? timelineViewport.getSnapBeats()
+            : 0.05;
+
+    const auto length =
+        juce::jmax (
+            minimum,
+            dragInitialLengthBeats
+                + deltaBeats
+        );
+
+    auto snappedLength =
+        length;
+
+    if (
+        timelineViewport.isSnapEnabled()
+    )
+    {
+        snappedLength =
+            std::round (
+                length
+                / timelineViewport
+                    .getSnapBeats()
+            )
+            * timelineViewport
+                .getSnapBeats();
+
+        snappedLength =
+            juce::jmax (
+                minimum,
+                snappedLength
+            );
+    }
+
+    clip->setLengthBeats (
+        snappedLength
+    );
+
+    repaint();
+}
+
+void MainComponent::mouseUp (
+    const juce::MouseEvent&)
+{
+    dragMode =
+        DragMode::none;
+
+    dragTrackIndex = -1;
+    dragClipIndex = -1;
+}
+
+
+============================================================
+FILE: Source\UI\MainComponent.h
+============================================================
+
+#pragma once
+
+#include <juce_gui_basics/juce_gui_basics.h>
+
+#include "../Core/JADContext.h"
+
+#include "JADLookAndFeel.h"
+#include "SessionOverviewPanel.h"
+#include "SynthVoicePanel.h"
+#include "TimelineViewportState.h"
+#include "TransportPanel.h"
+#include "VirtualKeyboardPanel.h"
+
+class MainComponent :
+    public juce::Component,
+    private juce::Timer
+{
+public:
+    explicit MainComponent (
+        JADContext& contextToUse
+    );
+
+    ~MainComponent() override;
+
+    void paint (
+        juce::Graphics&
+    ) override;
+
+    void resized() override;
+
+    void mouseDown (
+        const juce::MouseEvent&
+    ) override;
+
+    void mouseDrag (
+        const juce::MouseEvent&
+    ) override;
+
+    void mouseUp (
+        const juce::MouseEvent&
+    ) override;
+
+private:
+    enum class DockPage
+    {
+        keyboard = 0,
+        synth,
+        mixer
+    };
+
+    enum class DragMode
+    {
+        none = 0,
+        moveClip,
+        resizeClip,
+        trackGain,
+        trackPan
+    };
+
+    void timerCallback() override;
+
+    void addTrack();
+    void deleteSelectedTrack();
+
+    void selectTrack (
+        int index
+    );
+
+    void clearClipSelection();
+
+    void setDockPage (
+        DockPage page
+    );
+
+    void refreshWorkspace();
+
+    void drawPanel (
+        juce::Graphics&,
+        juce::Rectangle<int>,
+        const juce::String& title,
+        juce::Colour accent,
+        float alpha = 0.16f
+    );
+
+    void drawTrackRack (
+        juce::Graphics&,
+        juce::Rectangle<int>
+    );
+
+    void drawArrangement (
+        juce::Graphics&,
+        juce::Rectangle<int>
+    );
+
+    void drawInspector (
+        juce::Graphics&,
+        juce::Rectangle<int>
+    );
+
+    void drawDock (
+        juce::Graphics&,
+        juce::Rectangle<int>
+    );
+
+    juce::Rectangle<int>
+    getTrackRowBounds (
+        int trackIndex
+    ) const;
+
+    juce::Rectangle<int>
+    getTrackGainBounds (
+        int trackIndex
+    ) const;
+
+    juce::Rectangle<int>
+    getTrackPanBounds (
+        int trackIndex
+    ) const;
+
+    juce::Rectangle<int>
+    getTimelineBounds() const;
+
+    juce::Rectangle<int>
+    getLaneBounds (
+        int trackIndex
+    ) const;
+
+    juce::Rectangle<int>
+    getClipBounds (
+        int trackIndex,
+        int clipIndex
+    ) const;
+
+    int beatToX (
+        double beat
+    ) const;
+
+    double xToBeat (
+        int x
+    ) const;
+
+    void seekTransport (
+        double beat
+    );
+
+    void beginClipInteraction (
+        int trackIndex,
+        int clipIndex,
+        int mouseX,
+        bool resize
+    );
+
+    JADContext& context;
+
+    JADLookAndFeel jadLookAndFeel;
+
+    TransportPanel transportPanel;
+    SessionOverviewPanel sessionOverviewPanel;
+    SynthVoicePanel synthVoicePanel;
+    VirtualKeyboardPanel keyboardPanel;
+
+    TimelineViewportState timelineViewport;
+
+    juce::Label projectLabel;
+    juce::Label statusLabel;
+
+    juce::TextButton addTrackButton {
+        "+ TRACK"
+    };
+
+    juce::TextButton deleteTrackButton {
+        "- TRACK"
+    };
+
+    juce::TextButton scrollLeftButton {
+        "<<"
+    };
+
+    juce::TextButton scrollRightButton {
+        ">>"
+    };
+
+    juce::TextButton zoomOutButton {
+        "ZOOM -"
+    };
+
+    juce::TextButton zoomInButton {
+        "ZOOM +"
+    };
+
+    juce::TextButton snapButton {
+        "SNAP"
+    };
+
+    juce::TextButton keyboardTabButton {
+        "KEYBOARD"
+    };
+
+    juce::TextButton synthTabButton {
+        "SYNTH"
+    };
+
+    juce::TextButton mixerTabButton {
+        "MIXER"
+    };
+
+    int selectedTrackIndex = 0;
+
+    int selectedClipTrackIndex = -1;
+    int selectedClipIndex = -1;
+
+    DockPage dockPage =
+        DockPage::keyboard;
+
+    DragMode dragMode =
+        DragMode::none;
+
+    int dragTrackIndex = -1;
+    int dragClipIndex = -1;
+
+    int dragAnchorX = 0;
+
+    double dragInitialStartBeat = 0.0;
+    double dragInitialLengthBeats = 0.0;
+
+    juce::Rectangle<int> cachedTrackRack;
+    juce::Rectangle<int> cachedArrangement;
+    juce::Rectangle<int> cachedInspector;
+    juce::Rectangle<int> cachedDock;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
+        MainComponent
+    )
+};
+
+
+============================================================
+FILE: Source\UI\SessionOverviewPanel.cpp
+============================================================
+
+#include "SessionOverviewPanel.h"
+
+SessionOverviewPanel::SessionOverviewPanel (
+    SessionState& sessionState)
+    : session (sessionState)
+{
+}
+
+void SessionOverviewPanel::paint (
+    juce::Graphics& g)
+{
+    const auto bounds =
+        getLocalBounds().toFloat();
+
+    g.setColour (
+        juce::Colour::fromRGB (
+            9,
+            15,
+            23
+        )
+    );
+
+    g.fillRoundedRectangle (
+        bounds,
+        12.0f
+    );
+
+    g.setColour (
+        juce::Colour::fromRGB (
+            75,
+            200,
+            220
+        )
+    );
+
+    g.drawRoundedRectangle (
+        bounds.reduced (1.0f),
+        12.0f,
+        1.5f
+    );
+
+    auto area =
+        getLocalBounds().reduced (18);
+
+    auto& project =
+        session.getProjectState();
+
+    auto& transport =
+        session.getTransportState();
+
+    auto& master =
+        session.getMasterBusState();
+
+    g.setColour (
+        juce::Colours::white
+    );
+
+    g.setFont (18.0f);
+
+    g.drawText (
+        juce::String (
+            project.getTitle()
+        ),
+        area.removeFromTop (28),
+        juce::Justification::centredLeft
+    );
+
+    g.setFont (12.0f);
+
+    g.setColour (
+        juce::Colour::fromRGB (
+            110,
+            230,
+            245
+        )
+    );
+
+    g.drawText (
+        "SESSION BACKBONE",
+        area.removeFromTop (22),
+        juce::Justification::centredLeft
+    );
+
+    area.removeFromTop (8);
+
+    g.setColour (
+        juce::Colours::lightgrey
+    );
+
+    const auto transportText =
+        "TRANSPORT   "
+        + juce::String (
+            transport.getTempo(),
+            1
+        )
+        + " BPM   "
+        + juce::String (
+            transport.getTimeSignatureNumerator()
+        )
+        + "/"
+        + juce::String (
+            transport.getTimeSignatureDenominator()
+        );
+
+    g.drawText (
+        transportText,
+        area.removeFromTop (24),
+        juce::Justification::centredLeft
+    );
+
+    const auto masterText =
+        "MASTER      gain "
+        + juce::String (
+            master.getGain(),
+            2
+        )
+        + (
+            master.isMuted()
+                ? "   MUTED"
+                : "   LIVE"
+        );
+
+    g.drawText (
+        masterText,
+        area.removeFromTop (24),
+        juce::Justification::centredLeft
+    );
+
+    area.removeFromTop (10);
+
+    for (
+        std::size_t i = 0;
+        i < session.getTrackCount();
+        ++i
+    )
+    {
+        auto* track =
+            session.getTrack (i);
+
+        if (track == nullptr)
+            continue;
+
+        auto row =
+            area.removeFromTop (50);
+
+        g.setColour (
+            juce::Colour::fromRGB (
+                15,
+                25,
+                34
+            )
+        );
+
+        g.fillRoundedRectangle (
+            row.toFloat(),
+            7.0f
+        );
+
+        g.setColour (
+            juce::Colour::fromRGB (
+                55,
+                120,
+                145
+            )
+        );
+
+        g.drawRoundedRectangle (
+            row.toFloat(),
+            7.0f,
+            1.0f
+        );
+
+        auto inner =
+            row.reduced (10, 5);
+
+        g.setColour (
+            juce::Colours::white
+        );
+
+        g.drawText (
+            juce::String (
+                track->getName()
+            ),
+            inner.removeFromLeft (95),
+            juce::Justification::centredLeft
+        );
+
+        g.setColour (
+            juce::Colour::fromRGB (
+                110,
+                220,
+                240
+            )
+        );
+
+        g.drawText (
+            "ID "
+                + juce::String (
+                    static_cast<int> (
+                        track->getId()
+                    )
+                ),
+            inner.removeFromLeft (45),
+            juce::Justification::centredLeft
+        );
+
+        g.setColour (
+            juce::Colours::lightgrey
+        );
+
+        g.drawText (
+            juce::String (
+                static_cast<int> (
+                    track->getClipCount()
+                )
+            )
+                + " clip",
+            inner.removeFromLeft (55),
+            juce::Justification::centredLeft
+        );
+
+        const auto flags =
+            juce::String (
+                track->isMuted()
+                    ? "M "
+                    : "- "
+            )
+            + (
+                track->isSolo()
+                    ? "S "
+                    : "- "
+            )
+            + (
+                track->isRecordArmed()
+                    ? "R"
+                    : "-"
+            );
+
+        g.drawText (
+            flags,
+            inner,
+            juce::Justification::centredRight
+        );
+
+        area.removeFromTop (7);
+    }
+
+    area.removeFromTop (8);
+
+    g.setColour (
+        juce::Colour::fromRGB (
+            130,
+            130,
+            155
+        )
+    );
+
+    g.drawText (
+        "CLIPS / MASTER / PROJECT / TRACK FLEET",
+        area.removeFromTop (22),
+        juce::Justification::centred
+    );
+}
+
+
+============================================================
+FILE: Source\UI\SessionOverviewPanel.h
+============================================================
+
+#pragma once
+
+#include <juce_gui_basics/juce_gui_basics.h>
+
+#include "../Model/SessionState.h"
+
+class SessionOverviewPanel :
+    public juce::Component
+{
+public:
+    explicit SessionOverviewPanel (
+        SessionState& sessionState
+    );
+
+    void paint (
+        juce::Graphics& g
+    ) override;
+
+private:
+    SessionState& session;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
+        SessionOverviewPanel
+    )
+};
+
+
+============================================================
+FILE: Source\UI\SynthVoicePanel.cpp
+============================================================
+
+#include "SynthVoicePanel.h"
+
+SynthVoicePanel::SynthVoicePanel (AudioSystem& audioSystem)
+    : audio (audioSystem)
+{
+    titleLabel.setText (
+        "SYNTH VOICE",
+        juce::dontSendNotification
+    );
+
+    titleLabel.setJustificationType (
+        juce::Justification::centred
+    );
+
+    addAndMakeVisible (titleLabel);
+
+    waveformLabel.setText (
+        "WAVEFORM",
+        juce::dontSendNotification
+    );
+
+    frequencyLabel.setText (
+        "FREQUENCY",
+        juce::dontSendNotification
+    );
+
+    gainLabel.setText (
+        "GAIN",
+        juce::dontSendNotification
+    );
+
+    for (auto* label : {
+        &waveformLabel,
+        &frequencyLabel,
+        &gainLabel
+    })
+    {
+        label->setJustificationType (
+            juce::Justification::centred
+        );
+
+        addAndMakeVisible (*label);
+    }
+
+    waveformBox.addItem ("SINE",   1);
+    waveformBox.addItem ("SAW",    2);
+    waveformBox.addItem ("SQUARE", 3);
+
+    const auto waveform =
+        audio.getWaveform();
+
+    if (waveform == AudioSystem::Waveform::sine)
+        waveformBox.setSelectedId (1, juce::dontSendNotification);
+
+    if (waveform == AudioSystem::Waveform::saw)
+        waveformBox.setSelectedId (2, juce::dontSendNotification);
+
+    if (waveform == AudioSystem::Waveform::square)
+        waveformBox.setSelectedId (3, juce::dontSendNotification);
+
+    waveformBox.onChange = [this]
+    {
+        const auto id =
+            waveformBox.getSelectedId();
+
+        if (id == 1)
+            audio.setWaveform (AudioSystem::Waveform::sine);
+
+        if (id == 2)
+            audio.setWaveform (AudioSystem::Waveform::saw);
+
+        if (id == 3)
+            audio.setWaveform (AudioSystem::Waveform::square);
+    };
+
+    addAndMakeVisible (waveformBox);
+
+    frequencySlider.setRange (
+        40.0,
+        2000.0,
+        1.0
+    );
+
+    frequencySlider.setValue (
+        audio.getFrequency(),
+        juce::dontSendNotification
+    );
+
+    frequencySlider.setTextValueSuffix (" Hz");
+
+    frequencySlider.setSkewFactorFromMidPoint (
+        440.0
+    );
+
+    frequencySlider.onValueChange = [this]
+    {
+        audio.setFrequency (
+            frequencySlider.getValue()
+        );
+    };
+
+    addAndMakeVisible (frequencySlider);
+
+    gainSlider.setRange (
+        0.0,
+        0.20,
+        0.001
+    );
+
+    gainSlider.setValue (
+        audio.getGain(),
+        juce::dontSendNotification
+    );
+
+    gainSlider.setTextValueSuffix (" gain");
+
+    gainSlider.onValueChange = [this]
+    {
+        audio.setGain (
+            static_cast<float> (
+                gainSlider.getValue()
+            )
+        );
+    };
+
+    addAndMakeVisible (gainSlider);
+
+    voiceButton.setClickingTogglesState (true);
+
+    voiceButton.setToggleState (
+        audio.isTestToneEnabled(),
+        juce::dontSendNotification
+    );
+
+    voiceButton.onClick = [this]
+    {
+        audio.setTestToneEnabled (
+            voiceButton.getToggleState()
+        );
+
+        repaint();
+    };
+
+    addAndMakeVisible (voiceButton);
+}
+
+SynthVoicePanel::~SynthVoicePanel()
+{
+    audio.setTestToneEnabled (false);
+}
+
+void SynthVoicePanel::paint (juce::Graphics& g)
+{
+    auto bounds =
+        getLocalBounds()
+            .toFloat()
+            .reduced (1.0f);
+
+    g.setColour (
+        juce::Colour::fromRGB (
+            12,
+            16,
+            24
+        )
+    );
+
+    g.fillRoundedRectangle (
+        bounds,
+        12.0f
+    );
+
+    g.setColour (
+        voiceButton.getToggleState()
+            ? juce::Colour::fromRGB (95, 230, 145)
+            : juce::Colour::fromRGB (65, 105, 125)
+    );
+
+    g.drawRoundedRectangle (
+        bounds,
+        12.0f,
+        1.5f
+    );
+}
+
+void SynthVoicePanel::resized()
+{
+    auto area =
+        getLocalBounds().reduced (28);
+
+    titleLabel.setBounds (
+        area.removeFromTop (30)
+    );
+
+    area.removeFromTop (14);
+
+    waveformLabel.setBounds (
+        area.removeFromTop (22)
+    );
+
+    waveformBox.setBounds (
+        area.removeFromTop (38)
+    );
+
+    area.removeFromTop (14);
+
+    frequencyLabel.setBounds (
+        area.removeFromTop (22)
+    );
+
+    frequencySlider.setBounds (
+        area.removeFromTop (40)
+    );
+
+    area.removeFromTop (14);
+
+    gainLabel.setBounds (
+        area.removeFromTop (22)
+    );
+
+    gainSlider.setBounds (
+        area.removeFromTop (40)
+    );
+
+    area.removeFromTop (20);
+
+    voiceButton.setBounds (
+        area.removeFromTop (44)
+            .withSizeKeepingCentre (
+                240,
+                44
+            )
+    );
+}
+
+
+============================================================
+FILE: Source\UI\SynthVoicePanel.h
+============================================================
+
+#pragma once
+
+#include <juce_gui_basics/juce_gui_basics.h>
+
+#include "../Audio/AudioSystem.h"
+
+class SynthVoicePanel : public juce::Component
+{
+public:
+    explicit SynthVoicePanel (AudioSystem& audioSystem);
+    ~SynthVoicePanel() override;
+
+    void paint (juce::Graphics& g) override;
+    void resized() override;
+
+private:
+    AudioSystem& audio;
+
+    juce::TextButton voiceButton { "VOICE" };
+
+    juce::Slider frequencySlider {
+        juce::Slider::LinearHorizontal,
+        juce::Slider::TextBoxRight
+    };
+
+    juce::Slider gainSlider {
+        juce::Slider::LinearHorizontal,
+        juce::Slider::TextBoxRight
+    };
+
+    juce::ComboBox waveformBox;
+
+    juce::Label titleLabel;
+    juce::Label waveformLabel;
+    juce::Label frequencyLabel;
+    juce::Label gainLabel;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthVoicePanel)
+};
+
+
+============================================================
+FILE: Source\UI\TimelineViewportState.h
+============================================================
+
+#pragma once
+
+#include <juce_core/juce_core.h>
+
+#include <cmath>
+
+class TimelineViewportState
+{
+public:
+    double getStartBeat() const noexcept
+    {
+        return startBeat;
+    }
+
+    double getVisibleBeats() const noexcept
+    {
+        return visibleBeats;
+    }
+
+    double getEndBeat() const noexcept
+    {
+        return startBeat + visibleBeats;
+    }
+
+    double getSnapBeats() const noexcept
+    {
+        return snapBeats;
+    }
+
+    bool isSnapEnabled() const noexcept
+    {
+        return snapEnabled;
+    }
+
+    void setSnapEnabled (
+        bool enabled) noexcept
+    {
+        snapEnabled = enabled;
+    }
+
+    void toggleSnap() noexcept
+    {
+        snapEnabled = ! snapEnabled;
+    }
+
+    void setSnapBeats (
+        double beats) noexcept
+    {
+        snapBeats =
+            juce::jlimit (
+                0.0625,
+                4.0,
+                beats
+            );
+    }
+
+    void zoomIn() noexcept
+    {
+        const auto centre =
+            startBeat
+            + visibleBeats * 0.5;
+
+        visibleBeats =
+            juce::jlimit (
+                4.0,
+                128.0,
+                visibleBeats / 1.35
+            );
+
+        startBeat =
+            juce::jmax (
+                0.0,
+                centre
+                - visibleBeats * 0.5
+            );
+    }
+
+    void zoomOut() noexcept
+    {
+        const auto centre =
+            startBeat
+            + visibleBeats * 0.5;
+
+        visibleBeats =
+            juce::jlimit (
+                4.0,
+                128.0,
+                visibleBeats * 1.35
+            );
+
+        startBeat =
+            juce::jmax (
+                0.0,
+                centre
+                - visibleBeats * 0.5
+            );
+    }
+
+    void scrollBy (
+        double beats) noexcept
+    {
+        startBeat =
+            juce::jmax (
+                0.0,
+                startBeat + beats
+            );
+    }
+
+    void scrollLeft() noexcept
+    {
+        scrollBy (
+            -visibleBeats * 0.25
+        );
+    }
+
+    void scrollRight() noexcept
+    {
+        scrollBy (
+            visibleBeats * 0.25
+        );
+    }
+
+    double snapBeat (
+        double beat) const noexcept
+    {
+        const auto safeBeat =
+            juce::jmax (
+                0.0,
+                beat
+            );
+
+        if (! snapEnabled)
+            return safeBeat;
+
+        return std::round (
+            safeBeat / snapBeats
+        ) * snapBeats;
+    }
+
+private:
+    double startBeat = 0.0;
+    double visibleBeats = 32.0;
+
+    double snapBeats = 0.25;
+
+    bool snapEnabled = true;
+};
+
+
+============================================================
+FILE: Source\UI\TransportPanel.cpp
+============================================================
+
+#include "TransportPanel.h"
+
+#include <cmath>
+
+TransportPanel::TransportPanel (
+    TransportState& transportState)
+    : transport (transportState)
+{
+    addAndMakeVisible (stopButton);
+    addAndMakeVisible (playButton);
+    addAndMakeVisible (recordButton);
+    addAndMakeVisible (loopButton);
+
+    stopButton.onClick = [this]
+    {
+        transport.stop();
+        refreshState();
+    };
+
+    playButton.onClick = [this]
+    {
+        transport.play();
+        refreshState();
+    };
+
+    recordButton.setClickingTogglesState (
+        true
+    );
+
+    recordButton.onClick = [this]
+    {
+        if (recordButton.getToggleState())
+            transport.beginRecording();
+
+        if (! recordButton.getToggleState())
+            transport.endRecording();
+
+        refreshState();
+    };
+
+    loopButton.setClickingTogglesState (
+        true
+    );
+
+    loopButton.setToggleState (
+        transport.isLoopEnabled(),
+        juce::dontSendNotification
+    );
+
+    loopButton.onClick = [this]
+    {
+        transport.setLoopEnabled (
+            loopButton.getToggleState()
+        );
+
+        repaint();
+    };
+
+    tempoSlider.setRange (
+        20.0,
+        400.0,
+        0.1
+    );
+
+    tempoSlider.setValue (
+        transport.getTempo(),
+        juce::dontSendNotification
+    );
+
+    tempoSlider.setSliderStyle (
+        juce::Slider::LinearHorizontal
+    );
+
+    tempoSlider.setTextBoxStyle (
+        juce::Slider::TextBoxRight,
+        false,
+        72,
+        24
+    );
+
+    tempoSlider.onValueChange = [this]
+    {
+        transport.setTempo (
+            tempoSlider.getValue()
+        );
+    };
+
+    addAndMakeVisible (
+        tempoSlider
+    );
+
+    tempoLabel.setText (
+        "BPM",
+        juce::dontSendNotification
+    );
+
+    tempoLabel.setJustificationType (
+        juce::Justification::centred
+    );
+
+    addAndMakeVisible (
+        tempoLabel
+    );
+
+    positionLabel.setJustificationType (
+        juce::Justification::centred
+    );
+
+    meterLabel.setJustificationType (
+        juce::Justification::centred
+    );
+
+    addAndMakeVisible (
+        positionLabel
+    );
+
+    addAndMakeVisible (
+        meterLabel
+    );
+
+    startTimerHz (30);
+
+    refreshState();
+}
+
+TransportPanel::~TransportPanel()
+{
+    stopTimer();
+}
+
+void TransportPanel::refreshState()
+{
+    playButton.setButtonText (
+        transport.isPlaying()
+            ? "PLAYING"
+            : "PLAY"
+    );
+
+    recordButton.setToggleState (
+        transport.isRecording(),
+        juce::dontSendNotification
+    );
+
+    const auto beats =
+        transport.getPositionInBeats();
+
+    const auto numerator =
+        juce::jmax (
+            1,
+            transport.getTimeSignatureNumerator()
+        );
+
+    const auto wholeBeat =
+        static_cast<int> (
+            std::floor (beats)
+        );
+
+    const auto bar =
+        wholeBeat / numerator + 1;
+
+    const auto beat =
+        wholeBeat % numerator + 1;
+
+    const auto fraction =
+        static_cast<int> (
+            std::floor (
+                (
+                    beats
+                    - std::floor (beats)
+                )
+                * 1000.0
+            )
+        );
+
+    positionLabel.setText (
+        juce::String (bar)
+            + " | "
+            + juce::String (beat)
+            + " | "
+            + juce::String (fraction)
+                .paddedLeft ('0', 3),
+        juce::dontSendNotification
+    );
+
+    meterLabel.setText (
+        juce::String (
+            transport.getTimeSignatureNumerator()
+        )
+        + " / "
+        + juce::String (
+            transport.getTimeSignatureDenominator()
+        ),
+        juce::dontSendNotification
+    );
+
+    repaint();
+}
+
+void TransportPanel::timerCallback()
+{
+    refreshState();
+}
+
+void TransportPanel::paint (
+    juce::Graphics& g)
+{
+    auto bounds =
+        getLocalBounds().toFloat();
+
+    juce::ColourGradient gradient (
+        juce::Colour::fromRGB (
+            8,
+            8,
+            10
+        ),
+        bounds.getX(),
+        bounds.getCentreY(),
+
+        juce::Colour::fromRGB (
+            90,
+            0,
+            8
+        ),
+        bounds.getCentreX(),
+        bounds.getCentreY(),
+
+        false
+    );
+
+    gradient.addColour (
+        0.72,
+        juce::Colour::fromRGB (
+            28,
+            0,
+            4
+        )
+    );
+
+    gradient.addColour (
+        1.0,
+        juce::Colour::fromRGB (
+            5,
+            5,
+            7
+        )
+    );
+
+    g.setGradientFill (
+        gradient
+    );
+
+    g.fillRoundedRectangle (
+        bounds,
+        10.0f
+    );
+
+    g.setColour (
+        juce::Colour::fromRGB (
+            180,
+            25,
+            35
+        )
+    );
+
+    g.drawRoundedRectangle (
+        bounds.reduced (1.0f),
+        10.0f,
+        1.4f
+    );
+
+    if (transport.isPlaying())
+    {
+        g.setColour (
+            juce::Colour::fromRGB (
+                255,
+                55,
+                65
+            )
+            .withAlpha (0.12f)
+        );
+
+        g.fillRoundedRectangle (
+            bounds.reduced (5.0f),
+            7.0f
+        );
+    }
+}
+
+void TransportPanel::resized()
+{
+    auto area =
+        getLocalBounds().reduced (14);
+
+    const int buttonWidth =
+        86;
+
+    stopButton.setBounds (
+        area.removeFromLeft (
+            buttonWidth
+        )
+    );
+
+    area.removeFromLeft (8);
+
+    playButton.setBounds (
+        area.removeFromLeft (
+            buttonWidth
+        )
+    );
+
+    area.removeFromLeft (8);
+
+    recordButton.setBounds (
+        area.removeFromLeft (
+            buttonWidth
+        )
+    );
+
+    area.removeFromLeft (8);
+
+    loopButton.setBounds (
+        area.removeFromLeft (
+            buttonWidth
+        )
+    );
+
+    area.removeFromLeft (24);
+
+    tempoLabel.setBounds (
+        area.removeFromLeft (42)
+    );
+
+    tempoSlider.setBounds (
+        area.removeFromLeft (190)
+    );
+
+    area.removeFromLeft (18);
+
+    meterLabel.setBounds (
+        area.removeFromLeft (75)
+    );
+
+    area.removeFromLeft (18);
+
+    positionLabel.setBounds (
+        area
+    );
+}
+
+
+============================================================
+FILE: Source\UI\TransportPanel.h
+============================================================
+
+#pragma once
+
+#include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_events/juce_events.h>
+
+#include "../Model/TransportState.h"
+
+class TransportPanel :
+    public juce::Component,
+    private juce::Timer
+{
+public:
+    explicit TransportPanel (
+        TransportState& transportState
+    );
+
+    ~TransportPanel() override;
+
+    void paint (
+        juce::Graphics& g
+    ) override;
+
+    void resized() override;
+
+private:
+    void timerCallback() override;
+    void refreshState();
+
+    TransportState& transport;
+
+    juce::TextButton stopButton { "STOP" };
+    juce::TextButton playButton { "PLAY" };
+    juce::TextButton recordButton { "REC" };
+    juce::TextButton loopButton { "LOOP" };
+
+    juce::Slider tempoSlider;
+
+    juce::Label tempoLabel;
+    juce::Label positionLabel;
+    juce::Label meterLabel;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
+        TransportPanel
+    )
+};
+
+
+============================================================
+FILE: Source\UI\VirtualKeyboardPanel.cpp
+============================================================
+
+#include "VirtualKeyboardPanel.h"
+
+#include "JADLookAndFeel.h"
+
+VirtualKeyboardPanel::VirtualKeyboardPanel (
+    AudioSystem& audioSystemToUse,
+    JADLookAndFeel& lookAndFeelToUse)
+    : audioSystem (
+        audioSystemToUse
+    ),
+      jadLookAndFeel (
+        lookAndFeelToUse
+    ),
+      midiSystem (
+        audioSystem
+    ),
+      keyboard (
+        midiSystem.getKeyboardState(),
+        juce::MidiKeyboardComponent::horizontalKeyboard
+    )
+{
+    titleLabel.setText (
+        "CHROMATIC KEYBOARD",
+        juce::dontSendNotification
+    );
+
+    titleLabel.setFont (
+        juce::FontOptions (18.0f)
+            .withStyle ("Bold")
+    );
+
+    activityLabel.setText (
+        "MIDI • waiting",
+        juce::dontSendNotification
+    );
+
+    octaveLabel.setText (
+        "OCT 3",
+        juce::dontSendNotification
+    );
+
+    velocityLabel.setText (
+        "VELOCITY",
+        juce::dontSendNotification
+    );
+
+    keyboardThemeBox.addItem (
+        "NEON GALAXY",
+        1
+    );
+
+    keyboardThemeBox.addItem (
+        "SUNSET FIRE",
+        2
+    );
+
+    keyboardThemeBox.addItem (
+        "CYBER OCEAN",
+        3
+    );
+
+    keyboardThemeBox.addItem (
+        "ACID FOREST",
+        4
+    );
+
+    keyboardThemeBox.setSelectedId (
+        1,
+        juce::dontSendNotification
+    );
+
+    keyboardThemeBox.onChange =
+        [this]
+        {
+            jadLookAndFeel.setPaletteIndex (
+                keyboardThemeBox.getSelectedItemIndex()
+            );
+
+            applyKeyboardTheme();
+
+            repaint();
+
+            if (
+                auto* parent =
+                    getParentComponent()
+            )
+            {
+                parent->repaint();
+            }
+        };
+
+    velocitySlider.setRange (
+        0.1,
+        1.0,
+        0.01
+    );
+
+    velocitySlider.setValue (
+        0.82
+    );
+
+    velocitySlider.setSliderStyle (
+        juce::Slider::LinearHorizontal
+    );
+
+    velocitySlider.setTextBoxStyle (
+        juce::Slider::TextBoxRight,
+        false,
+        62,
+        22
+    );
+
+    keyboard.setAvailableRange (
+        24,
+        96
+    );
+
+    keyboard.setLowestVisibleKey (
+        36
+    );
+
+    keyboard.setKeyWidth (
+        24.0f
+    );
+
+    keyboard.setMidiChannel (
+        1
+    );
+
+    octaveDownButton.onClick =
+        [this]
+        {
+            baseOctave =
+                juce::jmax (
+                    0,
+                    baseOctave - 1
+                );
+
+            keyboard.setLowestVisibleKey (
+                12 * baseOctave
+            );
+
+            octaveLabel.setText (
+                "OCT "
+                    + juce::String (
+                        baseOctave
+                    ),
+                juce::dontSendNotification
+            );
+        };
+
+    octaveUpButton.onClick =
+        [this]
+        {
+            baseOctave =
+                juce::jmin (
+                    7,
+                    baseOctave + 1
+                );
+
+            keyboard.setLowestVisibleKey (
+                12 * baseOctave
+            );
+
+            octaveLabel.setText (
+                "OCT "
+                    + juce::String (
+                        baseOctave
+                    ),
+                juce::dontSendNotification
+            );
+        };
+
+    refreshMidiButton.onClick =
+        [this]
+        {
+            midiSystem.refreshDevices();
+            rebuildMidiDeviceList();
+        };
+
+    midiDeviceBox.onChange =
+        [this]
+        {
+            const auto index =
+                midiDeviceBox
+                    .getSelectedItemIndex()
+                - 1;
+
+            if (index < 0)
+            {
+                midiSystem.closeDevice();
+                return;
+            }
+
+            midiSystem.openDevice (
+                index
+            );
+        };
+
+    addAndMakeVisible (titleLabel);
+    addAndMakeVisible (activityLabel);
+    addAndMakeVisible (octaveLabel);
+    addAndMakeVisible (velocityLabel);
+
+    addAndMakeVisible (midiDeviceBox);
+    addAndMakeVisible (keyboardThemeBox);
+    addAndMakeVisible (octaveDownButton);
+    addAndMakeVisible (octaveUpButton);
+    addAndMakeVisible (refreshMidiButton);
+    addAndMakeVisible (velocitySlider);
+    addAndMakeVisible (keyboard);
+
+    rebuildMidiDeviceList();
+    applyKeyboardTheme();
+
+    startTimerHz (24);
+}
+
+void VirtualKeyboardPanel::rebuildMidiDeviceList()
+{
+    midiDeviceBox.clear (
+        juce::dontSendNotification
+    );
+
+    midiDeviceBox.addItem (
+        "VIRTUAL / NONE",
+        1
+    );
+
+    for (
+        int i = 0;
+        i < midiSystem.getDeviceCount();
+        ++i
+    )
+    {
+        midiDeviceBox.addItem (
+            midiSystem.getDeviceName (i),
+            i + 2
+        );
+    }
+
+    midiDeviceBox.setSelectedId (
+        1,
+        juce::dontSendNotification
+    );
+}
+
+void VirtualKeyboardPanel::applyKeyboardTheme()
+{
+    const auto primary =
+        jadLookAndFeel.colourA();
+
+    const auto secondary =
+        jadLookAndFeel.colourD();
+
+    keyboard.setColour (
+        juce::MidiKeyboardComponent::whiteNoteColourId,
+        primary
+            .interpolatedWith (
+                juce::Colours::white,
+                0.72f
+            )
+    );
+
+    keyboard.setColour (
+        juce::MidiKeyboardComponent::blackNoteColourId,
+        juce::Colour::fromRGB (
+            20,
+            10,
+            35
+        )
+    );
+
+    keyboard.setColour (
+        juce::MidiKeyboardComponent::keySeparatorLineColourId,
+        secondary.withAlpha (0.65f)
+    );
+
+    keyboard.setColour (
+        juce::MidiKeyboardComponent::mouseOverKeyOverlayColourId,
+        secondary.withAlpha (0.50f)
+    );
+
+    keyboard.setColour (
+        juce::MidiKeyboardComponent::keyDownOverlayColourId,
+        primary.withAlpha (0.88f)
+    );
+
+    keyboard.setColour (
+        juce::MidiKeyboardComponent::textLabelColourId,
+        juce::Colour::fromRGB (
+            35,
+            15,
+            55
+        )
+    );
+}
+
+void VirtualKeyboardPanel::timerCallback()
+{
+    const auto note =
+        midiSystem.getLastNote();
+
+    if (note < 0)
+    {
+        activityLabel.setText (
+            "MIDI • waiting",
+            juce::dontSendNotification
+        );
+
+        return;
+    }
+
+    activityLabel.setText (
+        "MIDI • NOTE "
+            + juce::String (note)
+            + " • VEL "
+            + juce::String (
+                midiSystem.getLastVelocity(),
+                2
+            ),
+        juce::dontSendNotification
+    );
+}
+
+void VirtualKeyboardPanel::paint (
+    juce::Graphics& g)
+{
+    auto bounds =
+        getLocalBounds()
+            .toFloat();
+
+    juce::ColourGradient glass (
+        jadLookAndFeel.colourB()
+            .withAlpha (0.30f),
+        bounds.getTopLeft(),
+        jadLookAndFeel.colourD()
+            .withAlpha (0.14f),
+        bounds.getBottomRight(),
+        false
+    );
+
+    g.setGradientFill (glass);
+
+    g.fillRoundedRectangle (
+        bounds,
+        18.0f
+    );
+
+    g.setColour (
+        jadLookAndFeel.colourD()
+            .withAlpha (0.58f)
+    );
+
+    g.drawRoundedRectangle (
+        bounds.reduced (1.0f),
+        18.0f,
+        1.5f
+    );
+}
+
+void VirtualKeyboardPanel::resized()
+{
+    auto area =
+        getLocalBounds()
+            .reduced (16);
+
+    auto header =
+        area.removeFromTop (34);
+
+    titleLabel.setBounds (
+        header.removeFromLeft (230)
+    );
+
+    activityLabel.setBounds (
+        header.removeFromRight (180)
+    );
+
+    auto controls =
+        area.removeFromTop (42);
+
+    midiDeviceBox.setBounds (
+        controls.removeFromLeft (230)
+            .reduced (3)
+    );
+
+    refreshMidiButton.setBounds (
+        controls.removeFromLeft (125)
+            .reduced (3)
+    );
+
+    keyboardThemeBox.setBounds (
+        controls.removeFromLeft (165)
+            .reduced (3)
+    );
+
+    octaveDownButton.setBounds (
+        controls.removeFromLeft (72)
+            .reduced (3)
+    );
+
+    octaveLabel.setBounds (
+        controls.removeFromLeft (58)
+            .reduced (3)
+    );
+
+    octaveUpButton.setBounds (
+        controls.removeFromLeft (72)
+            .reduced (3)
+    );
+
+    velocityLabel.setBounds (
+        controls.removeFromLeft (68)
+            .reduced (3)
+    );
+
+    velocitySlider.setBounds (
+        controls.reduced (3)
+    );
+
+    area.removeFromTop (8);
+
+    keyboard.setBounds (
+        area
+    );
+}
+
+
+============================================================
+FILE: Source\UI\VirtualKeyboardPanel.h
+============================================================
+
+#pragma once
+
+#include <juce_gui_basics/juce_gui_basics.h>
+#include <juce_audio_utils/juce_audio_utils.h>
+
+#include "../Audio/AudioSystem.h"
+#include "../Audio/MidiSystem.h"
+
+class JADLookAndFeel;
+
+class VirtualKeyboardPanel :
+    public juce::Component,
+    private juce::Timer
+{
+public:
+    VirtualKeyboardPanel (
+        AudioSystem& audioSystemToUse,
+        JADLookAndFeel& lookAndFeelToUse
+    );
+
+    void paint (
+        juce::Graphics&
+    ) override;
+
+    void resized() override;
+
+private:
+    void timerCallback() override;
+
+    void rebuildMidiDeviceList();
+    void applyKeyboardTheme();
+
+    AudioSystem& audioSystem;
+    JADLookAndFeel& jadLookAndFeel;
+
+    MidiSystem midiSystem;
+
+    juce::MidiKeyboardComponent keyboard;
+
+    juce::Label titleLabel;
+    juce::Label activityLabel;
+    juce::Label octaveLabel;
+    juce::Label velocityLabel;
+
+    juce::ComboBox midiDeviceBox;
+    juce::ComboBox keyboardThemeBox;
+
+    juce::TextButton octaveDownButton {
+        "OCT -"
+    };
+
+    juce::TextButton octaveUpButton {
+        "OCT +"
+    };
+
+    juce::TextButton refreshMidiButton {
+        "REFRESH MIDI"
+    };
+
+    juce::Slider velocitySlider;
+
+    int baseOctave = 3;
+};
+
+
+FRONTIER SCAN
+=============
+Source\UI\MainComponent.cpp:293: : "OFFLINE"
+Source\UI\VirtualKeyboardPanel.cpp:33: "MIDI • waiting",
+Source\UI\VirtualKeyboardPanel.cpp:307: "MIDI • waiting",
