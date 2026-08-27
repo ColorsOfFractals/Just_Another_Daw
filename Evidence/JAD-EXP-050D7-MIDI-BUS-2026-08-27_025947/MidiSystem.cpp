@@ -10,20 +10,12 @@ MidiSystem::MidiSystem (
         audioSystemToUse
     )
 {
-    keyboardState.addListener (
-        this
-    );
-
     refreshDevices();
 }
 
 MidiSystem::~MidiSystem()
 {
     closeDevice();
-
-    keyboardState.removeListener (
-        this
-    );
 }
 
 juce::MidiKeyboardState&
@@ -147,10 +139,18 @@ void MidiSystem::playVirtualNote (
 void MidiSystem::releaseVirtualNote (
     int midiNote)
 {
-    keyboardState.noteOff (
-        1,
-        midiNote,
-        0.0f
+    const auto message =
+        juce::MidiMessage::noteOff (
+            1,
+            midiNote
+        );
+
+    keyboardState.processNextMidiEvent (
+        message
+    );
+
+    applyMessage (
+        message
     );
 }
 
@@ -162,59 +162,11 @@ void MidiSystem::handleIncomingMidiMessage (
         message
     );
 
-    if (
-        ! message.isNoteOn()
-        && ! message.isNoteOff()
-    )
-    {
-        applyMessage (
-            message
-        );
-    }
-}
-
-void MidiSystem::handleNoteOn (
-    juce::MidiKeyboardState*,
-    int midiChannel,
-    int midiNoteNumber,
-    float velocity)
-{
-    const auto message =
-        juce::MidiMessage::noteOn (
-            midiChannel,
-            midiNoteNumber,
-            static_cast<juce::uint8> (
-                juce::jlimit (
-                    0,
-                    127,
-                    juce::roundToInt (
-                        velocity * 127.0f
-                    )
-                )
-            )
-        );
-
     applyMessage (
         message
     );
 }
 
-void MidiSystem::handleNoteOff (
-    juce::MidiKeyboardState*,
-    int midiChannel,
-    int midiNoteNumber,
-    float)
-{
-    const auto message =
-        juce::MidiMessage::noteOff (
-            midiChannel,
-            midiNoteNumber
-        );
-
-    applyMessage (
-        message
-    );
-}
 void MidiSystem::applyMessage (
     const juce::MidiMessage& message)
 {

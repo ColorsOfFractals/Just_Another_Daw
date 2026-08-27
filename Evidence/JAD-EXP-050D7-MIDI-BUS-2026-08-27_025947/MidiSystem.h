@@ -10,8 +10,7 @@
 class AudioSystem;
 
 class MidiSystem :
-    private juce::MidiInputCallback,
-    private juce::MidiKeyboardState::Listener
+    private juce::MidiInputCallback
 {
 public:
     explicit MidiSystem (
@@ -63,20 +62,6 @@ private:
     void applyMessage (
         const juce::MidiMessage&
     );
-
-    void handleNoteOn (
-        juce::MidiKeyboardState* source,
-        int midiChannel,
-        int midiNoteNumber,
-        float velocity
-    ) override;
-
-    void handleNoteOff (
-        juce::MidiKeyboardState* source,
-        int midiChannel,
-        int midiNoteNumber,
-        float velocity
-    ) override;
 
     AudioSystem& audioSystem;
 
