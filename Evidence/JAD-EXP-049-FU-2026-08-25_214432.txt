@@ -1,0 +1,23 @@
+﻿╔════════════════════════════════════════════════════════════╗
+║                       FU VESSEL                           ║
+╠════════════════════════════════════════════════════════════╣
+║ Expedition : JAD-EXP-049
+║ State      : CONTROL_SURFACE_CHECKPOINT
+║ Build      : BLOCKED_MISSING_EXP049_FILES
+║ HomeGate   : ALIVE
+║ Waves      : SMOOTH
+║ Transport  : RADIAL_WORK_IN_PROGRESS
+║ Mixer      : PHYSICAL_CONSOLE_WORK_IN_PROGRESS
+║ Session    : AUTHORITATIVE
+║ Branch     : main
+║ Commit     : c4b0399
+║ Git        : COMMITTED
+║ Remote     : PUSHED
+║ Repository : CLEAN
+║ ExeSHA     : 5E6D1041DC53C3C7F4840459273DC270E30EA31130EE6287EE009D9044441169
+║ ExeBuilt   : 2026-08-25 21:20:16
+║ Missing    : C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MixerConsolePanel.h; C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MixerConsolePanel.cpp
+║ Next       : EXP-049_RESUME_CONTROL_SURFACE
+║ Horizon    : VST_LIBRARY
+║ Fu         : TIRED_AS_FUCK
+╚════════════════════════════════════════════════════════════╝

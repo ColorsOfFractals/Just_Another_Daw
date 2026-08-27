@@ -55,8 +55,6 @@ target_sources(
         Source/Model/SessionState.h
 
         Source/UI/MainComponent.cpp
-        Source/UI/PluginLibraryPanel.cpp
-        Source/UI/PluginLibraryPanel.h
         Source/UI/StartupOverlay.cpp
         Source/UI/VirtualKeyboardPanel.h
         Source/UI/VirtualKeyboardPanel.cpp

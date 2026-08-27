@@ -18,7 +18,6 @@ MainComponent::MainComponent (
           context.getAudioSystem()
       ),
       pluginLibraryPanel (
-          context.getPluginCatalog(),
           jadLookAndFeel
       ),
       keyboardPanel (
@@ -54,7 +53,7 @@ MainComponent::MainComponent (
     );
 
     statusLabel.setText (
-        "PROJECT - LIVE",
+        "PROJECT ΓÇó LIVE",
         juce::dontSendNotification
     );
 
@@ -295,18 +294,18 @@ void MainComponent::refreshWorkspace()
     statusLabel.setText (
         "TRACKS "
             + juce::String (count)
-            + "  -  "
+            + "  ΓÇó  "
             + (
                 timelineViewport.isSnapEnabled()
                     ? "SNAP 1/4"
                     : "SNAP OFF"
             )
-            + "  -  "
+            + "  ΓÇó  "
             + juce::String (
                 timelineViewport.getVisibleBeats(),
                 1
             )
-            + " BEATS  -  AUDIO "
+            + " BEATS  ΓÇó  AUDIO "
             + (
                 context.getAudioSystem().isReady()
                     ? "ONLINE"
@@ -1115,7 +1114,7 @@ void MainComponent::drawArrangement (
     drawPanel (
         g,
         area,
-        "ARRANGEMENT - CLICK TO SEEK - DRAG CLIPS - EDGE TO RESIZE",
+        "ARRANGEMENT ΓÇó CLICK TO SEEK ΓÇó DRAG CLIPS ΓÇó EDGE TO RESIZE",
         jadLookAndFeel.colourD(),
         0.11f
     );
@@ -1962,7 +1961,7 @@ void MainComponent::paint (
     g.setFont (10.5f);
 
     g.drawText (
-        "JUST ANOTHER DAW - HANDS ON TIMELINE - 047 SEED PLANTED",
+        "JUST ANOTHER DAW ΓÇó HANDS ON TIMELINE ΓÇó 047 SEED PLANTED",
         header.reduced (18),
         juce::Justification::centredRight
     );

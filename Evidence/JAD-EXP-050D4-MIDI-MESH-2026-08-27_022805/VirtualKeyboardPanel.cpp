@@ -54,7 +54,7 @@ VirtualKeyboardPanel::VirtualKeyboardPanel (
     );
 
     activityLabel.setText (
-        "MIDI ONLINE",
+        "MIDI - waiting",
         juce::dontSendNotification
     );
 
@@ -444,69 +444,28 @@ void VirtualKeyboardPanel::timerCallback()
 {
     refreshComputerNotes();
 
-    const auto serial =
-        midiSystem.getActivitySerial();
-
-    if (serial != observedActivitySerial)
-    {
-        observedActivitySerial = serial;
-        midiPulse = 1.0f;
-    }
-
-    midiSpin +=
-        midiSystem.isMidiActive()
-            ? 0.19f
-            : 0.045f;
-
-    if (
-        midiSpin
-        >= juce::MathConstants<float>::twoPi
-    )
-    {
-        midiSpin -=
-            juce::MathConstants<float>::twoPi;
-    }
-
-    midiPulse =
-        juce::jmax (
-            0.0f,
-            midiPulse - 0.045f
-        );
-
     const auto note =
         midiSystem.getLastNote();
 
-    if (
-        midiSystem.isMidiActive()
-        && note >= 0
-    )
+    if (note < 0)
     {
         activityLabel.setText (
-            "MIDI  "
-                + juce::String (note)
-                + "  "
-                + juce::String (
-                    midiSystem.getLastVelocity(),
-                    2
-                ),
+            "MIDI - waiting",
             juce::dontSendNotification
         );
-    }
-    else
-    {
-        activityLabel.setText (
-            midiSystem.isDeviceOpen()
-                ? "MIDI ONLINE  + CONTROLLER"
-                : "MIDI ONLINE",
-            juce::dontSendNotification
-        );
+
+        return;
     }
 
-    repaint (
-        midiStatusBounds.expanded (
-            10,
-            6
-        )
+    activityLabel.setText (
+        "MIDI - NOTE "
+            + juce::String (note)
+            + " - VEL "
+            + juce::String (
+                midiSystem.getLastVelocity(),
+                2
+            ),
+        juce::dontSendNotification
     );
 }
 
@@ -798,102 +757,6 @@ void VirtualKeyboardPanel::paint (
         g,
         legendBounds
     );
-
-    if (! midiStatusBounds.isEmpty())
-    {
-        const auto active =
-            midiSystem.isMidiActive();
-
-        const auto centre =
-            midiStatusBounds
-                .toFloat()
-                .getCentre();
-
-        const float glow =
-            active
-                ? 0.95f
-                : 0.34f + midiPulse * 0.45f;
-
-        const auto accent =
-            jadLookAndFeel.colourA();
-
-        g.setColour (
-            accent.withAlpha (
-                0.10f + midiPulse * 0.14f
-            )
-        );
-
-        g.fillEllipse (
-            centre.x - 15.0f,
-            centre.y - 15.0f,
-            30.0f,
-            30.0f
-        );
-
-        juce::Path spiral;
-
-        constexpr int points = 42;
-
-        for (
-            int i = 0;
-            i < points;
-            ++i
-        )
-        {
-            const float t =
-                static_cast<float> (i)
-                / static_cast<float> (
-                    points - 1
-                );
-
-            const float angle =
-                midiSpin
-                + t
-                    * juce::MathConstants<float>::twoPi
-                    * 2.15f;
-
-            const float radius =
-                2.0f
-                + t * 10.5f;
-
-            const float x =
-                centre.x
-                + std::cos (angle)
-                    * radius;
-
-            const float y =
-                centre.y
-                + std::sin (angle)
-                    * radius;
-
-            if (i == 0)
-                spiral.startNewSubPath (x,y);
-            else
-                spiral.lineTo (x,y);
-        }
-
-        g.setColour (
-            accent.withAlpha (glow)
-        );
-
-        g.strokePath (
-            spiral,
-            juce::PathStrokeType (
-                active
-                    ? 2.3f
-                    : 1.35f,
-                juce::PathStrokeType::curved,
-                juce::PathStrokeType::rounded
-            )
-        );
-
-        g.fillEllipse (
-            centre.x - 2.4f,
-            centre.y - 2.4f,
-            4.8f,
-            4.8f
-        );
-    }
 }
 
 void VirtualKeyboardPanel::resized()
@@ -909,14 +772,8 @@ void VirtualKeyboardPanel::resized()
         header.removeFromLeft (230)
     );
 
-    auto midiStatusArea =
-        header.removeFromRight (245);
-
-    midiStatusBounds =
-        midiStatusArea.removeFromLeft (34);
-
     activityLabel.setBounds (
-        midiStatusArea
+        header.removeFromRight (220)
     );
 
     auto controls =

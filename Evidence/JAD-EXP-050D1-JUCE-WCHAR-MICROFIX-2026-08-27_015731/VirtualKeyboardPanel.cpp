@@ -9,7 +9,7 @@ namespace
 
     struct ComputerKeyMap
     {
-        juce::uint32 key;
+        juce_wchar key;
         int semitone;
     };
 
@@ -54,7 +54,7 @@ VirtualKeyboardPanel::VirtualKeyboardPanel (
     );
 
     activityLabel.setText (
-        "MIDI ONLINE",
+        "MIDI - waiting",
         juce::dontSendNotification
     );
 
@@ -313,7 +313,7 @@ void VirtualKeyboardPanel::changeComputerOctave (
 }
 
 int VirtualKeyboardPanel::getMidiNoteForComputerKey (
-    juce::uint32 key) const
+    juce_wchar key) const
 {
     key = juce::CharacterFunctions::toLowerCase (key);
 
@@ -444,69 +444,28 @@ void VirtualKeyboardPanel::timerCallback()
 {
     refreshComputerNotes();
 
-    const auto serial =
-        midiSystem.getActivitySerial();
-
-    if (serial != observedActivitySerial)
-    {
-        observedActivitySerial = serial;
-        midiPulse = 1.0f;
-    }
-
-    midiSpin +=
-        midiSystem.isMidiActive()
-            ? 0.19f
-            : 0.045f;
-
-    if (
-        midiSpin
-        >= juce::MathConstants<float>::twoPi
-    )
-    {
-        midiSpin -=
-            juce::MathConstants<float>::twoPi;
-    }
-
-    midiPulse =
-        juce::jmax (
-            0.0f,
-            midiPulse - 0.045f
-        );
-
     const auto note =
         midiSystem.getLastNote();
 
-    if (
-        midiSystem.isMidiActive()
-        && note >= 0
-    )
+    if (note < 0)
     {
         activityLabel.setText (
-            "MIDI  "
-                + juce::String (note)
-                + "  "
-                + juce::String (
-                    midiSystem.getLastVelocity(),
-                    2
-                ),
+            "MIDI - waiting",
             juce::dontSendNotification
         );
-    }
-    else
-    {
-        activityLabel.setText (
-            midiSystem.isDeviceOpen()
-                ? "MIDI ONLINE  + CONTROLLER"
-                : "MIDI ONLINE",
-            juce::dontSendNotification
-        );
+
+        return;
     }
 
-    repaint (
-        midiStatusBounds.expanded (
-            10,
-            6
-        )
+    activityLabel.setText (
+        "MIDI - NOTE "
+            + juce::String (note)
+            + " - VEL "
+            + juce::String (
+                midiSystem.getLastVelocity(),
+                2
+            ),
+        juce::dontSendNotification
     );
 }
 
@@ -583,14 +542,14 @@ void VirtualKeyboardPanel::drawComputerKeyboardLegend (
 
     auto box =
         bounds.toFloat()
-            .reduced (3.0f);
+            .reduced (4.0f);
 
     g.setColour (
         juce::Colour::fromRGB (
             10,
             14,
             32
-        ).withAlpha (0.62f)
+        ).withAlpha (0.58f)
     );
 
     g.fillRoundedRectangle (
@@ -600,7 +559,7 @@ void VirtualKeyboardPanel::drawComputerKeyboardLegend (
 
     g.setColour (
         jadLookAndFeel.colourD()
-            .withAlpha (0.62f)
+            .withAlpha (0.55f)
     );
 
     g.drawRoundedRectangle (
@@ -610,15 +569,16 @@ void VirtualKeyboardPanel::drawComputerKeyboardLegend (
     );
 
     auto text =
-        bounds.reduced (14, 8);
-
-    g.setFont (
-        juce::FontOptions (13.0f)
-    );
+        bounds.reduced (16, 9);
 
     g.setColour (
         juce::Colours::white
-            .withAlpha (0.96f)
+            .withAlpha (0.92f)
+    );
+
+    g.setFont (
+        juce::FontOptions (13.0f)
+            .withStyle ("Bold")
     );
 
     g.drawText (
@@ -627,130 +587,68 @@ void VirtualKeyboardPanel::drawComputerKeyboardLegend (
         juce::Justification::centredLeft
     );
 
-    text.removeFromTop (5);
+    text.removeFromTop (3);
+
+    g.setFont (
+        juce::FontOptions (13.0f)
+    );
 
     g.setColour (
         jadLookAndFeel.colourD()
             .interpolatedWith (
                 juce::Colours::white,
-                0.22f
+                0.25f
             )
     );
 
     g.drawText (
-        "   W E   T Y U        BLACK",
+        "    W E     T Y U      BLACK",
         text.removeFromTop (18),
         juce::Justification::centredLeft
     );
 
     g.setColour (
         juce::Colours::white
-            .withAlpha (0.94f)
+            .withAlpha (0.92f)
     );
 
     g.drawText (
-        "A S D F G H J K      WHITE",
+        "A S D F G H J K        WHITE",
         text.removeFromTop (18),
         juce::Justification::centredLeft
     );
 
-    text.removeFromTop (8);
+    text.removeFromTop (5);
 
     g.setColour (
         juce::Colours::white
-            .withAlpha (0.74f)
+            .withAlpha (0.70f)
     );
 
     g.drawText (
         "Z  OCTAVE DOWN",
-        text.removeFromTop (18),
+        text.removeFromTop (17),
         juce::Justification::centredLeft
     );
 
     g.drawText (
         "X  OCTAVE UP",
-        text.removeFromTop (18),
+        text.removeFromTop (17),
         juce::Justification::centredLeft
     );
 
-    text.removeFromTop (10);
-
-    auto octaveRow =
-        text.removeFromTop (20);
-
-    const float centreY =
-        static_cast<float> (
-            octaveRow.getCentreY()
-        );
-
-    const float leftX =
-        static_cast<float> (
-            octaveRow.getX() + 5
-        );
-
-    const float rightX =
-        static_cast<float> (
-            octaveRow.getRight() - 5
-        );
+    text.removeFromTop (4);
 
     g.setColour (
         jadLookAndFeel.colourA()
-            .withAlpha (0.92f)
-    );
-
-    g.fillEllipse (
-        leftX - 3.5f,
-        centreY - 3.5f,
-        7.0f,
-        7.0f
-    );
-
-    g.fillEllipse (
-        rightX - 3.5f,
-        centreY - 3.5f,
-        7.0f,
-        7.0f
-    );
-
-    g.drawLine (
-        leftX + 7.0f,
-        centreY,
-        rightX - 7.0f,
-        centreY,
-        1.0f
-    );
-
-    g.setColour (
-        juce::Colour::fromRGB (
-            10,
-            14,
-            32
-        )
-    );
-
-    auto labelBounds =
-        octaveRow.withSizeKeepingCentre (
-            132,
-            octaveRow.getHeight()
-        );
-
-    g.fillRect (
-        labelBounds.reduced (2, 4)
-    );
-
-    g.setColour (
-        juce::Colours::white
-            .withAlpha (0.86f)
-    );
-
-    g.setFont (
-        juce::FontOptions (10.5f)
+            .withAlpha (0.95f)
     );
 
     g.drawText (
-        "CURRENT OCTAVE",
-        labelBounds,
-        juce::Justification::centred
+        "ACTIVE: OCT "
+            + juce::String (baseOctave),
+        text.removeFromTop (18),
+        juce::Justification::centredLeft
     );
 }
 
@@ -798,102 +696,6 @@ void VirtualKeyboardPanel::paint (
         g,
         legendBounds
     );
-
-    if (! midiStatusBounds.isEmpty())
-    {
-        const auto active =
-            midiSystem.isMidiActive();
-
-        const auto centre =
-            midiStatusBounds
-                .toFloat()
-                .getCentre();
-
-        const float glow =
-            active
-                ? 0.95f
-                : 0.34f + midiPulse * 0.45f;
-
-        const auto accent =
-            jadLookAndFeel.colourA();
-
-        g.setColour (
-            accent.withAlpha (
-                0.10f + midiPulse * 0.14f
-            )
-        );
-
-        g.fillEllipse (
-            centre.x - 15.0f,
-            centre.y - 15.0f,
-            30.0f,
-            30.0f
-        );
-
-        juce::Path spiral;
-
-        constexpr int points = 42;
-
-        for (
-            int i = 0;
-            i < points;
-            ++i
-        )
-        {
-            const float t =
-                static_cast<float> (i)
-                / static_cast<float> (
-                    points - 1
-                );
-
-            const float angle =
-                midiSpin
-                + t
-                    * juce::MathConstants<float>::twoPi
-                    * 2.15f;
-
-            const float radius =
-                2.0f
-                + t * 10.5f;
-
-            const float x =
-                centre.x
-                + std::cos (angle)
-                    * radius;
-
-            const float y =
-                centre.y
-                + std::sin (angle)
-                    * radius;
-
-            if (i == 0)
-                spiral.startNewSubPath (x,y);
-            else
-                spiral.lineTo (x,y);
-        }
-
-        g.setColour (
-            accent.withAlpha (glow)
-        );
-
-        g.strokePath (
-            spiral,
-            juce::PathStrokeType (
-                active
-                    ? 2.3f
-                    : 1.35f,
-                juce::PathStrokeType::curved,
-                juce::PathStrokeType::rounded
-            )
-        );
-
-        g.fillEllipse (
-            centre.x - 2.4f,
-            centre.y - 2.4f,
-            4.8f,
-            4.8f
-        );
-    }
 }
 
 void VirtualKeyboardPanel::resized()
@@ -909,14 +711,8 @@ void VirtualKeyboardPanel::resized()
         header.removeFromLeft (230)
     );
 
-    auto midiStatusArea =
-        header.removeFromRight (245);
-
-    midiStatusBounds =
-        midiStatusArea.removeFromLeft (34);
-
     activityLabel.setBounds (
-        midiStatusArea
+        header.removeFromRight (220)
     );
 
     auto controls =
@@ -963,16 +759,12 @@ void VirtualKeyboardPanel::resized()
 
     area.removeFromTop (12);
 
-    auto performanceArea =
-        area;
-
-    constexpr int whiteKeyCount = 43;
-    constexpr int gapWidth = 14;
+    auto performanceArea = area;
 
     const int legendWidth =
         juce::jlimit (
-            315,
-            380,
+            260,
+            360,
             performanceArea.getWidth() / 4
         );
 
@@ -981,34 +773,10 @@ void VirtualKeyboardPanel::resized()
             legendWidth
         );
 
-    performanceArea.removeFromRight (
-        gapWidth
-    );
-
-    const float fittedKeyWidth =
-        static_cast<float> (
-            performanceArea.getWidth()
-        )
-        / static_cast<float> (
-            whiteKeyCount
-        );
-
-    keyboard.setKeyWidth (
-        fittedKeyWidth
-    );
-
-    const int exactKeyboardWidth =
-        juce::roundToInt (
-            fittedKeyWidth
-            * static_cast<float> (
-                whiteKeyCount
-            )
-        );
+    performanceArea.removeFromRight (12);
 
     keyboardBounds =
-        performanceArea.removeFromLeft (
-            exactKeyboardWidth
-        );
+        performanceArea;
 
     keyboard.setBounds (
         keyboardBounds

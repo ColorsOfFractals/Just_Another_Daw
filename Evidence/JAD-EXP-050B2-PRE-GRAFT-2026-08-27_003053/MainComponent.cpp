@@ -17,10 +17,6 @@ MainComponent::MainComponent (
       synthVoicePanel (
           context.getAudioSystem()
       ),
-      pluginLibraryPanel (
-          context.getPluginCatalog(),
-          jadLookAndFeel
-      ),
       keyboardPanel (
           context.getAudioSystem(),
           jadLookAndFeel
@@ -54,7 +50,7 @@ MainComponent::MainComponent (
     );
 
     statusLabel.setText (
-        "PROJECT - LIVE",
+        "PROJECT ΓÇó LIVE",
         juce::dontSendNotification
     );
 
@@ -149,14 +145,6 @@ MainComponent::MainComponent (
             );
         };
 
-    pluginsTabButton.onClick =
-        [this]
-        {
-            setDockPage (
-                DockPage::plugins
-            );
-        };
-
     addAndMakeVisible (
         transportPanel
     );
@@ -167,10 +155,6 @@ MainComponent::MainComponent (
 
     addAndMakeVisible (
         synthVoicePanel
-    );
-
-    addAndMakeVisible (
-        pluginLibraryPanel
     );
 
     addAndMakeVisible (
@@ -223,10 +207,6 @@ MainComponent::MainComponent (
 
     addAndMakeVisible (
         mixerTabButton
-    );
-
-    addAndMakeVisible (
-        pluginsTabButton
     );
 
     sessionOverviewPanel.setVisible (
@@ -295,18 +275,18 @@ void MainComponent::refreshWorkspace()
     statusLabel.setText (
         "TRACKS "
             + juce::String (count)
-            + "  -  "
+            + "  ΓÇó  "
             + (
                 timelineViewport.isSnapEnabled()
                     ? "SNAP 1/4"
                     : "SNAP OFF"
             )
-            + "  -  "
+            + "  ΓÇó  "
             + juce::String (
                 timelineViewport.getVisibleBeats(),
                 1
             )
-            + " BEATS  -  AUDIO "
+            + " BEATS  ΓÇó  AUDIO "
             + (
                 context.getAudioSystem().isReady()
                     ? "ONLINE"
@@ -435,10 +415,6 @@ void MainComponent::setDockPage (
         dockPage == DockPage::synth
     );
 
-    pluginLibraryPanel.setVisible (
-        dockPage == DockPage::plugins
-    );
-
     keyboardTabButton.setToggleState (
         dockPage == DockPage::keyboard,
         juce::dontSendNotification
@@ -451,11 +427,6 @@ void MainComponent::setDockPage (
 
     mixerTabButton.setToggleState (
         dockPage == DockPage::mixer,
-        juce::dontSendNotification
-    );
-
-    pluginsTabButton.setToggleState (
-        dockPage == DockPage::plugins,
         juce::dontSendNotification
     );
 
@@ -1115,7 +1086,7 @@ void MainComponent::drawArrangement (
     drawPanel (
         g,
         area,
-        "ARRANGEMENT - CLICK TO SEEK - DRAG CLIPS - EDGE TO RESIZE",
+        "ARRANGEMENT ΓÇó CLICK TO SEEK ΓÇó DRAG CLIPS ΓÇó EDGE TO RESIZE",
         jadLookAndFeel.colourD(),
         0.11f
     );
@@ -1962,7 +1933,7 @@ void MainComponent::paint (
     g.setFont (10.5f);
 
     g.drawText (
-        "JUST ANOTHER DAW - HANDS ON TIMELINE - 047 SEED PLANTED",
+        "JUST ANOTHER DAW ΓÇó HANDS ON TIMELINE ΓÇó 047 SEED PLANTED",
         header.reduced (18),
         juce::Justification::centredRight
     );
@@ -2125,11 +2096,6 @@ void MainComponent::resized()
             .reduced (2)
     );
 
-    pluginsTabButton.setBounds (
-        tabs.removeFromLeft (92)
-            .reduced (2)
-    );
-
     dockControls.removeFromTop (4);
 
     keyboardPanel.setBounds (
@@ -2137,10 +2103,6 @@ void MainComponent::resized()
     );
 
     synthVoicePanel.setBounds (
-        dockControls
-    );
-
-    pluginLibraryPanel.setBounds (
         dockControls
     );
 

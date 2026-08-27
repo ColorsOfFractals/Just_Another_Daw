@@ -110,21 +110,6 @@ float MidiSystem::getLastVelocity() const noexcept
     return lastVelocity.load();
 }
 
-bool MidiSystem::isMidiActive() const noexcept
-{
-    return activeNoteCount.load() > 0;
-}
-
-int MidiSystem::getActiveNoteCount() const noexcept
-{
-    return activeNoteCount.load();
-}
-
-juce::uint32 MidiSystem::getActivitySerial() const noexcept
-{
-    return activitySerial.load();
-}
-
 void MidiSystem::playVirtualNote (
     int midiNote,
     float velocity)
@@ -195,9 +180,6 @@ void MidiSystem::applyMessage (
             velocity
         );
 
-        activeNoteCount.fetch_add (1);
-        activitySerial.fetch_add (1);
-
         const auto frequency =
             440.0
             * std::pow (
@@ -219,29 +201,11 @@ void MidiSystem::applyMessage (
 
     if (message.isNoteOff())
     {
-        auto count =
-            activeNoteCount.load();
+        lastNote.store (-1);
+        lastVelocity.store (0.0f);
 
-        while (
-            count > 0
-            && ! activeNoteCount.compare_exchange_weak (
-                count,
-                count - 1
-            )
-        )
-        {
-        }
-
-        activitySerial.fetch_add (1);
-
-        if (activeNoteCount.load() <= 0)
-        {
-            lastNote.store (-1);
-            lastVelocity.store (0.0f);
-
-            audioSystem.setTestToneEnabled (
-                false
-            );
-        }
+        audioSystem.setTestToneEnabled (
+            false
+        );
     }
 }

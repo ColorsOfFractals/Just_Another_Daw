@@ -1,0 +1,60 @@
+﻿JAD EXP-050D.5
+STATE=MIDI_MESH_UI_CHECKPOINT
+STAMP=2026-08-27_024206
+BRANCH=main
+PRE_COMMIT=c4b0399
+
+=== WORKTREE BEFORE COMMIT ===
+ M CMakeLists.txt
+ M Source/Audio/MidiSystem.cpp
+ M Source/Audio/MidiSystem.h
+ M Source/Core/JADContext.cpp
+ M Source/Core/JADContext.h
+ M Source/UI/MainComponent.cpp
+ M Source/UI/MainComponent.h
+ M Source/UI/VirtualKeyboardPanel.cpp
+ M Source/UI/VirtualKeyboardPanel.h
+?? Evidence/JAD-EXP-049-FU-2026-08-25_214432.txt
+?? Evidence/JAD-EXP-050A-PRE-FOSSIL-EXCISION-2026-08-27_000945/
+?? Evidence/JAD-EXP-050A-PRE-PLUGIN-BRAIN-2026-08-26_235530/
+?? Evidence/JAD-EXP-050A-SHONK-2026-08-27_000218.cmd
+?? Evidence/JAD-EXP-050A-SHONK-RETRY-2026-08-27_000945.cmd
+?? Evidence/JAD-EXP-050A2-PRE-VST3-BONK-2026-08-27_001550/
+?? Evidence/JAD-EXP-050A2-VST3-SHONK-2026-08-27_001550.cmd
+?? Evidence/JAD-EXP-050A3-MainComponent-before-resurrection-2026-08-27_001938.cpp
+?? Evidence/JAD-EXP-050A3-RESURRECTION-SHONK-2026-08-27_001938.cmd
+?? Evidence/JAD-EXP-050B2-PRE-GRAFT-2026-08-27_003053/
+?? Evidence/JAD-EXP-050B2B-PRE-GRAFT-2026-08-27_003509/
+?? Evidence/JAD-EXP-050B3-SHONK-2026-08-27_003910.cmd
+?? Evidence/JAD-EXP-050B3-SHONK-2026-08-27_003945.cmd
+?? Evidence/JAD-EXP-050C-FEED-SHONK-2026-08-27_010802.cmd
+?? Evidence/JAD-EXP-050C-PRE-FEED-2026-08-27_010802/
+?? Evidence/JAD-EXP-050C-PRE-GLYPH-CLEAN-2026-08-27_010416/
+?? Evidence/JAD-EXP-050D0-KEYBOARD-SHONK-2026-08-27_015448.cmd
+?? Evidence/JAD-EXP-050D1-JUCE-WCHAR-MICROFIX-2026-08-27_015731/
+?? Evidence/JAD-EXP-050D1-WCHAR-SHONK-2026-08-27_015731.cmd
+?? Evidence/JAD-EXP-050D2-KEYTYPE-2026-08-27_015839/
+?? Evidence/JAD-EXP-050D2-KEYTYPE-SHONK-2026-08-27_015839.cmd
+?? Evidence/JAD-EXP-050D3-GEOMETRY-SHONK-2026-08-27_020929.cmd
+?? Evidence/JAD-EXP-050D3-KEYBOARD-GEOMETRY-2026-08-27_020929/
+?? Evidence/JAD-EXP-050D4-MIDI-MESH-2026-08-27_022805/
+?? Evidence/JAD-EXP-050D4-MIDI-MESH-SHONK-2026-08-27_022805.cmd
+?? Source/Plugins/
+?? Source/UI/PluginLibraryPanel.cpp
+?? Source/UI/PluginLibraryPanel.h
+?? Source/UI/VirtualKeyboardPanel.cpp.exp050d0.bak
+?? Source/UI/VirtualKeyboardPanel.h.exp050d0.bak
+
+=== KEYBOARD CONTRACT ===
+C0-C6 bounded keyboard
+Post-keyboard tail excised
+Computer-key legend isolated
+A-K / W-E-T-Y-U computer mapping
+Z/X octave control
+OCT numeric indicator
+Moving octave vector
+MIDI mesh telemetry scaffold
+Signal spiral scaffold
+VST discovery alive
+Plugin cabinet alive
+VST audio instantiation not yet wired

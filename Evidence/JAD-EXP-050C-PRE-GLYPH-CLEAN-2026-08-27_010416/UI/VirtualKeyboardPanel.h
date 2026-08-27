@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -6,7 +6,7 @@
 #include "../Audio/AudioSystem.h"
 #include "../Audio/MidiSystem.h"
 
-#include "JADLookAndFeel.h"
+class JADLookAndFeel;
 
 class VirtualKeyboardPanel :
     public juce::Component,
@@ -18,47 +18,17 @@ public:
         JADLookAndFeel& lookAndFeelToUse
     );
 
-    ~VirtualKeyboardPanel() override;
-
     void paint (
         juce::Graphics&
     ) override;
 
     void resized() override;
 
-    bool keyPressed (
-        const juce::KeyPress&
-    ) override;
-
-    bool keyStateChanged (
-        bool isKeyDown
-    ) override;
-
 private:
     void timerCallback() override;
 
     void rebuildMidiDeviceList();
     void applyKeyboardTheme();
-
-    void changeComputerOctave (
-        int delta
-    );
-
-    void refreshComputerNotes();
-
-    int getMidiNoteForComputerKey (
-        juce::uint32 key
-    ) const;
-
-    void drawComputerKeyboardLegend (
-        juce::Graphics&,
-        juce::Rectangle<int>
-    );
-
-    void drawOctaveMarkers (
-        juce::Graphics&,
-        juce::Rectangle<int>
-    );
 
     AudioSystem& audioSystem;
     JADLookAndFeel& jadLookAndFeel;
@@ -90,19 +60,4 @@ private:
     juce::Slider velocitySlider;
 
     int baseOctave = 3;
-
-    juce::Array<int> heldComputerNotes;
-
-    juce::Rectangle<int> keyboardBounds;
-    juce::Rectangle<int> legendBounds;
-    juce::Rectangle<int> midiStatusBounds;
-
-    float midiPulse = 0.0f;
-    float midiSpin = 0.0f;
-
-    juce::uint32 observedActivitySerial = 0;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
-        VirtualKeyboardPanel
-    )
 };

@@ -1,8 +1,7 @@
-#include "JADContext.h"
+﻿#include "JADContext.h"
 
 JADContext::JADContext()
 {
-    pluginCatalog.initialise();
     audioSystem.setSessionState (
         &sessionState
     );
@@ -32,8 +31,4 @@ bool JADContext::isAlive() const noexcept
         && sessionState.isAlive();
 }
 
-PluginCatalog&
-JADContext::getPluginCatalog() noexcept
-{
-    return pluginCatalog;
-}
+

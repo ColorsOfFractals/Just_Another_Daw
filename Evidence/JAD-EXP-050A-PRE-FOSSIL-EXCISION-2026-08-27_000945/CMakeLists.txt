@@ -55,8 +55,8 @@ target_sources(
         Source/Model/SessionState.h
 
         Source/UI/MainComponent.cpp
-        Source/UI/PluginLibraryPanel.cpp
-        Source/UI/PluginLibraryPanel.h
+        Source/UI/MixerConsolePanel.cpp
+        Source/UI/MixerConsolePanel.h
         Source/UI/StartupOverlay.cpp
         Source/UI/VirtualKeyboardPanel.h
         Source/UI/VirtualKeyboardPanel.cpp
@@ -91,7 +91,6 @@ target_compile_definitions(
     PRIVATE
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
-        JUCE_PLUGINHOST_VST3=1
 )
 
 target_link_libraries(JAD

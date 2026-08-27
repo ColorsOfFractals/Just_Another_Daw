@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_basics/juce_audio_basics.h>
@@ -40,10 +40,6 @@ public:
     int getLastNote() const noexcept;
     float getLastVelocity() const noexcept;
 
-    bool isMidiActive() const noexcept;
-    int getActiveNoteCount() const noexcept;
-    juce::uint32 getActivitySerial() const noexcept;
-
     void playVirtualNote (
         int midiNote,
         float velocity
@@ -77,7 +73,4 @@ private:
 
     std::atomic<int> lastNote { -1 };
     std::atomic<float> lastVelocity { 0.0f };
-
-    std::atomic<int> activeNoteCount { 0 };
-    std::atomic<juce::uint32> activitySerial { 0 };
 };

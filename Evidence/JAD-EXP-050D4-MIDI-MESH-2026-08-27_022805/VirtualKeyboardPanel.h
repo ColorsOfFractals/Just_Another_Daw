@@ -95,12 +95,6 @@ private:
 
     juce::Rectangle<int> keyboardBounds;
     juce::Rectangle<int> legendBounds;
-    juce::Rectangle<int> midiStatusBounds;
-
-    float midiPulse = 0.0f;
-    float midiSpin = 0.0f;
-
-    juce::uint32 observedActivitySerial = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
         VirtualKeyboardPanel

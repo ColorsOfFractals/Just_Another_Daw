@@ -5,7 +5,6 @@
 #include "../Core/JADContext.h"
 
 #include "JADLookAndFeel.h"
-#include "PluginLibraryPanel.h"
 #include "SessionOverviewPanel.h"
 #include "StartupOverlay.h"
 #include "SynthVoicePanel.h"
@@ -47,8 +46,7 @@ private:
     {
         keyboard = 0,
         synth,
-        mixer,
-        plugins
+        mixer
     };
 
     enum class DragMode
@@ -161,7 +159,6 @@ private:
     SessionOverviewPanel sessionOverviewPanel;
     StartupOverlay startupOverlay;
     SynthVoicePanel synthVoicePanel;
-    PluginLibraryPanel pluginLibraryPanel;
     VirtualKeyboardPanel keyboardPanel;
 
     TimelineViewportState timelineViewport;
@@ -207,10 +204,6 @@ private:
 
     juce::TextButton mixerTabButton {
         "MIXER"
-    };
-
-    juce::TextButton pluginsTabButton {
-        "PLUGINS"
     };
 
     int selectedTrackIndex = 0;

@@ -18,7 +18,6 @@ MainComponent::MainComponent (
           context.getAudioSystem()
       ),
       pluginLibraryPanel (
-          context.getPluginCatalog(),
           jadLookAndFeel
       ),
       keyboardPanel (
@@ -295,18 +294,18 @@ void MainComponent::refreshWorkspace()
     statusLabel.setText (
         "TRACKS "
             + juce::String (count)
-            + "  -  "
+            + "  ΓÇó  "
             + (
                 timelineViewport.isSnapEnabled()
                     ? "SNAP 1/4"
                     : "SNAP OFF"
             )
-            + "  -  "
+            + "  ΓÇó  "
             + juce::String (
                 timelineViewport.getVisibleBeats(),
                 1
             )
-            + " BEATS  -  AUDIO "
+            + " BEATS  ΓÇó  AUDIO "
             + (
                 context.getAudioSystem().isReady()
                     ? "ONLINE"

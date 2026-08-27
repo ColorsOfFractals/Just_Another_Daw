@@ -24,9 +24,6 @@ target_sources(
         Source/Core/JADContext.cpp
         Source/Core/JADContext.h
 
-        Source/Plugins/PluginCatalog.cpp
-        Source/Plugins/PluginCatalog.h
-
         Source/Audio/AudioSystem.cpp
         Source/Audio/MidiSystem.h
         Source/Audio/MidiSystem.cpp
@@ -55,8 +52,8 @@ target_sources(
         Source/Model/SessionState.h
 
         Source/UI/MainComponent.cpp
-        Source/UI/PluginLibraryPanel.cpp
-        Source/UI/PluginLibraryPanel.h
+        Source/UI/MixerConsolePanel.cpp
+        Source/UI/MixerConsolePanel.h
         Source/UI/StartupOverlay.cpp
         Source/UI/VirtualKeyboardPanel.h
         Source/UI/VirtualKeyboardPanel.cpp
@@ -91,7 +88,6 @@ target_compile_definitions(
     PRIVATE
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
-        JUCE_PLUGINHOST_VST3=1
 )
 
 target_link_libraries(JAD
@@ -100,7 +96,6 @@ target_link_libraries(JAD
         juce::juce_audio_devices
         juce::juce_audio_basics
         juce::juce_audio_utils
-        juce::juce_audio_processors
 )
 
 
