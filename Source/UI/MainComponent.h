@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -77,6 +77,7 @@ private:
     );
 
     void refreshWorkspace();
+    void updateLiveRecordingRegion();
 
     void drawPanel (
         juce::Graphics&,
@@ -223,6 +224,11 @@ private:
 
     int selectedClipTrackIndex = -1;
     int selectedClipIndex = -1;
+
+    bool recordingWasActive = false;
+    int activeRecordingTrackIndex = -1;
+    int activeRecordingClipIndex = -1;
+    double activeRecordingStartBeat = 0.0;
 
     DockPage dockPage =
         DockPage::keyboard;

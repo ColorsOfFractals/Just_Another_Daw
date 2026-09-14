@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <string>
 
 MainComponent::MainComponent (
     JADContext& contextToUse)
@@ -300,7 +301,159 @@ MainComponent::~MainComponent()
 
 void MainComponent::timerCallback()
 {
+    updateLiveRecordingRegion();
     refreshWorkspace();
+}
+
+void MainComponent::updateLiveRecordingRegion()
+{
+    auto& session =
+        context.getSessionState();
+
+    auto& transport =
+        session.getTransportState();
+
+    const auto recordingNow =
+        transport.isRecording();
+
+    if (recordingNow && ! recordingWasActive)
+    {
+        activeRecordingTrackIndex = -1;
+        activeRecordingClipIndex = -1;
+
+        if (selectedTrackIndex >= 0)
+        {
+            auto* track =
+                session.getTrack (
+                    static_cast<std::size_t> (
+                        selectedTrackIndex
+                    )
+                );
+
+            if (
+                track != nullptr
+                && track->isRecordArmed()
+            )
+            {
+                activeRecordingStartBeat =
+                    transport.getPositionInBeats();
+
+                track->clearRecordedMidiEvents();
+
+                track->addClip (
+                    "MIDI RECORDING",
+                    activeRecordingStartBeat,
+                    0.001
+                );
+
+                activeRecordingTrackIndex =
+                    selectedTrackIndex;
+
+                activeRecordingClipIndex =
+                    static_cast<int> (
+                        track->getClipCount()
+                    ) - 1;
+
+                selectedClipTrackIndex =
+                    activeRecordingTrackIndex;
+
+                selectedClipIndex =
+                    activeRecordingClipIndex;
+            }
+        }
+    }
+
+    if (
+        recordingNow
+        && activeRecordingTrackIndex >= 0
+        && activeRecordingClipIndex >= 0
+    )
+    {
+        auto* track =
+            session.getTrack (
+                static_cast<std::size_t> (
+                    activeRecordingTrackIndex
+                )
+            );
+
+        auto* clip =
+            track != nullptr
+                ? track->getClip (
+                    static_cast<std::size_t> (
+                        activeRecordingClipIndex
+                    )
+                )
+                : nullptr;
+
+        if (clip != nullptr)
+        {
+            clip->setLengthBeats (
+                juce::jmax (
+                    0.001,
+                    transport.getPositionInBeats()
+                        - activeRecordingStartBeat
+                )
+            );
+        }
+    }
+
+    if (! recordingNow && recordingWasActive)
+    {
+        if (
+            activeRecordingTrackIndex >= 0
+            && activeRecordingClipIndex >= 0
+        )
+        {
+            auto* track =
+                session.getTrack (
+                    static_cast<std::size_t> (
+                        activeRecordingTrackIndex
+                    )
+                );
+
+            auto* clip =
+                track != nullptr
+                    ? track->getClip (
+                        static_cast<std::size_t> (
+                            activeRecordingClipIndex
+                        )
+                    )
+                    : nullptr;
+
+            if (
+                track != nullptr
+                && clip != nullptr
+            )
+            {
+                const auto eventCount =
+                    track->getRecordedMidiEventCount();
+
+                if (eventCount == 0)
+                {
+                    track->removeClip (
+                        clip->getId()
+                    );
+
+                    clearClipSelection();
+                }
+                else
+                {
+                    clip->setName (
+                        "MIDI TAKE - "
+                            + std::to_string (
+                                (eventCount + 1) / 2
+                            )
+                            + " NOTES"
+                    );
+                }
+            }
+        }
+
+        activeRecordingTrackIndex = -1;
+        activeRecordingClipIndex = -1;
+    }
+
+    recordingWasActive = recordingNow;
 }
 
 void MainComponent::refreshWorkspace()
