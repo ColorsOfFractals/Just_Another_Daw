@@ -83,9 +83,6 @@ public:
 
     juce::String getTrackPluginName() const;
 
-    juce::AudioPluginInstance*
-    getTrackPlugin() noexcept;
-
 private:
     void audioDeviceIOCallbackWithContext (
         const float* const* inputChannelData,

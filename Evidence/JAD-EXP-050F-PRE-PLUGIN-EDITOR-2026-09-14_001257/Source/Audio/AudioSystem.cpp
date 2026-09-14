@@ -174,13 +174,6 @@ juce::String AudioSystem::getTrackPluginName() const
 {
     return pluginSource.getPluginName();
 }
-
-
-juce::AudioPluginInstance*
-AudioSystem::getTrackPlugin() noexcept
-{
-    return pluginSource.getPlugin();
-}
 void AudioSystem::setTestToneEnabled (
     bool enabled
 ) noexcept

@@ -1,44 +1,5 @@
 #include "PluginLibraryPanel.h"
 
-
-namespace
-{
-class PluginEditorWindow final :
-    public juce::DocumentWindow
-{
-public:
-    PluginEditorWindow (
-        juce::AudioProcessorEditor* editor,
-        const juce::String& pluginName)
-        : juce::DocumentWindow (
-            pluginName + " | JAD",
-            juce::Colour::fromRGB (18, 12, 38),
-            juce::DocumentWindow::allButtons
-        )
-    {
-        setUsingNativeTitleBar (true);
-        setResizable (true, false);
-        setContentOwned (editor, true);
-
-        centreWithSize (
-            juce::jmax (420, getWidth()),
-            juce::jmax (300, getHeight())
-        );
-
-        setVisible (true);
-        toFront (true);
-    }
-
-    void closeButtonPressed() override
-    {
-        setVisible (false);
-    }
-
-private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditorWindow)
-};
-}
-
 PluginLibraryPanel::PluginLibraryPanel (
     PluginCatalog& catalogToUse,
     AudioSystem& audioSystemToUse,
@@ -155,7 +116,6 @@ PluginLibraryPanel::PluginLibraryPanel (
             static_cast<juce::Component*> (&effectsButton),
             static_cast<juce::Component*> (&favouritesButton),
             static_cast<juce::Component*> (&loadButton),
-            static_cast<juce::Component*> (&openEditorButton),
             static_cast<juce::Component*> (&pluginList)
         })
     {
@@ -177,7 +137,6 @@ PluginLibraryPanel::PluginLibraryPanel (
 
     favouritesButton.setEnabled (false);
     loadButton.setEnabled (false);
-    openEditorButton.setEnabled (false);
 
     scanButton.onClick =
         [this]
@@ -279,9 +238,6 @@ PluginLibraryPanel::PluginLibraryPanel (
             const auto loadedName =
                 instance->getName();
 
-            
-            pluginEditorWindow.reset();
-
             if (
                 ! audioSystem.installTrackPlugin (
                     std::move (instance)
@@ -316,17 +272,8 @@ PluginLibraryPanel::PluginLibraryPanel (
                 "LOADED INTO TRACK 1"
             );
 
-            openEditorButton.setEnabled (true);
-
             repaint();
         };
-    openEditorButton.onClick =
-        [this]
-        {
-            openPluginEditor();
-        };
-
-
 
     allButton.onClick =
         [this]
@@ -353,48 +300,6 @@ PluginLibraryPanel::PluginLibraryPanel (
         };
 
     refreshPlugins();
-}
-
-void PluginLibraryPanel::openPluginEditor()
-{
-    if (pluginEditorWindow != nullptr)
-    {
-        pluginEditorWindow->setVisible (true);
-        pluginEditorWindow->toFront (true);
-        return;
-    }
-
-    auto* plugin =
-        audioSystem.getTrackPlugin();
-
-    if (plugin == nullptr)
-    {
-        detailLabel.setText (
-            "NO PLUGIN LOADED",
-            juce::dontSendNotification
-        );
-
-        openEditorButton.setEnabled (false);
-        return;
-    }
-
-    auto* editor =
-        plugin->createEditorIfNeeded();
-
-    if (editor == nullptr)
-    {
-        detailLabel.setText (
-            "PLUGIN HAS NO CUSTOM EDITOR",
-            juce::dontSendNotification
-        );
-        return;
-    }
-
-    pluginEditorWindow =
-        std::make_unique<PluginEditorWindow> (
-            editor,
-            plugin->getName()
-        );
 }
 
 int PluginLibraryPanel::getNumRows()
@@ -914,23 +819,9 @@ void PluginLibraryPanel::resized()
         detail.removeFromTop (30)
             .reduced (10, 0)
     );
-    auto actionRow =
-        detail.removeFromBottom (34)
-            .reduced (10, 2);
-
-    const auto editorWidth =
-        juce::jmin (
-            150,
-            actionRow.getWidth() / 3
-        );
-
-    openEditorButton.setBounds (
-        actionRow.removeFromRight (editorWidth)
-    );
-
-    actionRow.removeFromRight (6);
 
     loadButton.setBounds (
-        actionRow
+        detail.removeFromBottom (34)
+            .reduced (10, 2)
     );
 }

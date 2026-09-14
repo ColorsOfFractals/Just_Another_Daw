@@ -49,8 +49,6 @@ private:
 
     void refreshPlugins();
 
-    void openPluginEditor();
-
     void setFilter (
         Filter newFilter
     );
@@ -105,17 +103,10 @@ Filter filter =
         "LOAD INTO TRACK"
     };
 
-    juce::TextButton openEditorButton {
-        "OPEN PLUGIN"
-    };
-
     juce::ListBox pluginList {
         "Plugin Cabinet",
         this
     };
-
-    std::unique_ptr<juce::DocumentWindow>
-        pluginEditorWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
         PluginLibraryPanel
