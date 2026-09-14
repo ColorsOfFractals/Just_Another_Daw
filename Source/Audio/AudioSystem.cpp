@@ -127,6 +127,40 @@ void AudioSystem::handleMidiMessage (
     const auto trackIndex =
         midiTargetTrackIndex.load();
 
+    const auto isCapturableMessage =
+        message.isNoteOn()
+        || message.isNoteOff();
+
+    if (
+        isCapturableMessage
+        && sessionState != nullptr
+        && transportState != nullptr
+        && transportState->isRecording()
+        && trackIndex >= 0
+        && trackIndex < maxTrackCount
+    )
+    {
+        if (
+            auto* track = sessionState->getTrack (
+                static_cast<std::size_t> (trackIndex)
+            );
+            track != nullptr
+            && track->isRecordArmed()
+        )
+        {
+            if (! recordingCaptureActive.exchange (true))
+                track->clearRecordedMidiEvents();
+
+            track->recordMidiEvent (
+                message.isNoteOn(),
+                message.getNoteNumber(),
+                message.getFloatVelocity(),
+                message.getChannel(),
+                transportState->getPositionInBeats()
+            );
+        }
+    }
+
     if (
         trackIndex >= 0
         && trackIndex < maxTrackCount
@@ -528,6 +562,14 @@ void AudioSystem::audioDeviceIOCallbackWithContext (
                 numSamples
             );
         }
+    }
+
+    if (
+        transportState == nullptr
+        || ! transportState->isRecording()
+    )
+    {
+        recordingCaptureActive.store (false);
     }
 
     if (currentSampleRate <= 0.0)

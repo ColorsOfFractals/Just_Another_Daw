@@ -1,4 +1,4 @@
-﻿#include "TrackModel.h"
+#include "TrackModel.h"
 
 #include <algorithm>
 #include <utility>
@@ -92,6 +92,54 @@ void TrackModel::setRecordArmed (
 bool TrackModel::isRecordArmed() const noexcept
 {
     return recordArmed.load();
+}
+
+void TrackModel::clearRecordedMidiEvents()
+{
+    const std::scoped_lock lock (
+        recordedMidiMutex
+    );
+
+    recordedMidiEvents.clear();
+}
+
+void TrackModel::recordMidiEvent (
+    bool noteOn,
+    int noteNumber,
+    float velocity,
+    int channel,
+    double beat)
+{
+    const std::scoped_lock lock (
+        recordedMidiMutex
+    );
+
+    recordedMidiEvents.push_back ({
+        noteOn,
+        noteNumber,
+        velocity,
+        channel,
+        beat
+    });
+}
+
+std::size_t TrackModel::getRecordedMidiEventCount() const
+{
+    const std::scoped_lock lock (
+        recordedMidiMutex
+    );
+
+    return recordedMidiEvents.size();
+}
+
+std::vector<TrackModel::RecordedMidiEvent>
+TrackModel::getRecordedMidiEventsSnapshot() const
+{
+    const std::scoped_lock lock (
+        recordedMidiMutex
+    );
+
+    return recordedMidiEvents;
 }
 
 ClipModel& TrackModel::addClip (

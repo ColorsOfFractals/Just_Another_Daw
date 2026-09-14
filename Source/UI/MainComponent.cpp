@@ -1699,6 +1699,15 @@ void MainComponent::drawInspector (
             )
         );
 
+        drawValue (
+            "MIDI EVENTS",
+            juce::String (
+                static_cast<int> (
+                    track->getRecordedMidiEventCount()
+                )
+            )
+        );
+
         return;
     }
 

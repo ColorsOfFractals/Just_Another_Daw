@@ -147,6 +147,7 @@ private:
     > trackProcessors;
 
     std::atomic<int> midiTargetTrackIndex { 0 };
+    std::atomic<bool> recordingCaptureActive { false };
 
     juce::AudioBuffer<float> masterMixBuffer;
 
