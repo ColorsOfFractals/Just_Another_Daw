@@ -1,0 +1,1785 @@
+﻿============================================================
+ JAD EXP-050E.2B - UI COCKPIT ANATOMY
+============================================================
+
+TARGET:
+MainComponent -> AUDIO button -> existing AudioSystem
+                              -> AudioDeviceSelectorComponent
+
+
+============================================================
+FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.h
+============================================================
+
+-----
+    1: #pragma once
+    2: 
+    3: #include <juce_gui_basics/juce_gui_basics.h>
+    4: 
+    5: #include "../Core/JADContext.h"
+    6: 
+    7: #include "JADLookAndFeel.h"
+    8: #include "PluginLibraryPanel.h"
+    9: #include "SessionOverviewPanel.h"
+   10: #include "StartupOverlay.h"
+   11: #include "SynthVoicePanel.h"
+   12: #include "TimelineViewportState.h"
+   13: #include "TransportPanel.h"
+   14: #include "VirtualKeyboardPanel.h"
+   15: 
+   16: class MainComponent :
+   17:     public juce::Component,
+   18:     private juce::Timer
+   19: {
+   20: public:
+   21:     explicit MainComponent (
+   22:         JADContext& contextToUse
+   23:     );
+   24: 
+   25:     ~MainComponent() override;
+   26: 
+   27:     void paint (
+   28:         juce::Graphics&
+   29:     ) override;
+   30: 
+   31:     void resized() override;
+   32: 
+   33:     void mouseDown (
+   34:         const juce::MouseEvent&
+   35:     ) override;
+   36: 
+   37:     void mouseDrag (
+   38:         const juce::MouseEvent&
+   39:     ) override;
+   40: 
+   41:     void mouseUp (
+   42:         const juce::MouseEvent&
+   43:     ) override;
+   44: 
+   45: private:
+   46:     enum class DockPage
+   47:     {
+   48:         keyboard = 0,
+   49:         synth,
+   50:         mixer,
+   51:         plugins
+   52:     };
+   53: 
+   54:     enum class DragMode
+   55:     {
+   56:         none = 0,
+   57:         moveClip,
+   58:         resizeClip,
+   59:         trackGain,
+   60:         trackPan
+   61:     };
+   62: 
+   63:     void timerCallback() override;
+   64: 
+   65:     void addTrack();
+   66:     void deleteSelectedTrack();
+   67: 
+
+-----
+  139:     ) const;
+  140: 
+  141:     double xToBeat (
+  142:         int x
+  143:     ) const;
+  144: 
+  145:     void seekTransport (
+  146:         double beat
+  147:     );
+  148: 
+  149:     void beginClipInteraction (
+  150:         int trackIndex,
+  151:         int clipIndex,
+  152:         int mouseX,
+  153:         bool resize
+  154:     );
+  155: 
+  156:     JADContext& context;
+  157: 
+  158:     JADLookAndFeel jadLookAndFeel;
+  159: 
+  160:     TransportPanel transportPanel;
+  161:     SessionOverviewPanel sessionOverviewPanel;
+  162:     StartupOverlay startupOverlay;
+  163:     SynthVoicePanel synthVoicePanel;
+  164:     PluginLibraryPanel pluginLibraryPanel;
+  165:     VirtualKeyboardPanel keyboardPanel;
+  166: 
+  167:     TimelineViewportState timelineViewport;
+  168: 
+  169:     juce::Label projectLabel;
+  170:     juce::Label statusLabel;
+  171: 
+  172:     juce::TextButton addTrackButton {
+  173:         "+ TRACK"
+  174:     };
+  175: 
+  176:     juce::TextButton deleteTrackButton {
+  177:         "- TRACK"
+  178:     };
+  179: 
+  180:     juce::TextButton scrollLeftButton {
+  181:         "<<"
+  182:     };
+  183: 
+  184:     juce::TextButton scrollRightButton {
+  185:         ">>"
+  186:     };
+  187: 
+  188:     juce::TextButton zoomOutButton {
+  189:         "ZOOM -"
+  190:     };
+  191: 
+  192:     juce::TextButton zoomInButton {
+  193:         "ZOOM +"
+  194:     };
+  195: 
+  196:     juce::TextButton snapButton {
+  197:         "SNAP"
+  198:     };
+  199: 
+  200:     juce::TextButton keyboardTabButton {
+  201:         "KEYBOARD"
+  202:     };
+  203: 
+  204:     juce::TextButton synthTabButton {
+  205:         "SYNTH"
+  206:     };
+  207: 
+  208:     juce::TextButton mixerTabButton {
+  209:         "MIXER"
+  210:     };
+  211: 
+  212:     juce::TextButton pluginsTabButton {
+  213:         "PLUGINS"
+  214:     };
+  215: 
+  216:     int selectedTrackIndex = 0;
+  217: 
+  218:     int selectedClipTrackIndex = -1;
+  219:     int selectedClipIndex = -1;
+  220: 
+  221:     DockPage dockPage =
+  222:         DockPage::keyboard;
+  223: 
+  224:     DragMode dragMode =
+  225:         DragMode::none;
+  226: 
+  227:     int dragTrackIndex = -1;
+  228:     int dragClipIndex = -1;
+  229: 
+  230:     int dragAnchorX = 0;
+  231: 
+  232:     double dragInitialStartBeat = 0.0;
+  233:     double dragInitialLengthBeats = 0.0;
+  234: 
+  235:     juce::Rectangle<int> cachedTrackRack;
+  236:     juce::Rectangle<int> cachedArrangement;
+  237:     juce::Rectangle<int> cachedInspector;
+  238:     juce::Rectangle<int> cachedDock;
+  239: 
+  240:     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
+  241:         MainComponent
+  242:     )
+  243: };
+
+============================================================
+FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\UI\MainComponent.cpp
+============================================================
+
+-----
+    1: #include "MainComponent.h"
+    2: 
+    3: #include <algorithm>
+    4: #include <cmath>
+    5: #include <cstdint>
+    6: 
+    7: MainComponent::MainComponent (
+    8:     JADContext& contextToUse)
+    9:     : context (contextToUse),
+   10:       transportPanel (
+   11:           context.getSessionState()
+   12:               .getTransportState()
+   13:       ),
+   14:       sessionOverviewPanel (
+   15:           context.getSessionState()
+   16:       ),
+   17:       synthVoicePanel (
+   18:           context.getAudioSystem()
+   19:       ),
+   20:       pluginLibraryPanel (
+   21:           context.getPluginCatalog(),
+   22:           jadLookAndFeel
+   23:       ),
+   24:       keyboardPanel (
+   25:           context.getAudioSystem(),
+   26:           jadLookAndFeel
+   27:       )
+   28: {
+   29:     setLookAndFeel (
+   30:         &jadLookAndFeel
+   31:     );
+   32: 
+   33:     setSize (
+   34:         1540,
+   35:         980
+   36:     );
+   37: 
+   38:     setWantsKeyboardFocus (
+   39:         true
+   40:     );
+   41: 
+   42:     projectLabel.setText (
+   43:         "FIRST JAD SESSION",
+   44:         juce::dontSendNotification
+   45:     );
+   46: 
+   47:     projectLabel.setFont (
+   48:         juce::FontOptions (15.0f)
+   49:             .withStyle ("Bold")
+   50:     );
+   51: 
+   52:     projectLabel.setJustificationType (
+   53:         juce::Justification::centredLeft
+   54:     );
+   55: 
+   56:     statusLabel.setText (
+   57:         "PROJECT - LIVE",
+   58:         juce::dontSendNotification
+   59:     );
+   60: 
+   61:     statusLabel.setFont (
+   62:         juce::FontOptions (11.0f)
+   63:     );
+   64: 
+   65:     statusLabel.setJustificationType (
+   66:         juce::Justification::centredRight
+   67:     );
+   68: 
+   69:     addTrackButton.onClick =
+   70:         [this]
+   71:         {
+   72:             addTrack();
+   73:         };
+   74: 
+   75:     deleteTrackButton.onClick =
+   76:         [this]
+   77:         {
+   78:             deleteSelectedTrack();
+   79:         };
+   80: 
+   81:     scrollLeftButton.onClick =
+   82:         [this]
+   83:         {
+   84:             timelineViewport.scrollLeft();
+   85:             repaint();
+   86:         };
+   87: 
+   88:     scrollRightButton.onClick =
+   89:         [this]
+   90:         {
+   91:             timelineViewport.scrollRight();
+   92:             repaint();
+   93:         };
+   94: 
+   95:     zoomOutButton.onClick =
+   96:         [this]
+   97:         {
+   98:             timelineViewport.zoomOut();
+   99:             repaint();
+  100:         };
+  101: 
+  102:     zoomInButton.onClick =
+  103:         [this]
+  104:         {
+  105:             timelineViewport.zoomIn();
+  106:             repaint();
+  107:         };
+  108: 
+  109:     snapButton.setClickingTogglesState (
+  110:         true
+  111:     );
+  112: 
+  113:     snapButton.setToggleState (
+  114:         timelineViewport.isSnapEnabled(),
+  115:         juce::dontSendNotification
+  116:     );
+  117: 
+  118:     snapButton.onClick =
+  119:         [this]
+  120:         {
+  121:             timelineViewport.setSnapEnabled (
+  122:                 snapButton.getToggleState()
+  123:             );
+  124: 
+  125:             repaint();
+  126:         };
+  127: 
+  128:     keyboardTabButton.onClick =
+  129:         [this]
+  130:         {
+  131:             setDockPage (
+  132:                 DockPage::keyboard
+  133:             );
+  134:         };
+  135: 
+  136:     synthTabButton.onClick =
+  137:         [this]
+  138:         {
+  139:             setDockPage (
+  140:                 DockPage::synth
+  141:             );
+  142:         };
+  143: 
+  144:     mixerTabButton.onClick =
+  145:         [this]
+  146:         {
+  147:             setDockPage (
+  148:                 DockPage::mixer
+  149:             );
+  150:         };
+  151: 
+  152:     pluginsTabButton.onClick =
+  153:         [this]
+  154:         {
+  155:             setDockPage (
+  156:                 DockPage::plugins
+  157:             );
+  158:         };
+  159: 
+  160:     addAndMakeVisible (
+  161:         transportPanel
+  162:     );
+  163: 
+  164:     addAndMakeVisible (
+  165:         sessionOverviewPanel
+  166:     );
+  167: 
+  168:     addAndMakeVisible (
+  169:         synthVoicePanel
+  170:     );
+  171: 
+  172:     addAndMakeVisible (
+  173:         pluginLibraryPanel
+  174:     );
+  175: 
+  176:     addAndMakeVisible (
+  177:         keyboardPanel
+  178:     );
+  179: 
+  180:     addAndMakeVisible (
+  181:         projectLabel
+  182:     );
+  183: 
+  184:     addAndMakeVisible (
+  185:         statusLabel
+  186:     );
+  187: 
+  188:     addAndMakeVisible (
+  189:         addTrackButton
+  190:     );
+  191: 
+  192:     addAndMakeVisible (
+  193:         deleteTrackButton
+  194:     );
+  195: 
+  196:     addAndMakeVisible (
+  197:         scrollLeftButton
+  198:     );
+  199: 
+  200:     addAndMakeVisible (
+  201:         scrollRightButton
+  202:     );
+  203: 
+  204:     addAndMakeVisible (
+  205:         zoomOutButton
+  206:     );
+  207: 
+  208:     addAndMakeVisible (
+  209:         zoomInButton
+  210:     );
+  211: 
+  212:     addAndMakeVisible (
+  213:         snapButton
+  214:     );
+  215: 
+  216:     addAndMakeVisible (
+  217:         keyboardTabButton
+  218:     );
+  219: 
+  220:     addAndMakeVisible (
+  221:         synthTabButton
+  222:     );
+  223: 
+  224:     addAndMakeVisible (
+  225:         mixerTabButton
+  226:     );
+  227: 
+  228:     addAndMakeVisible (
+  229:         pluginsTabButton
+  230:     );
+  231: 
+  232:     sessionOverviewPanel.setVisible (
+  233:         false
+  234:     );
+  235: 
+  236:     setDockPage (
+  237:         DockPage::keyboard
+  238:     );
+  239: 
+  240:     startTimerHz (30);
+  241: }
+  242: 
+  243: MainComponent::~MainComponent()
+  244: {
+  245:     stopTimer();
+  246: 
+  247:     setLookAndFeel (
+  248:         nullptr
+  249:     );
+  250: }
+  251: 
+  252: void MainComponent::timerCallback()
+  253: {
+  254:     refreshWorkspace();
+  255: }
+  256: 
+  257: void MainComponent::refreshWorkspace()
+  258: {
+  259:     auto& session =
+  260:         context.getSessionState();
+  261: 
+  262:     const auto count =
+  263:         static_cast<int> (
+  264:             session.getTrackCount()
+  265:         );
+  266: 
+  267:     if (count <= 0)
+  268:         selectedTrackIndex = -1;
+
+-----
+  283:         selectedTrackIndex =
+  284:             count - 1;
+  285:     }
+  286: 
+  287:     if (
+  288:         selectedClipTrackIndex
+  289:         >= count
+  290:     )
+  291:     {
+  292:         clearClipSelection();
+  293:     }
+  294: 
+  295:     statusLabel.setText (
+  296:         "TRACKS "
+  297:             + juce::String (count)
+  298:             + "  -  "
+  299:             + (
+  300:                 timelineViewport.isSnapEnabled()
+  301:                     ? "SNAP 1/4"
+  302:                     : "SNAP OFF"
+  303:             )
+  304:             + "  -  "
+  305:             + juce::String (
+  306:                 timelineViewport.getVisibleBeats(),
+  307:                 1
+  308:             )
+  309:             + " BEATS  -  AUDIO "
+  310:             + (
+  311:                 context.getAudioSystem().isReady()
+  312:                     ? "ONLINE"
+  313:                     : "OFFLINE"
+  314:             ),
+  315:         juce::dontSendNotification
+  316:     );
+  317: 
+  318:     repaint();
+  319: }
+  320: 
+  321: void MainComponent::addTrack()
+  322: {
+  323:     auto& session =
+  324:         context.getSessionState();
+  325: 
+  326:     auto& track =
+  327:         session.addTrack();
+  328: 
+  329:     track.addClip (
+  330:         "NEW CLIP",
+  331:         timelineViewport.getStartBeat(),
+  332:         4.0
+  333:     );
+  334: 
+  335:     selectedTrackIndex =
+  336:         static_cast<int> (
+  337:             session.getTrackCount()
+  338:         ) - 1;
+  339: 
+  340:     clearClipSelection();
+  341: 
+  342:     refreshWorkspace();
+  343: }
+  344: 
+  345: void MainComponent::deleteSelectedTrack()
+  346: {
+  347:     auto& session =
+  348:         context.getSessionState();
+  349: 
+  350:     if (selectedTrackIndex < 0)
+  351:         return;
+  352: 
+  353:     auto* track =
+  354:         session.getTrack (
+  355:             static_cast<std::size_t> (
+  356:                 selectedTrackIndex
+  357:             )
+  358:         );
+  359: 
+  360:     if (track == nullptr)
+  361:         return;
+  362: 
+  363:     session.removeTrack (
+  364:         track->getId()
+  365:     );
+  366: 
+  367:     clearClipSelection();
+
+-----
+  399:         index < 0
+  400:         || index >= count
+  401:     )
+  402:     {
+  403:         return;
+  404:     }
+  405: 
+  406:     selectedTrackIndex = index;
+  407: 
+  408:     if (
+  409:         selectedClipTrackIndex
+  410:         != selectedTrackIndex
+  411:     )
+  412:     {
+  413:         clearClipSelection();
+  414:     }
+  415: 
+  416:     repaint();
+  417: }
+  418: 
+  419: void MainComponent::clearClipSelection()
+  420: {
+  421:     selectedClipTrackIndex = -1;
+  422:     selectedClipIndex = -1;
+  423: }
+  424: 
+  425: void MainComponent::setDockPage (
+  426:     DockPage page)
+  427: {
+  428:     dockPage = page;
+  429: 
+  430:     keyboardPanel.setVisible (
+  431:         dockPage == DockPage::keyboard
+  432:     );
+  433: 
+  434:     synthVoicePanel.setVisible (
+  435:         dockPage == DockPage::synth
+  436:     );
+  437: 
+  438:     pluginLibraryPanel.setVisible (
+  439:         dockPage == DockPage::plugins
+  440:     );
+  441: 
+  442:     keyboardTabButton.setToggleState (
+  443:         dockPage == DockPage::keyboard,
+  444:         juce::dontSendNotification
+  445:     );
+  446: 
+  447:     synthTabButton.setToggleState (
+  448:         dockPage == DockPage::synth,
+  449:         juce::dontSendNotification
+  450:     );
+  451: 
+  452:     mixerTabButton.setToggleState (
+  453:         dockPage == DockPage::mixer,
+  454:         juce::dontSendNotification
+  455:     );
+  456: 
+  457:     pluginsTabButton.setToggleState (
+  458:         dockPage == DockPage::plugins,
+  459:         juce::dontSendNotification
+  460:     );
+  461: 
+  462:     resized();
+  463:     repaint();
+  464: }
+  465: 
+  466: void MainComponent::drawPanel (
+  467:     juce::Graphics& g,
+  468:     juce::Rectangle<int> area,
+  469:     const juce::String& title,
+  470:     juce::Colour accent,
+  471:     float alpha)
+  472: {
+  473:     if (area.isEmpty())
+  474:         return;
+  475: 
+  476:     const auto bounds =
+  477:         area.toFloat();
+  478: 
+  479:     juce::ColourGradient glass (
+  480:         accent.withAlpha (
+  481:             alpha + 0.08f
+  482:         ),
+  483:         bounds.getTopLeft(),
+  484:         jadLookAndFeel.colourB()
+  485:             .withAlpha (
+  486:                 alpha * 0.45f
+  487:             ),
+  488:         bounds.getBottomRight(),
+  489:         false
+  490:     );
+  491: 
+  492:     g.setGradientFill (
+  493:         glass
+  494:     );
+  495: 
+  496:     g.fillRoundedRectangle (
+  497:         bounds,
+  498:         14.0f
+  499:     );
+
+-----
+  661:         timeline.getWidth(),
+  662:         laneHeight
+  663:     };
+  664: }
+  665: 
+  666: int MainComponent::beatToX (
+  667:     double beat) const
+  668: {
+  669:     const auto timeline =
+  670:         getTimelineBounds();
+  671: 
+  672:     if (timeline.getWidth() <= 0)
+  673:         return timeline.getX();
+  674: 
+  675:     const auto fraction =
+  676:         (
+  677:             beat
+  678:             - timelineViewport.getStartBeat()
+  679:         )
+  680:         / timelineViewport.getVisibleBeats();
+  681: 
+  682:     return timeline.getX()
+  683:         + static_cast<int> (
+  684:             fraction
+  685:             * timeline.getWidth()
+  686:         );
+  687: }
+  688: 
+  689: double MainComponent::xToBeat (
+  690:     int x) const
+  691: {
+  692:     const auto timeline =
+  693:         getTimelineBounds();
+  694: 
+  695:     if (timeline.getWidth() <= 0)
+  696:         return timelineViewport.getStartBeat();
+  697: 
+  698:     const auto fraction =
+  699:         juce::jlimit (
+  700:             0.0,
+  701:             1.0,
+  702:             static_cast<double> (
+  703:                 x - timeline.getX()
+  704:             )
+  705:             / static_cast<double> (
+  706:                 timeline.getWidth()
+  707:             )
+  708:         );
+  709: 
+  710:     return timelineViewport.getStartBeat()
+  711:         + fraction
+  712:         * timelineViewport.getVisibleBeats();
+  713: }
+  714: 
+  715: juce::Rectangle<int>
+  716: MainComponent::getClipBounds (
+  717:     int trackIndex,
+  718:     int clipIndex) const
+  719: {
+  720:     const auto lane =
+  721:         getLaneBounds (
+  722:             trackIndex
+  723:         );
+  724: 
+  725:     if (lane.isEmpty())
+  726:         return {};
+  727: 
+  728:     auto* track =
+  729:         context.getSessionState()
+  730:             .getTrack (
+  731:                 static_cast<std::size_t> (
+  732:                     trackIndex
+  733:                 )
+  734:             );
+  735: 
+  736:     if (track == nullptr)
+  737:         return {};
+  738: 
+  739:     if (
+  740:         clipIndex < 0
+  741:         || clipIndex
+  742:             >= static_cast<int> (
+  743:                 track->getClipCount()
+  744:             )
+  745:     )
+  746:     {
+  747:         return {};
+  748:     }
+  749: 
+  750:     auto* clip =
+  751:         track->getClip (
+  752:             static_cast<std::size_t> (
+  753:                 clipIndex
+  754:             )
+  755:         );
+  756: 
+  757:     if (clip == nullptr)
+  758:         return {};
+  759: 
+  760:     const auto visibleStart =
+  761:         timelineViewport.getStartBeat();
+  762: 
+  763:     const auto visibleEnd =
+  764:         timelineViewport.getEndBeat();
+  765: 
+  766:     const auto clipStart =
+  767:         clip->getStartBeat();
+  768: 
+  769:     const auto clipEnd =
+  770:         clipStart
+  771:         + clip->getLengthBeats();
+  772: 
+  773:     if (
+  774:         clipEnd <= visibleStart
+  775:         || clipStart >= visibleEnd
+  776:     )
+  777:     {
+  778:         return {};
+  779:     }
+  780: 
+  781:     const auto start =
+  782:         juce::jmax (
+  783:             visibleStart,
+  784:             clipStart
+  785:         );
+  786: 
+  787:     const auto end =
+  788:         juce::jmin (
+  789:             visibleEnd,
+  790:             clipEnd
+  791:         );
+  792: 
+  793:     const auto x1 =
+  794:         beatToX (start);
+  795: 
+  796:     const auto x2 =
+  797:         beatToX (end);
+  798: 
+  799:     return {
+  800:         x1 + 3,
+
+-----
+ 1130: 
+ 1131:     const auto timeline =
+ 1132:         getTimelineBounds();
+ 1133: 
+ 1134:     g.setColour (
+ 1135:         juce::Colours::black
+ 1136:             .withAlpha (0.28f)
+ 1137:     );
+ 1138: 
+ 1139:     g.fillRoundedRectangle (
+ 1140:         ruler.toFloat(),
+ 1141:         7.0f
+ 1142:     );
+ 1143: 
+ 1144:     const auto firstBeat =
+ 1145:         static_cast<int> (
+ 1146:             std::floor (
+ 1147:                 timelineViewport.getStartBeat()
+ 1148:             )
+ 1149:         );
+ 1150: 
+ 1151:     const auto lastBeat =
+ 1152:         static_cast<int> (
+ 1153:             std::ceil (
+ 1154:                 timelineViewport.getEndBeat()
+ 1155:             )
+ 1156:         );
+ 1157: 
+ 1158:     for (
+ 1159:         int beat = firstBeat;
+ 1160:         beat <= lastBeat;
+ 1161:         ++beat
+ 1162:     )
+ 1163:     {
+ 1164:         const auto x =
+ 1165:             beatToX (
+ 1166:                 static_cast<double> (
+ 1167:                     beat
+ 1168:                 )
+ 1169:             );
+ 1170: 
+ 1171:         const auto bar =
+ 1172:             beat % 4 == 0;
+ 1173: 
+ 1174:         g.setColour (
+ 1175:             (
+ 1176:                 bar
+ 1177:                     ? jadLookAndFeel.colourD()
+ 1178:                     : juce::Colours::white
+ 1179:             )
+ 1180:             .withAlpha (
+ 1181:                 bar ? 0.46f : 0.10f
+ 1182:             )
+ 1183:         );
+ 1184: 
+ 1185:         g.drawVerticalLine (
+ 1186:             x,
+ 1187:             static_cast<float> (
+ 1188:                 ruler.getY()
+ 1189:             ),
+ 1190:             static_cast<float> (
+
+-----
+ 1395:             g.drawText (
+ 1396:                 juce::String (
+ 1397:                     clip->getName()
+ 1398:                 ),
+ 1399:                 clipBounds.reduced (7),
+ 1400:                 juce::Justification::centredLeft
+ 1401:             );
+ 1402:         }
+ 1403:     }
+ 1404: 
+ 1405:     const auto playheadBeat =
+ 1406:         context.getSessionState()
+ 1407:             .getTransportState()
+ 1408:             .getPositionInBeats();
+ 1409: 
+ 1410:     if (
+ 1411:         playheadBeat
+ 1412:             >= timelineViewport.getStartBeat()
+ 1413:         && playheadBeat
+ 1414:             <= timelineViewport.getEndBeat()
+ 1415:     )
+ 1416:     {
+ 1417:         const auto x =
+ 1418:             beatToX (
+ 1419:                 playheadBeat
+ 1420:             );
+ 1421: 
+ 1422:         g.setColour (
+ 1423:             juce::Colours::white
+ 1424:                 .withAlpha (0.94f)
+ 1425:         );
+ 1426: 
+ 1427:         g.drawVerticalLine (
+ 1428:             x,
+ 1429:             static_cast<float> (
+ 1430:                 ruler.getY()
+ 1431:             ),
+ 1432:             static_cast<float> (
+ 1433:                 timeline.getBottom()
+ 1434:             )
+ 1435:         );
+ 1436: 
+ 1437:         g.setColour (
+ 1438:             jadLookAndFeel.colourA()
+ 1439:         );
+ 1440: 
+ 1441:         juce::Path head;
+ 1442: 
+ 1443:         head.addTriangle (
+ 1444:             static_cast<float> (
+ 1445:                 x - 5
+ 1446:             ),
+ 1447:             static_cast<float> (
+ 1448:                 ruler.getY()
+ 1449:             ),
+ 1450:             static_cast<float> (
+
+-----
+ 1852:             static_cast<int> (
+ 1853:                 fill.getHeight()
+ 1854:                 * (1.0f - gain)
+ 1855:             )
+ 1856:         );
+ 1857: 
+ 1858:         g.setColour (
+ 1859:             colour.withAlpha (0.86f)
+ 1860:         );
+ 1861: 
+ 1862:         g.fillRoundedRectangle (
+ 1863:             fill.toFloat(),
+ 1864:             4.0f
+ 1865:         );
+ 1866:     }
+ 1867: }
+ 1868: 
+ 1869: void MainComponent::paint (
+ 1870:     juce::Graphics& g)
+ 1871: {
+ 1872:     const auto bounds =
+ 1873:         getLocalBounds()
+ 1874:             .toFloat();
+ 1875: 
+ 1876:     g.fillAll (
+ 1877:         juce::Colour::fromRGB (
+ 1878:             5,
+ 1879:             4,
+ 1880:             14
+ 1881:         )
+ 1882:     );
+ 1883: 
+ 1884:     juce::ColourGradient background (
+ 1885:         jadLookAndFeel.colourA()
+ 1886:             .withAlpha (0.31f),
+ 1887:         bounds.getTopLeft(),
+ 1888:         jadLookAndFeel.colourC()
+ 1889:             .withAlpha (0.18f),
+ 1890:         bounds.getBottomRight(),
+ 1891:         false
+ 1892:     );
+ 1893: 
+ 1894:     background.addColour (
+ 1895:         0.32,
+ 1896:         jadLookAndFeel.colourB()
+ 1897:             .withAlpha (0.20f)
+ 1898:     );
+ 1899: 
+ 1900:     background.addColour (
+ 1901:         0.67,
+ 1902:         jadLookAndFeel.colourD()
+ 1903:             .withAlpha (0.16f)
+ 1904:     );
+ 1905: 
+ 1906:     background.addColour (
+ 1907:         0.88,
+ 1908:         juce::Colour::fromRGB (
+ 1909:             8,
+ 1910:             5,
+ 1911:             22
+ 1912:         )
+ 1913:     );
+ 1914: 
+ 1915:     g.setGradientFill (
+ 1916:         background
+ 1917:     );
+ 1918: 
+ 1919:     g.fillRect (
+ 1920:         bounds
+ 1921:     );
+ 1922: 
+ 1923:     auto header =
+ 1924:         getLocalBounds()
+ 1925:             .removeFromTop (66)
+ 1926:             .reduced (18, 7);
+ 1927: 
+ 1928:     juce::ColourGradient headerGradient (
+ 1929:         jadLookAndFeel.colourA()
+ 1930:             .withAlpha (0.82f),
+ 1931:         header.getTopLeft().toFloat(),
+ 1932:         jadLookAndFeel.colourD()
+ 1933:             .withAlpha (0.48f),
+ 1934:         header.getBottomRight().toFloat(),
+ 1935:         false
+ 1936:     );
+ 1937: 
+ 1938:     g.setGradientFill (
+ 1939:         headerGradient
+ 1940:     );
+ 1941: 
+ 1942:     g.fillRoundedRectangle (
+ 1943:         header.toFloat(),
+ 1944:         16.0f
+ 1945:     );
+ 1946: 
+ 1947:     g.setColour (
+ 1948:         juce::Colours::white
+ 1949:     );
+ 1950: 
+ 1951:     g.setFont (
+ 1952:         juce::FontOptions (25.0f)
+ 1953:             .withStyle ("Bold")
+ 1954:     );
+ 1955: 
+ 1956:     g.drawText (
+ 1957:         "JAD",
+ 1958:         header.reduced (18),
+ 1959:         juce::Justification::centredLeft
+ 1960:     );
+ 1961: 
+ 1962:     g.setFont (10.5f);
+ 1963: 
+ 1964:     g.drawText (
+ 1965:         "JUST ANOTHER DAW - HANDS ON TIMELINE - 047 SEED PLANTED",
+ 1966:         header.reduced (18),
+ 1967:         juce::Justification::centredRight
+ 1968:     );
+ 1969: 
+ 1970:     drawTrackRack (
+ 1971:         g,
+ 1972:         cachedTrackRack
+ 1973:     );
+ 1974: 
+ 1975:     drawArrangement (
+ 1976:         g,
+ 1977:         cachedArrangement
+ 1978:     );
+ 1979: 
+ 1980:     drawInspector (
+ 1981:         g,
+ 1982:         cachedInspector
+ 1983:     );
+ 1984: 
+ 1985:     drawDock (
+ 1986:         g,
+ 1987:         cachedDock
+ 1988:     );
+ 1989: }
+ 1990: 
+ 1991: void MainComponent::resized()
+ 1992: {
+ 1993:     auto area =
+ 1994:         getLocalBounds();
+ 1995: 
+ 1996:     area.removeFromTop (68);
+ 1997: 
+ 1998:     auto commandBar =
+ 1999:         area.removeFromTop (46)
+ 2000:             .reduced (18, 3);
+ 2001: 
+ 2002:     projectLabel.setBounds (
+ 2003:         commandBar.removeFromLeft (235)
+ 2004:     );
+ 2005: 
+ 2006:     commandBar.removeFromLeft (6);
+ 2007: 
+ 2008:     addTrackButton.setBounds (
+ 2009:         commandBar.removeFromLeft (82)
+ 2010:             .reduced (2)
+ 2011:     );
+ 2012: 
+ 2013:     deleteTrackButton.setBounds (
+ 2014:         commandBar.removeFromLeft (82)
+ 2015:             .reduced (2)
+ 2016:     );
+ 2017: 
+ 2018:     commandBar.removeFromLeft (8);
+ 2019: 
+ 2020:     scrollLeftButton.setBounds (
+ 2021:         commandBar.removeFromLeft (42)
+ 2022:             .reduced (2)
+ 2023:     );
+ 2024: 
+ 2025:     scrollRightButton.setBounds (
+ 2026:         commandBar.removeFromLeft (42)
+ 2027:             .reduced (2)
+ 2028:     );
+ 2029: 
+ 2030:     zoomOutButton.setBounds (
+ 2031:         commandBar.removeFromLeft (78)
+ 2032:             .reduced (2)
+ 2033:     );
+ 2034: 
+ 2035:     zoomInButton.setBounds (
+ 2036:         commandBar.removeFromLeft (78)
+ 2037:             .reduced (2)
+ 2038:     );
+ 2039: 
+ 2040:     snapButton.setBounds (
+ 2041:         commandBar.removeFromLeft (66)
+ 2042:             .reduced (2)
+ 2043:     );
+ 2044: 
+ 2045:     statusLabel.setBounds (
+ 2046:         commandBar
+ 2047:     );
+ 2048: 
+ 2049:     auto transportArea =
+ 2050:         area.removeFromTop (82)
+ 2051:             .reduced (18, 4);
+ 2052: 
+ 2053:     transportPanel.setBounds (
+ 2054:         transportArea
+ 2055:     );
+ 2056: 
+ 2057:     area.reduce (
+ 2058:         18,
+ 2059:         7
+ 2060:     );
+ 2061: 
+ 2062:     const int dockHeight =
+ 2063:         juce::jlimit (
+ 2064:             210,
+ 2065:             310,
+ 2066:             area.getHeight() / 3
+ 2067:         );
+ 2068: 
+ 2069:     cachedDock =
+ 2070:         area.removeFromBottom (
+ 2071:             dockHeight
+ 2072:         );
+ 2073: 
+ 2074:     area.removeFromBottom (10);
+ 2075: 
+ 2076:     const auto rackWidth =
+ 2077:         juce::jlimit (
+ 2078:             190,
+ 2079:             260,
+ 2080:             area.getWidth() / 5
+ 2081:         );
+ 2082: 
+ 2083:     const auto inspectorWidth =
+ 2084:         juce::jlimit (
+ 2085:             190,
+ 2086:             260,
+ 2087:             area.getWidth() / 5
+ 2088:         );
+ 2089: 
+
+-----
+ 2096: 
+ 2097:     cachedInspector =
+ 2098:         area.removeFromRight (
+ 2099:             inspectorWidth
+ 2100:         );
+ 2101: 
+ 2102:     area.removeFromRight (10);
+ 2103: 
+ 2104:     cachedArrangement =
+ 2105:         area;
+ 2106: 
+ 2107:     auto dockControls =
+ 2108:         cachedDock.reduced (12);
+ 2109: 
+ 2110:     auto tabs =
+ 2111:         dockControls.removeFromTop (38);
+ 2112: 
+ 2113:     keyboardTabButton.setBounds (
+ 2114:         tabs.removeFromLeft (110)
+ 2115:             .reduced (2)
+ 2116:     );
+ 2117: 
+ 2118:     synthTabButton.setBounds (
+ 2119:         tabs.removeFromLeft (90)
+ 2120:             .reduced (2)
+ 2121:     );
+ 2122: 
+ 2123:     mixerTabButton.setBounds (
+ 2124:         tabs.removeFromLeft (90)
+ 2125:             .reduced (2)
+ 2126:     );
+ 2127: 
+ 2128:     pluginsTabButton.setBounds (
+ 2129:         tabs.removeFromLeft (92)
+ 2130:             .reduced (2)
+ 2131:     );
+ 2132: 
+ 2133:     dockControls.removeFromTop (4);
+ 2134: 
+ 2135:     keyboardPanel.setBounds (
+ 2136:         dockControls
+ 2137:     );
+ 2138: 
+ 2139:     synthVoicePanel.setBounds (
+ 2140:         dockControls
+ 2141:     );
+ 2142: 
+ 2143:     pluginLibraryPanel.setBounds (
+ 2144:         dockControls
+ 2145:     );
+ 2146: 
+ 2147:     sessionOverviewPanel.setBounds (
+ 2148:         {}
+ 2149:     );
+ 2150: }
+ 2151: 
+ 2152: void MainComponent::seekTransport (
+ 2153:     double beat)
+ 2154: {
+ 2155:     auto& transport =
+ 2156:         context.getSessionState()
+ 2157:             .getTransportState();
+ 2158: 
+ 2159:     const auto snapped =
+ 2160:         timelineViewport.snapBeat (
+ 2161:             beat
+ 2162:         );
+ 2163: 
+ 2164:     transport.setPositionInBeats (
+ 2165:         snapped
+ 2166:     );
+ 2167: 
+ 2168:     const auto sampleRate =
+ 2169:         context.getAudioSystem()
+ 2170:             .getSampleRate();
+ 2171: 
+ 2172:     if (sampleRate <= 0.0)
+ 2173:         return;
+ 2174: 
+ 2175:     const auto tempo =
+ 2176:         transport.getTempo();
+ 2177: 
+ 2178:     if (tempo <= 0.0)
+ 2179:         return;
+ 2180: 
+ 2181:     const auto seconds =
+ 2182:         snapped
+ 2183:         * 60.0
+ 2184:         / tempo;
+ 2185: 
+ 2186:     transport.setPositionInSamples (
+ 2187:         static_cast<std::int64_t> (
+ 2188:             seconds * sampleRate
+ 2189:         )
+ 2190:     );
+ 2191: }
+ 2192: 
+ 2193: void MainComponent::beginClipInteraction (
+ 2194:     int trackIndex,
+ 2195:     int clipIndex,
+ 2196:     int mouseX,
+ 2197:     bool resize)
+ 2198: {
+ 2199:     auto* track =
+ 2200:         context.getSessionState()
+ 2201:             .getTrack (
+ 2202:                 static_cast<std::size_t> (
+ 2203:                     trackIndex
+ 2204:                 )
+ 2205:             );
+
+-----
+ 2232:     dragClipIndex =
+ 2233:         clipIndex;
+ 2234: 
+ 2235:     dragAnchorX =
+ 2236:         mouseX;
+ 2237: 
+ 2238:     dragInitialStartBeat =
+ 2239:         clip->getStartBeat();
+ 2240: 
+ 2241:     dragInitialLengthBeats =
+ 2242:         clip->getLengthBeats();
+ 2243: 
+ 2244:     dragMode =
+ 2245:         resize
+ 2246:             ? DragMode::resizeClip
+ 2247:             : DragMode::moveClip;
+ 2248: 
+ 2249:     repaint();
+ 2250: }
+ 2251: 
+ 2252: void MainComponent::mouseDown (
+ 2253:     const juce::MouseEvent& event)
+ 2254: {
+ 2255:     const auto point =
+ 2256:         event.getPosition();
+ 2257: 
+ 2258:     auto& session =
+ 2259:         context.getSessionState();
+ 2260: 
+ 2261:     const auto count =
+ 2262:         static_cast<int> (
+ 2263:             session.getTrackCount()
+ 2264:         );
+ 2265: 
+ 2266:     if (
+ 2267:         cachedTrackRack.contains (
+ 2268:             point
+ 2269:         )
+ 2270:     )
+ 2271:     {
+ 2272:         for (
+ 2273:             int index = 0;
+ 2274:             index < count;
+ 2275:             ++index
+ 2276:         )
+ 2277:         {
+ 2278:             const auto row =
+ 2279:                 getTrackRowBounds (
+ 2280:                     index
+ 2281:                 );
+ 2282: 
+ 2283:             if (! row.contains (point))
+ 2284:                 continue;
+ 2285: 
+
+-----
+ 2310: 
+ 2311:             toggleLine.removeFromLeft (3);
+ 2312: 
+ 2313:             auto solo =
+ 2314:                 toggleLine.removeFromLeft (23);
+ 2315: 
+ 2316:             toggleLine.removeFromLeft (3);
+ 2317: 
+ 2318:             auto arm =
+ 2319:                 toggleLine.removeFromLeft (23);
+ 2320: 
+ 2321:             if (mute.contains (point))
+ 2322:             {
+ 2323:                 track->setMuted (
+ 2324:                     ! track->isMuted()
+ 2325:                 );
+ 2326: 
+ 2327:                 repaint();
+ 2328:                 return;
+ 2329:             }
+ 2330: 
+ 2331:             if (solo.contains (point))
+ 2332:             {
+ 2333:                 track->setSolo (
+ 2334:                     ! track->isSolo()
+ 2335:                 );
+ 2336: 
+ 2337:                 repaint();
+ 2338:                 return;
+ 2339:             }
+ 2340: 
+ 2341:             if (arm.contains (point))
+ 2342:             {
+ 2343:                 track->setRecordArmed (
+ 2344:                     ! track->isRecordArmed()
+ 2345:                 );
+ 2346: 
+ 2347:                 repaint();
+ 2348:                 return;
+ 2349:             }
+ 2350: 
+ 2351:             const auto gain =
+ 2352:                 getTrackGainBounds (
+ 2353:                     index
+ 2354:                 );
+ 2355: 
+ 2356:             if (gain.contains (point))
+ 2357:             {
+ 2358:                 dragMode =
+ 2359:                     DragMode::trackGain;
+ 2360: 
+ 2361:                 dragTrackIndex =
+ 2362:                     index;
+ 2363: 
+ 2364:                 mouseDrag (
+ 2365:                     event
+ 2366:                 );
+ 2367: 
+ 2368:                 return;
+ 2369:             }
+ 2370: 
+ 2371:             const auto pan =
+ 2372:                 getTrackPanBounds (
+ 2373:                     index
+ 2374:                 );
+ 2375: 
+ 2376:             if (pan.contains (point))
+ 2377:             {
+ 2378:                 dragMode =
+ 2379:                     DragMode::trackPan;
+ 2380: 
+ 2381:                 dragTrackIndex =
+ 2382:                     index;
+ 2383: 
+
+-----
+ 2473:             )
+ 2474:         )
+ 2475:         {
+ 2476:             selectTrack (
+ 2477:                 trackIndex
+ 2478:             );
+ 2479: 
+ 2480:             break;
+ 2481:         }
+ 2482:     }
+ 2483: 
+ 2484:     seekTransport (
+ 2485:         xToBeat (
+ 2486:             point.x
+ 2487:         )
+ 2488:     );
+ 2489: 
+ 2490:     repaint();
+ 2491: }
+ 2492: 
+ 2493: void MainComponent::mouseDrag (
+ 2494:     const juce::MouseEvent& event)
+ 2495: {
+ 2496:     auto& session =
+ 2497:         context.getSessionState();
+ 2498: 
+ 2499:     if (
+ 2500:         dragMode
+ 2501:         == DragMode::trackGain
+ 2502:     )
+ 2503:     {
+ 2504:         auto* track =
+ 2505:             session.getTrack (
+ 2506:                 static_cast<std::size_t> (
+ 2507:                     dragTrackIndex
+ 2508:                 )
+ 2509:             );
+ 2510: 
+ 2511:         if (track == nullptr)
+ 2512:             return;
+ 2513: 
+ 2514:         const auto bounds =
+ 2515:             getTrackGainBounds (
+ 2516:                 dragTrackIndex
+ 2517:             );
+ 2518: 
+ 2519:         if (bounds.getWidth() <= 0)
+ 2520:             return;
+ 2521: 
+ 2522:         const auto fraction =
+ 2523:             juce::jlimit (
+ 2524:                 0.0f,
+ 2525:                 1.0f,
+ 2526:                 static_cast<float> (
+ 2527:                     event.x
+ 2528:                     - bounds.getX()
+ 2529:                 )
+ 2530:                 / static_cast<float> (
+ 2531:                     bounds.getWidth()
+ 2532:                 )
+ 2533:             );
+ 2534: 
+ 2535:         track->setGain (
+ 2536:             fraction * 2.0f
+ 2537:         );
+ 2538: 
+ 2539:         repaint();
+ 2540:         return;
+ 2541:     }
+ 2542: 
+ 2543:     if (
+ 2544:         dragMode
+ 2545:         == DragMode::trackPan
+ 2546:     )
+ 2547:     {
+ 2548:         auto* track =
+ 2549:             session.getTrack (
+ 2550:                 static_cast<std::size_t> (
+ 2551:                     dragTrackIndex
+ 2552:                 )
+ 2553:             );
+ 2554: 
+ 2555:         if (track == nullptr)
+ 2556:             return;
+ 2557: 
+ 2558:         const auto bounds =
+ 2559:             getTrackPanBounds (
+ 2560:                 dragTrackIndex
+ 2561:             );
+ 2562: 
+ 2563:         if (bounds.getWidth() <= 0)
+ 2564:             return;
+ 2565: 
+ 2566:         const auto fraction =
+ 2567:             juce::jlimit (
+ 2568:                 0.0f,
+ 2569:                 1.0f,
+ 2570:                 static_cast<float> (
+ 2571:                     event.x
+ 2572:                     - bounds.getX()
+ 2573:                 )
+ 2574:                 / static_cast<float> (
+ 2575:                     bounds.getWidth()
+ 2576:                 )
+ 2577:             );
+ 2578: 
+ 2579:         track->setPan (
+ 2580:             fraction * 2.0f
+ 2581:             - 1.0f
+ 2582:         );
+ 2583: 
+ 2584:         repaint();
+ 2585:         return;
+ 2586:     }
+ 2587: 
+ 2588:     if (
+ 2589:         dragMode
+ 2590:             != DragMode::moveClip
+ 2591:         && dragMode
+ 2592:             != DragMode::resizeClip
+ 2593:     )
+ 2594:     {
+ 2595:         return;
+ 2596:     }
+ 2597: 
+ 2598:     auto* track =
+ 2599:         session.getTrack (
+ 2600:             static_cast<std::size_t> (
+ 2601:                 dragTrackIndex
+ 2602:             )
+ 2603:         );
+ 2604: 
+ 2605:     if (track == nullptr)
+ 2606:         return;
+ 2607: 
+ 2608:     auto* clip =
+ 2609:         track->getClip (
+ 2610:             static_cast<std::size_t> (
+ 2611:                 dragClipIndex
+ 2612:             )
+ 2613:         );
+ 2614: 
+ 2615:     if (clip == nullptr)
+ 2616:         return;
+ 2617: 
+ 2618:     const auto timeline =
+ 2619:         getTimelineBounds();
+ 2620: 
+ 2621:     if (timeline.getWidth() <= 0)
+ 2622:         return;
+ 2623: 
+ 2624:     const auto deltaPixels =
+ 2625:         event.x
+ 2626:         - dragAnchorX;
+ 2627: 
+ 2628:     const auto deltaBeats =
+ 2629:         static_cast<double> (
+ 2630:             deltaPixels
+ 2631:         )
+ 2632:         / static_cast<double> (
+ 2633:             timeline.getWidth()
+ 2634:         )
+ 2635:         * timelineViewport.getVisibleBeats();
+ 2636: 
+ 2637:     if (
+ 2638:         dragMode
+ 2639:         == DragMode::moveClip
+ 2640:     )
+ 2641:     {
+ 2642:         clip->setStartBeat (
+ 2643:             timelineViewport.snapBeat (
+ 2644:                 dragInitialStartBeat
+ 2645:                 + deltaBeats
+ 2646:             )
+ 2647:         );
+ 2648: 
+ 2649:         repaint();
+ 2650:         return;
+ 2651:     }
+ 2652: 
+ 2653:     const auto minimum =
+ 2654:         timelineViewport.isSnapEnabled()
+ 2655:             ? timelineViewport.getSnapBeats()
+ 2656:             : 0.05;
+ 2657: 
+ 2658:     const auto length =
+ 2659:         juce::jmax (
+ 2660:             minimum,
+ 2661:             dragInitialLengthBeats
+ 2662:                 + deltaBeats
+ 2663:         );
+ 2664: 
+ 2665:     auto snappedLength =
+ 2666:         length;
+ 2667: 
+ 2668:     if (
+ 2669:         timelineViewport.isSnapEnabled()
+ 2670:     )
+ 2671:     {
+ 2672:         snappedLength =
+ 2673:             std::round (
+ 2674:                 length
+ 2675:                 / timelineViewport
+ 2676:                     .getSnapBeats()
+ 2677:             )
+ 2678:             * timelineViewport
+ 2679:                 .getSnapBeats();
+ 2680: 
+ 2681:         snappedLength =
+ 2682:             juce::jmax (
+ 2683:                 minimum,
+ 2684:                 snappedLength
+ 2685:             );
+ 2686:     }
+ 2687: 
+ 2688:     clip->setLengthBeats (
+ 2689:         snappedLength
+ 2690:     );
+ 2691: 
+ 2692:     repaint();
+ 2693: }
+ 2694: 
+ 2695: void MainComponent::mouseUp (
+ 2696:     const juce::MouseEvent&)
+ 2697: {
+ 2698:     dragMode =
+ 2699:         DragMode::none;
+ 2700: 
+ 2701:     dragTrackIndex = -1;
+ 2702:     dragClipIndex = -1;
+ 2703: }
+
+============================================================
+FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\Core\JADContext.h
+============================================================
+
+-----
+    1: #pragma once
+    2: 
+    3: #include "../Audio/AudioSystem.h"
+    4: #include "../Model/SessionState.h"
+    5: #include "../Plugins/PluginCatalog.h"
+    6: 
+    7: class JADContext
+    8: {
+    9: public:
+   10:     JADContext();
+   11: 
+   12:     AudioSystem& getAudioSystem() noexcept;
+   13:     SessionState& getSessionState() noexcept;
+   14:     PluginCatalog& getPluginCatalog() noexcept;
+   15: 
+   16:     bool isAlive() const noexcept;
+   17: 
+   18: private:
+   19:     AudioSystem audioSystem;
+   20:     SessionState sessionState;
+   21:     PluginCatalog pluginCatalog;
+   22: };
+
+============================================================
+FILE: C:\Users\benba\Tinkering\Just_Another_Daw\Source\Core\JADContext.cpp
+============================================================
+
+-----
+    1: #include "JADContext.h"
+    2: 
+    3: JADContext::JADContext()
+    4: {
+    5:     pluginCatalog.initialise();
+    6:     audioSystem.setSessionState (
+    7:         &sessionState
+    8:     );
+    9: 
+   10:     audioSystem.setTransportState (
+   11:         &sessionState.getTransportState()
+   12:     );
+   13: 
+   14:     audioSystem.setMasterBusState (
+   15:         &sessionState.getMasterBusState()
+   16:     );
+   17: }
+   18: 
+   19: AudioSystem& JADContext::getAudioSystem() noexcept
+   20: {
+   21:     return audioSystem;
+   22: }
+   23: 
+   24: SessionState& JADContext::getSessionState() noexcept
+   25: {
+   26:     return sessionState;
+   27: }
+   28: 
+   29: bool JADContext::isAlive() const noexcept
+   30: {
+   31:     return audioSystem.isAlive()
+   32:         && sessionState.isAlive();
+   33: }
+   34: 
+   35: PluginCatalog&
+   36: JADContext::getPluginCatalog() noexcept
+   37: {
+   38:     return pluginCatalog;
+   39: }
+
+============================================================
+PROJECT-WIDE OVERLAY / AUDIO UI HUNT
+============================================================
+Source\App\JADApplication.cpp:17: setVisible (true);
+Source\UI\MainComponent.cpp:160: addAndMakeVisible (
+Source\UI\MainComponent.cpp:164: addAndMakeVisible (
+Source\UI\MainComponent.cpp:168: addAndMakeVisible (
+Source\UI\MainComponent.cpp:172: addAndMakeVisible (
+Source\UI\MainComponent.cpp:176: addAndMakeVisible (
+Source\UI\MainComponent.cpp:180: addAndMakeVisible (
+Source\UI\MainComponent.cpp:184: addAndMakeVisible (
+Source\UI\MainComponent.cpp:188: addAndMakeVisible (
+Source\UI\MainComponent.cpp:192: addAndMakeVisible (
+Source\UI\MainComponent.cpp:196: addAndMakeVisible (
+Source\UI\MainComponent.cpp:200: addAndMakeVisible (
+Source\UI\MainComponent.cpp:204: addAndMakeVisible (
+Source\UI\MainComponent.cpp:208: addAndMakeVisible (
+Source\UI\MainComponent.cpp:212: addAndMakeVisible (
+Source\UI\MainComponent.cpp:216: addAndMakeVisible (
+Source\UI\MainComponent.cpp:220: addAndMakeVisible (
+Source\UI\MainComponent.cpp:224: addAndMakeVisible (
+Source\UI\MainComponent.cpp:228: addAndMakeVisible (
+Source\UI\MainComponent.cpp:232: sessionOverviewPanel.setVisible (
+Source\UI\MainComponent.cpp:430: keyboardPanel.setVisible (
+Source\UI\MainComponent.cpp:434: synthVoicePanel.setVisible (
+Source\UI\MainComponent.cpp:438: pluginLibraryPanel.setVisible (
+Source\UI\PluginLibraryPanel.cpp:120: addAndMakeVisible (*component);
+Source\UI\StartupOverlay.cpp:64: addAndMakeVisible(createButton);
+Source\UI\StartupOverlay.cpp:65: addAndMakeVisible(continueButton);
+Source\UI\StartupOverlay.cpp:67: createButton.setVisible(false);
+Source\UI\StartupOverlay.cpp:68: continueButton.setVisible(false);
+Source\UI\StartupOverlay.cpp:106: createButton.setVisible(true);
+Source\UI\StartupOverlay.cpp:107: continueButton.setVisible(true);
+Source\UI\StartupOverlay.cpp:144: setVisible(false);
+Source\UI\SynthVoicePanel.cpp:15: addAndMakeVisible (titleLabel);
+Source\UI\SynthVoicePanel.cpp:42: addAndMakeVisible (*label);
+Source\UI\SynthVoicePanel.cpp:76: addAndMakeVisible (waveformBox);
+Source\UI\SynthVoicePanel.cpp:102: addAndMakeVisible (frequencySlider);
+Source\UI\SynthVoicePanel.cpp:126: addAndMakeVisible (gainSlider);
+Source\UI\SynthVoicePanel.cpp:144: addAndMakeVisible (voiceButton);
+Source\UI\TransportPanel.cpp:9: addAndMakeVisible (stopButton);
+Source\UI\TransportPanel.cpp:10: addAndMakeVisible (playButton);
+Source\UI\TransportPanel.cpp:11: addAndMakeVisible (recordButton);
+Source\UI\TransportPanel.cpp:12: addAndMakeVisible (loopButton);
+Source\UI\TransportPanel.cpp:88: addAndMakeVisible (
+Source\UI\TransportPanel.cpp:101: addAndMakeVisible (
+Source\UI\TransportPanel.cpp:113: addAndMakeVisible (
+Source\UI\TransportPanel.cpp:117: addAndMakeVisible (
+Source\UI\VirtualKeyboardPanel.cpp:171: addAndMakeVisible (titleLabel);
+Source\UI\VirtualKeyboardPanel.cpp:172: addAndMakeVisible (activityLabel);
+Source\UI\VirtualKeyboardPanel.cpp:173: addAndMakeVisible (octaveLabel);
+Source\UI\VirtualKeyboardPanel.cpp:174: addAndMakeVisible (velocityLabel);
+Source\UI\VirtualKeyboardPanel.cpp:176: addAndMakeVisible (midiDeviceBox);
+Source\UI\VirtualKeyboardPanel.cpp:177: addAndMakeVisible (keyboardThemeBox);
+Source\UI\VirtualKeyboardPanel.cpp:178: addAndMakeVisible (octaveDownButton);
+Source\UI\VirtualKeyboardPanel.cpp:179: addAndMakeVisible (octaveUpButton);
+Source\UI\VirtualKeyboardPanel.cpp:180: addAndMakeVisible (refreshMidiButton);
+Source\UI\VirtualKeyboardPanel.cpp:181: addAndMakeVisible (velocitySlider);
+Source\UI\VirtualKeyboardPanel.cpp:182: addAndMakeVisible (keyboard);
+
+============================================================
+AUDIO SPINE CHECK
+============================================================
+Source\Audio\AudioSystem.h:33: getDeviceManager() noexcept;
+Source\Audio\AudioSystem.cpp:103: AudioSystem::getDeviceManager() noexcept
+
+============================================================
+WORKTREE
+============================================================
+ M Source/Audio/AudioSystem.cpp
+ M Source/Audio/AudioSystem.h
+ M Source/Plugins/PluginCatalog.cpp
+ M Source/Plugins/PluginCatalog.h
+ M Source/UI/PluginLibraryPanel.cpp
+ M Source/UI/PluginLibraryPanel.h
+?? Evidence/EXP-050E2A-DEVICE-MANAGER-20260907-215738/
+?? Evidence/EXP-050E2A-RESUME-20260907-220413/
+?? Evidence/JAD-EXP-050D-MIDI-MESH-FU-2026-08-27_030220.txt
+?? Evidence/JAD-EXP-050E1-CHEESE-INSTANCE-2026-08-27_032725/

@@ -1,0 +1,38 @@
+﻿ M CMakeLists.txt
+ M Source/Audio/AudioSystem.cpp
+ M Source/Audio/AudioSystem.h
+ M Source/Core/JADContext.cpp
+ M Source/Core/JADContext.h
+ M Source/Plugins/PluginCatalog.cpp
+ M Source/Plugins/PluginCatalog.h
+ M Source/UI/MainComponent.cpp
+ M Source/UI/MainComponent.h
+ M Source/UI/PluginLibraryPanel.cpp
+ M Source/UI/PluginLibraryPanel.h
+ M Source/UI/VirtualKeyboardPanel.cpp
+ M Source/UI/VirtualKeyboardPanel.h
+?? Evidence/EXP-050E2A-DEVICE-MANAGER-20260907-215738/
+?? Evidence/EXP-050E2A-RESUME-20260907-220413/
+?? Evidence/EXP-050E2B-AUDIO-COCKPIT-20260907-222657/
+?? Evidence/EXP-050E2B-RESUME-20260907-224140/
+?? Evidence/EXP-050E2B-UI-ANATOMY-20260907-222231.txt
+?? Evidence/EXP-050E2C-CONNECTOR-SURVEY-20260907-225559.txt
+?? Evidence/EXP-050E2C-CONNECTOR-SURVEY-20260907-225905.txt
+?? Evidence/EXP-050E2D-COCKPIT-20260907-230433/
+?? Evidence/EXP-050E2D-SCALPEL-20260907-232557/
+?? Evidence/EXP-050E3-CHEESE-HIGHWAY-ANATOMY-20260907-233143.txt
+?? Evidence/EXP-050E3-MIDI-SEAMS.txt
+?? Evidence/EXP-050E3A-MIDI-SPINE-20260907-235017/
+?? Evidence/EXP-050E3A-MIDI-SPINE-20260908-000851/
+?? Evidence/EXP-050E3B-MIDI-CONSTRUCTOR-ROCK-20260908-002649.txt
+?? Evidence/EXP-050E3B-PLUGINSOURCE-20260908-001357/
+?? Evidence/EXP-050E3B-PLUGINSOURCE-20260908-001623/
+?? Evidence/EXP-050E3B-PLUGINSOURCE-20260908-002440/
+?? Evidence/EXP-050E3B-R1-CONSTRUCTOR-ROCK-20260908-002812/
+?? Evidence/JAD-EXP-050D-MIDI-MESH-FU-2026-08-27_030220.txt
+?? Evidence/JAD-EXP-050E1-CHEESE-INSTANCE-2026-08-27_032725/
+?? Evidence/JAD-EXP-050E3C-PRE-CHEESE-HIGHWAY-2026-09-13_225215/
+?? Source/Audio/PluginSource.cpp
+?? Source/Audio/PluginSource.h
+?? Source/UI/AudioSettingsPanel.cpp
+?? Source/UI/AudioSettingsPanel.h

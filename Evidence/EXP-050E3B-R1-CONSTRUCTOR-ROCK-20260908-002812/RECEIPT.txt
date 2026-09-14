@@ -1,0 +1,11 @@
+﻿EXP-050E.3B-R1 — MIDI CONSTRUCTOR ROCK
+
+JADContext owns AudioSystem       : YES
+JADContext owns MidiSystem        : YES
+MidiSystem receives AudioSystem&  : YES
+Default-constructor error         : TERMINATED
+Build                             : PASS
+SHA256                            : E53EB97797FC6D7E904C6E787BEDCB5B37280633535C4E47BB9AFD77192B644A
+
+NEXT:
+EXP-050E.3B — PluginSource compiler contact

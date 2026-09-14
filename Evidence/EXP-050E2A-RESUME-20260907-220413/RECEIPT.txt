@@ -1,0 +1,14 @@
+﻿JAD EXP-050E.2A
+================
+
+RESULT=PASS
+
+AudioSystem owns AudioDeviceManager.
+getDeviceManager() accessor compiled.
+No second AudioDeviceManager created.
+
+VSDEVCMD=C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat
+EXE=C:\Users\benba\Tinkering\Just_Another_Daw\Build\JUCE-Foundation\JAD_artefacts\Debug\JAD.exe
+SHA256=32E6F2477BC4A5CA482BB1549117C9A4661EA0811AA2BBAE9792E2186CA6EE29
+
+NEXT=EXP-050E.2B AUDIO I/O COCKPIT

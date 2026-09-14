@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -15,6 +15,7 @@ class VirtualKeyboardPanel :
 public:
     VirtualKeyboardPanel (
         AudioSystem& audioSystemToUse,
+        MidiSystem& midiSystemToUse,
         JADLookAndFeel& lookAndFeelToUse
     );
 
@@ -63,7 +64,7 @@ private:
     AudioSystem& audioSystem;
     JADLookAndFeel& jadLookAndFeel;
 
-    MidiSystem midiSystem;
+    MidiSystem& midiSystem;
 
     juce::MidiKeyboardComponent keyboard;
 
@@ -106,3 +107,4 @@ private:
         VirtualKeyboardPanel
     )
 };
+

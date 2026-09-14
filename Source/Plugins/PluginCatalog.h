@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -23,6 +23,14 @@ public:
     juce::File getCatalogFile() const;
 
     juce::String getLastScanSummary() const;
+
+    std::unique_ptr<juce::AudioPluginInstance>
+    createInstance (
+        const juce::PluginDescription& description,
+        double sampleRate,
+        int blockSize,
+        juce::String& errorMessage
+    ) const;
 
 private:
     void load();

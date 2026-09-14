@@ -180,3 +180,19 @@ PluginCatalog::getLastScanSummary() const
 {
     return lastScanSummary;
 }
+
+std::unique_ptr<juce::AudioPluginInstance>
+PluginCatalog::createInstance (
+    const juce::PluginDescription& description,
+    double sampleRate,
+    int blockSize,
+    juce::String& errorMessage
+) const
+{
+    return formatManager.createPluginInstance (
+        description,
+        sampleRate,
+        blockSize,
+        errorMessage
+    );
+}

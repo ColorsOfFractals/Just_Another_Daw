@@ -1,0 +1,469 @@
+﻿
+================ Source\Core\JADContext.h ================
+
+#pragma once
+
+#include "../Audio/AudioSystem.h"
+#include "../Audio/MidiSystem.h"
+#include "../Model/SessionState.h"
+#include "../Plugins/PluginCatalog.h"
+
+class JADContext
+{
+public:
+    JADContext();
+
+    AudioSystem& getAudioSystem() noexcept;
+
+    MidiSystem& getMidiSystem() noexcept;
+    SessionState& getSessionState() noexcept;
+    PluginCatalog& getPluginCatalog() noexcept;
+
+    bool isAlive() const noexcept;
+
+private:
+    AudioSystem audioSystem;
+    MidiSystem midiSystem;
+    SessionState sessionState;
+    PluginCatalog pluginCatalog;
+};
+
+
+
+================ Source\Core\JADContext.cpp ================
+
+#include "JADContext.h"
+
+JADContext::JADContext()
+{
+    pluginCatalog.initialise();
+    audioSystem.setSessionState (
+        &sessionState
+    );
+
+    audioSystem.setTransportState (
+        &sessionState.getTransportState()
+    );
+
+    audioSystem.setMasterBusState (
+        &sessionState.getMasterBusState()
+    );
+}
+
+AudioSystem& JADContext::getAudioSystem() noexcept
+{
+    return audioSystem;
+}
+
+SessionState& JADContext::getSessionState() noexcept
+{
+    return sessionState;
+}
+
+bool JADContext::isAlive() const noexcept
+{
+    return audioSystem.isAlive()
+        && sessionState.isAlive();
+}
+
+PluginCatalog&
+JADContext::getPluginCatalog() noexcept
+{
+    return pluginCatalog;
+}
+MidiSystem&
+JADContext::getMidiSystem() noexcept
+{
+    return midiSystem;
+}
+
+
+================ Source\Audio\MidiSystem.h ================
+
+#pragma once
+
+#include <juce_audio_devices/juce_audio_devices.h>
+#include <juce_audio_basics/juce_audio_basics.h>
+
+#include <atomic>
+#include <memory>
+#include <vector>
+
+class AudioSystem;
+
+class MidiSystem :
+    private juce::MidiInputCallback,
+    private juce::MidiKeyboardState::Listener
+{
+public:
+    explicit MidiSystem (
+        AudioSystem& audioSystemToUse
+    );
+
+    ~MidiSystem() override;
+
+    juce::MidiKeyboardState& getKeyboardState() noexcept;
+
+    void refreshDevices();
+
+    int getDeviceCount() const noexcept;
+
+    juce::String getDeviceName (
+        int index
+    ) const;
+
+    bool openDevice (
+        int index
+    );
+
+    void closeDevice();
+
+    bool isDeviceOpen() const noexcept;
+
+    int getLastNote() const noexcept;
+    float getLastVelocity() const noexcept;
+
+    bool isMidiActive() const noexcept;
+    int getActiveNoteCount() const noexcept;
+    juce::uint32 getActivitySerial() const noexcept;
+
+    void playVirtualNote (
+        int midiNote,
+        float velocity
+    );
+
+    void releaseVirtualNote (
+        int midiNote
+    );
+
+private:
+    void handleIncomingMidiMessage (
+        juce::MidiInput*,
+        const juce::MidiMessage&
+    ) override;
+
+    void applyMessage (
+        const juce::MidiMessage&
+    );
+
+    void handleNoteOn (
+        juce::MidiKeyboardState* source,
+        int midiChannel,
+        int midiNoteNumber,
+        float velocity
+    ) override;
+
+    void handleNoteOff (
+        juce::MidiKeyboardState* source,
+        int midiChannel,
+        int midiNoteNumber,
+        float velocity
+    ) override;
+
+    AudioSystem& audioSystem;
+
+    juce::MidiKeyboardState keyboardState;
+
+    std::vector<
+        juce::MidiDeviceInfo
+    > availableInputs;
+
+    std::unique_ptr<
+        juce::MidiInput
+    > openInput;
+
+    std::atomic<int> lastNote { -1 };
+    std::atomic<float> lastVelocity { 0.0f };
+
+    std::atomic<int> activeNoteCount { 0 };
+    std::atomic<juce::uint32> activitySerial { 0 };
+};
+
+================ Source\Audio\MidiSystem.cpp ================
+
+#include "MidiSystem.h"
+
+#include "AudioSystem.h"
+
+#include <cmath>
+
+MidiSystem::MidiSystem (
+    AudioSystem& audioSystemToUse)
+    : audioSystem (
+        audioSystemToUse
+    )
+{
+    keyboardState.addListener (
+        this
+    );
+
+    refreshDevices();
+}
+
+MidiSystem::~MidiSystem()
+{
+    closeDevice();
+
+    keyboardState.removeListener (
+        this
+    );
+}
+
+juce::MidiKeyboardState&
+MidiSystem::getKeyboardState() noexcept
+{
+    return keyboardState;
+}
+
+void MidiSystem::refreshDevices()
+{
+    const auto devices =
+        juce::MidiInput::getAvailableDevices();
+
+    availableInputs.assign (
+        devices.begin(),
+        devices.end()
+    );
+}
+
+int MidiSystem::getDeviceCount() const noexcept
+{
+    return static_cast<int> (
+        availableInputs.size()
+    );
+}
+
+juce::String MidiSystem::getDeviceName (
+    int index) const
+{
+    if (
+        index < 0
+        || index >= getDeviceCount()
+    )
+    {
+        return {};
+    }
+
+    return availableInputs[
+        static_cast<std::size_t> (index)
+    ].name;
+}
+
+bool MidiSystem::openDevice (
+    int index)
+{
+    closeDevice();
+
+    if (
+        index < 0
+        || index >= getDeviceCount()
+    )
+    {
+        return false;
+    }
+
+    openInput =
+        juce::MidiInput::openDevice (
+            availableInputs[
+                static_cast<std::size_t> (index)
+            ].identifier,
+            this
+        );
+
+    if (openInput == nullptr)
+        return false;
+
+    openInput->start();
+
+    return true;
+}
+
+void MidiSystem::closeDevice()
+{
+    if (openInput != nullptr)
+        openInput->stop();
+
+    openInput.reset();
+}
+
+bool MidiSystem::isDeviceOpen() const noexcept
+{
+    return openInput != nullptr;
+}
+
+int MidiSystem::getLastNote() const noexcept
+{
+    return lastNote.load();
+}
+
+float MidiSystem::getLastVelocity() const noexcept
+{
+    return lastVelocity.load();
+}
+
+bool MidiSystem::isMidiActive() const noexcept
+{
+    return activeNoteCount.load() > 0;
+}
+
+int MidiSystem::getActiveNoteCount() const noexcept
+{
+    return activeNoteCount.load();
+}
+
+juce::uint32 MidiSystem::getActivitySerial() const noexcept
+{
+    return activitySerial.load();
+}
+
+void MidiSystem::playVirtualNote (
+    int midiNote,
+    float velocity)
+{
+    keyboardState.noteOn (
+        1,
+        midiNote,
+        velocity
+    );
+}
+
+void MidiSystem::releaseVirtualNote (
+    int midiNote)
+{
+    keyboardState.noteOff (
+        1,
+        midiNote,
+        0.0f
+    );
+}
+
+void MidiSystem::handleIncomingMidiMessage (
+    juce::MidiInput*,
+    const juce::MidiMessage& message)
+{
+    keyboardState.processNextMidiEvent (
+        message
+    );
+
+    if (
+        ! message.isNoteOn()
+        && ! message.isNoteOff()
+    )
+    {
+        applyMessage (
+            message
+        );
+    }
+}
+
+void MidiSystem::handleNoteOn (
+    juce::MidiKeyboardState*,
+    int midiChannel,
+    int midiNoteNumber,
+    float velocity)
+{
+    const auto message =
+        juce::MidiMessage::noteOn (
+            midiChannel,
+            midiNoteNumber,
+            static_cast<juce::uint8> (
+                juce::jlimit (
+                    0,
+                    127,
+                    juce::roundToInt (
+                        velocity * 127.0f
+                    )
+                )
+            )
+        );
+
+    applyMessage (
+        message
+    );
+}
+
+void MidiSystem::handleNoteOff (
+    juce::MidiKeyboardState*,
+    int midiChannel,
+    int midiNoteNumber,
+    float)
+{
+    const auto message =
+        juce::MidiMessage::noteOff (
+            midiChannel,
+            midiNoteNumber
+        );
+
+    applyMessage (
+        message
+    );
+}
+void MidiSystem::applyMessage (
+    const juce::MidiMessage& message)
+{
+    if (message.isNoteOn())
+    {
+        const auto note =
+            message.getNoteNumber();
+
+        const auto velocity =
+            message.getFloatVelocity();
+
+        lastNote.store (
+            note
+        );
+
+        lastVelocity.store (
+            velocity
+        );
+
+        activeNoteCount.fetch_add (1);
+        activitySerial.fetch_add (1);
+
+        const auto frequency =
+            440.0
+            * std::pow (
+                2.0,
+                (
+                    static_cast<double> (note)
+                    - 69.0
+                ) / 12.0
+            );
+
+        audioSystem.setFrequency (
+            frequency
+        );
+
+        audioSystem.setTestToneEnabled (
+            true
+        );
+    }
+
+    if (message.isNoteOff())
+    {
+        auto count =
+            activeNoteCount.load();
+
+        while (
+            count > 0
+            && ! activeNoteCount.compare_exchange_weak (
+                count,
+                count - 1
+            )
+        )
+        {
+        }
+
+        activitySerial.fetch_add (1);
+
+        if (activeNoteCount.load() <= 0)
+        {
+            lastNote.store (-1);
+            lastVelocity.store (0.0f);
+
+            audioSystem.setTestToneEnabled (
+                false
+            );
+        }
+    }
+}

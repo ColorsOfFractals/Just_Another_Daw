@@ -1,0 +1,19 @@
+ M Source/Audio/AudioSystem.cpp
+ M Source/Audio/AudioSystem.h
+ M Source/Plugins/PluginCatalog.cpp
+ M Source/Plugins/PluginCatalog.h
+ M Source/UI/MainComponent.h
+ M Source/UI/PluginLibraryPanel.cpp
+ M Source/UI/PluginLibraryPanel.h
+?? Evidence/EXP-050E2A-DEVICE-MANAGER-20260907-215738/
+?? Evidence/EXP-050E2A-RESUME-20260907-220413/
+?? Evidence/EXP-050E2B-AUDIO-COCKPIT-20260907-222657/
+?? Evidence/EXP-050E2B-RESUME-20260907-224140/
+?? Evidence/EXP-050E2B-UI-ANATOMY-20260907-222231.txt
+?? Evidence/EXP-050E2C-CONNECTOR-SURVEY-20260907-225559.txt
+?? Evidence/EXP-050E2C-CONNECTOR-SURVEY-20260907-225905.txt
+?? Evidence/EXP-050E2D-COCKPIT-20260907-230433/
+?? Evidence/JAD-EXP-050D-MIDI-MESH-FU-2026-08-27_030220.txt
+?? Evidence/JAD-EXP-050E1-CHEESE-INSTANCE-2026-08-27_032725/
+?? Source/UI/AudioSettingsPanel.cpp
+?? Source/UI/AudioSettingsPanel.h

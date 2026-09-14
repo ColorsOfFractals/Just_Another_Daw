@@ -1,6 +1,9 @@
-#include "JADContext.h"
+﻿#include "JADContext.h"
 
 JADContext::JADContext()
+    : midiSystem (
+        audioSystem
+    )
 {
     pluginCatalog.initialise();
     audioSystem.setSessionState (
@@ -37,3 +40,10 @@ JADContext::getPluginCatalog() noexcept
 {
     return pluginCatalog;
 }
+MidiSystem&
+JADContext::getMidiSystem() noexcept
+{
+    return midiSystem;
+}
+
+

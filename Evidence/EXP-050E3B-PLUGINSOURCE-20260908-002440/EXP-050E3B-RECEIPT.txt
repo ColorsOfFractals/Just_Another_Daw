@@ -1,0 +1,22 @@
+﻿EXP-050E.3B — PLUGINSOURCE FORGE
+
+PluginSource : AudioSource       : YES
+Owns AudioPluginInstance         : YES
+prepareToPlay implemented        : YES
+processBlock implemented         : YES
+MidiBuffer vessel exists         : YES
+
+AudioSystem routing changed      : NO
+MidiSystem behavior changed      : NO
+Track 0 source changed           : NO
+Native SynthSource lifeboat      : PRESERVED
+
+Build                            : PASS
+SHA256                           : 1E55FD010B991728D5E31D50057D1275E64FD54E63185704D5A52EB5192F1438
+
+IMPORTANT:
+PluginSource currently renders with an EMPTY MidiBuffer.
+TripleCheese has NOT been routed into Track 0 yet.
+
+NEXT:
+EXP-050E.3C — MIDI COLLECTOR + ENGINE OWNERSHIP

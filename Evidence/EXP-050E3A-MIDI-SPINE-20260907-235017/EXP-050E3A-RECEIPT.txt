@@ -1,0 +1,15 @@
+﻿EXP-050E.3A — MIDI SPINE PROMOTION
+
+JADContext owns MidiSystem       : YES
+VirtualKeyboardPanel owns MIDI   : NO
+VirtualKeyboardPanel borrows MIDI: YES
+MainComponent injects shared MIDI: YES
+Native SynthSource behavior      : PRESERVED
+Plugin routing changed           : NO
+AudioDeviceManager duplicated    : NO
+
+Build                            : PASS
+SHA256                           : 1E55FD010B991728D5E31D50057D1275E64FD54E63185704D5A52EB5192F1438
+
+NEXT:
+EXP-050E.3B — PluginSource / TripleCheese render bridge

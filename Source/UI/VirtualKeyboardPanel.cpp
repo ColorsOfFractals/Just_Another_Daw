@@ -1,4 +1,4 @@
-#include "VirtualKeyboardPanel.h"
+﻿#include "VirtualKeyboardPanel.h"
 
 #include <array>
 
@@ -32,10 +32,11 @@ namespace
 
 VirtualKeyboardPanel::VirtualKeyboardPanel (
     AudioSystem& audioSystemToUse,
+    MidiSystem& midiSystemToUse,
     JADLookAndFeel& lookAndFeelToUse)
     : audioSystem (audioSystemToUse),
       jadLookAndFeel (lookAndFeelToUse),
-      midiSystem (audioSystem),
+      midiSystem (midiSystemToUse),
       keyboard (
           midiSystem.getKeyboardState(),
           juce::MidiKeyboardComponent::horizontalKeyboard
@@ -1016,3 +1017,4 @@ void VirtualKeyboardPanel::resized()
 
     repaint();
 }
+

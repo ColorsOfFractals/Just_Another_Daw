@@ -1,0 +1,742 @@
+﻿diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ae4a979..bd2d568 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -31,6 +31,8 @@ target_sources(
+         Source/Audio/MidiSystem.h
+         Source/Audio/MidiSystem.cpp
+         Source/Audio/AudioSource.h
++        Source/Audio/PluginSource.cpp
++        Source/Audio/PluginSource.h
+         Source/Audio/SynthSource.cpp
+         Source/Audio/SynthSource.h
+         Source/Audio/TrackProcessor.cpp
+@@ -56,6 +58,8 @@ target_sources(
+ 
+         Source/UI/MainComponent.cpp
+         Source/UI/PluginLibraryPanel.cpp
++        Source/UI/AudioSettingsPanel.cpp
++        Source/UI/AudioSettingsPanel.h
+         Source/UI/PluginLibraryPanel.h
+         Source/UI/StartupOverlay.cpp
+         Source/UI/VirtualKeyboardPanel.h
+@@ -130,3 +134,7 @@ if (MSVC)
+ endif()
+ 
+ 
++
++
++
++
+diff --git a/Source/Audio/AudioSystem.cpp b/Source/Audio/AudioSystem.cpp
+index e94c11b..1b78708 100644
+--- a/Source/Audio/AudioSystem.cpp
++++ b/Source/Audio/AudioSystem.cpp
+@@ -1,4 +1,4 @@
+-∩╗┐#include "AudioSystem.h"
++#include "AudioSystem.h"
+ 
+ #include "../Model/MasterBusState.h"
+ #include "../Model/SessionState.h"
+@@ -99,6 +99,81 @@ int AudioSystem::getBufferSize() const noexcept
+     return 0;
+ }
+ 
++juce::AudioDeviceManager&
++AudioSystem::getDeviceManager() noexcept
++{
++    return deviceManager;
++}
++
++
++void AudioSystem::handleMidiMessage (
++    const juce::MidiMessage& message)
++{
++    pluginSource.addMidiMessage (
++        message
++    );
++}
++
++
++bool AudioSystem::installTrackPlugin (
++    std::unique_ptr<juce::AudioPluginInstance> instance)
++{
++    if (instance == nullptr)
++        return false;
++
++    if (
++        currentSampleRate <= 0.0
++        || currentBlockSize <= 0
++    )
++    {
++        return false;
++    }
++
++    const juce::ScopedLock callbackLock (
++        deviceManager.getAudioCallbackLock()
++    );
++
++    pluginSource.prepare (
++        currentSampleRate,
++        currentBlockSize
++    );
++
++    pluginSource.setPlugin (
++        std::move (instance)
++    );
++
++    trackProcessors[0].setSource (
++        &pluginSource
++    );
++
++    return pluginSource.hasPlugin();
++}
++
++
++void AudioSystem::restoreNativeSynth()
++{
++    const juce::ScopedLock callbackLock (
++        deviceManager.getAudioCallbackLock()
++    );
++
++    trackProcessors[0].setSource (
++        &synthSource
++    );
++
++    pluginSource.clearPlugin();
++}
++
++
++bool AudioSystem::hasTrackPlugin() const noexcept
++{
++    return pluginSource.hasPlugin();
++}
++
++
++juce::String AudioSystem::getTrackPluginName() const
++{
++    return pluginSource.getPluginName();
++}
+ void AudioSystem::setTestToneEnabled (
+     bool enabled
+ ) noexcept
+@@ -218,9 +293,12 @@ void AudioSystem::rebuildTrackRoutes()
+         );
+     }
+ 
+-    // First real source enters the track fleet.
++    // A proven plugin owns Track 0; otherwise the native synth remains
++    // connected as the recoverable lifeboat.
+     trackProcessors[0].setSource (
+-        &synthSource
++        pluginSource.hasPlugin()
++            ? static_cast<AudioSource*> (&pluginSource)
++            : static_cast<AudioSource*> (&synthSource)
+     );
+ 
+     if (
+@@ -273,6 +351,11 @@ void AudioSystem::audioDeviceAboutToStart (
+         currentBlockSize
+     );
+ 
++    pluginSource.prepare (
++        currentSampleRate,
++        currentBlockSize
++    );
++
+     rebuildTrackRoutes();
+ }
+ 
+@@ -280,6 +363,7 @@ void AudioSystem::audioDeviceStopped()
+ {
+     synthSource.setGate (false);
+     synthSource.reset();
++    pluginSource.reset();
+ 
+     for (
+         auto& processor :
+@@ -444,3 +528,4 @@ void AudioSystem::audioDeviceIOCallbackWithContext (
+         );
+     }
+ }
++
+diff --git a/Source/Audio/AudioSystem.h b/Source/Audio/AudioSystem.h
+index 928b077..b220dbf 100644
+--- a/Source/Audio/AudioSystem.h
++++ b/Source/Audio/AudioSystem.h
+@@ -1,5 +1,6 @@
+-∩╗┐#pragma once
++#pragma once
+ 
++#include "PluginSource.h"
+ #include "SynthSource.h"
+ #include "TrackProcessor.h"
+ 
+@@ -29,6 +30,9 @@ public:
+     double getSampleRate() const noexcept;
+     int getBufferSize() const noexcept;
+ 
++    juce::AudioDeviceManager&
++    getDeviceManager() noexcept;
++
+     void setTestToneEnabled (
+         bool enabled
+     ) noexcept;
+@@ -65,6 +69,20 @@ public:
+ 
+     Waveform getWaveform() const noexcept;
+ 
++    void handleMidiMessage (
++        const juce::MidiMessage& message
++    );
++
++    bool installTrackPlugin (
++        std::unique_ptr<juce::AudioPluginInstance> instance
++    );
++
++    void restoreNativeSynth();
++
++    bool hasTrackPlugin() const noexcept;
++
++    juce::String getTrackPluginName() const;
++
+ private:
+     void audioDeviceIOCallbackWithContext (
+         const float* const* inputChannelData,
+@@ -90,6 +108,7 @@ private:
+     juce::AudioDeviceManager deviceManager;
+ 
+     SynthSource synthSource;
++    PluginSource pluginSource;
+ 
+     std::array<
+         TrackProcessor,
+@@ -104,3 +123,4 @@ private:
+     bool alive = false;
+     bool ready = false;
+ };
++
+diff --git a/Source/Audio/MidiSystem.cpp b/Source/Audio/MidiSystem.cpp
+index 56e432b..c4cf1fd 100644
+--- a/Source/Audio/MidiSystem.cpp
++++ b/Source/Audio/MidiSystem.cpp
+@@ -218,6 +218,12 @@ void MidiSystem::handleNoteOff (
+ void MidiSystem::applyMessage (
+     const juce::MidiMessage& message)
+ {
++    // Every computer, mouse, and hardware MIDI event converges here.
++    // AudioSystem forwards it into PluginSource's thread-safe collector.
++    audioSystem.handleMidiMessage (
++        message
++    );
++
+     if (message.isNoteOn())
+     {
+         const auto note =
+diff --git a/Source/Core/JADContext.cpp b/Source/Core/JADContext.cpp
+index c100693..e024ef0 100644
+--- a/Source/Core/JADContext.cpp
++++ b/Source/Core/JADContext.cpp
+@@ -1,6 +1,9 @@
+-#include "JADContext.h"
++∩╗┐#include "JADContext.h"
+ 
+ JADContext::JADContext()
++    : midiSystem (
++        audioSystem
++    )
+ {
+     pluginCatalog.initialise();
+     audioSystem.setSessionState (
+@@ -36,4 +39,11 @@ PluginCatalog&
+ JADContext::getPluginCatalog() noexcept
+ {
+     return pluginCatalog;
+-}
+\ No newline at end of file
++}
++MidiSystem&
++JADContext::getMidiSystem() noexcept
++{
++    return midiSystem;
++}
++
++
+diff --git a/Source/Core/JADContext.h b/Source/Core/JADContext.h
+index 5e75536..60ac8a3 100644
+--- a/Source/Core/JADContext.h
++++ b/Source/Core/JADContext.h
+@@ -1,6 +1,7 @@
+-#pragma once
++∩╗┐#pragma once
+ 
+ #include "../Audio/AudioSystem.h"
++#include "../Audio/MidiSystem.h"
+ #include "../Model/SessionState.h"
+ #include "../Plugins/PluginCatalog.h"
+ 
+@@ -10,6 +11,8 @@ public:
+     JADContext();
+ 
+     AudioSystem& getAudioSystem() noexcept;
++
++    MidiSystem& getMidiSystem() noexcept;
+     SessionState& getSessionState() noexcept;
+     PluginCatalog& getPluginCatalog() noexcept;
+ 
+@@ -17,6 +20,9 @@ public:
+ 
+ private:
+     AudioSystem audioSystem;
++    MidiSystem midiSystem;
+     SessionState sessionState;
+     PluginCatalog pluginCatalog;
+ };
++
++
+diff --git a/Source/Plugins/PluginCatalog.cpp b/Source/Plugins/PluginCatalog.cpp
+index 159275f..9cfd989 100644
+--- a/Source/Plugins/PluginCatalog.cpp
++++ b/Source/Plugins/PluginCatalog.cpp
+@@ -180,3 +180,19 @@ PluginCatalog::getLastScanSummary() const
+ {
+     return lastScanSummary;
+ }
++
++std::unique_ptr<juce::AudioPluginInstance>
++PluginCatalog::createInstance (
++    const juce::PluginDescription& description,
++    double sampleRate,
++    int blockSize,
++    juce::String& errorMessage
++) const
++{
++    return formatManager.createPluginInstance (
++        description,
++        sampleRate,
++        blockSize,
++        errorMessage
++    );
++}
+\ No newline at end of file
+diff --git a/Source/Plugins/PluginCatalog.h b/Source/Plugins/PluginCatalog.h
+index 1137c10..8c41115 100644
+--- a/Source/Plugins/PluginCatalog.h
++++ b/Source/Plugins/PluginCatalog.h
+@@ -1,4 +1,4 @@
+-∩╗┐#pragma once
++#pragma once
+ 
+ #include <juce_audio_processors/juce_audio_processors.h>
+ 
+@@ -24,6 +24,14 @@ public:
+ 
+     juce::String getLastScanSummary() const;
+ 
++    std::unique_ptr<juce::AudioPluginInstance>
++    createInstance (
++        const juce::PluginDescription& description,
++        double sampleRate,
++        int blockSize,
++        juce::String& errorMessage
++    ) const;
++
+ private:
+     void load();
+     void save();
+diff --git a/Source/UI/MainComponent.cpp b/Source/UI/MainComponent.cpp
+index 6f66f3b..ed8611f 100644
+--- a/Source/UI/MainComponent.cpp
++++ b/Source/UI/MainComponent.cpp
+@@ -1,4 +1,4 @@
+-#include "MainComponent.h"
++∩╗┐#include "MainComponent.h"
+ 
+ #include <algorithm>
+ #include <cmath>
+@@ -17,12 +17,17 @@ MainComponent::MainComponent (
+       synthVoicePanel (
+           context.getAudioSystem()
+       ),
++      audioSettingsPanel (
++          context.getAudioSystem(),
++          jadLookAndFeel
++      ),
+       pluginLibraryPanel (
+           context.getPluginCatalog(),
+           jadLookAndFeel
+       ),
+       keyboardPanel (
+           context.getAudioSystem(),
++          context.getMidiSystem(),
+           jadLookAndFeel
+       )
+ {
+@@ -66,6 +71,34 @@ MainComponent::MainComponent (
+         juce::Justification::centredRight
+     );
+ 
++    addAndMakeVisible (
++        audioSettingsPanel
++    );
++
++    audioSettingsPanel.setVisible (
++        false
++    );
++
++    audioSettingsButton.onClick =
++        [this]
++        {
++            const bool shouldShow =
++                ! audioSettingsPanel.isVisible();
++
++            audioSettingsPanel.setVisible (
++                shouldShow
++            );
++
++            if (shouldShow)
++            {
++                audioSettingsPanel.toFront (
++                    true
++                );
++            }
++
++            resized();
++            repaint();
++        };
+     addTrackButton.onClick =
+         [this]
+         {
+@@ -213,7 +246,11 @@ MainComponent::MainComponent (
+         snapButton
+     );
+ 
++    
+     addAndMakeVisible (
++        audioSettingsButton
++    );
++addAndMakeVisible (
+         keyboardTabButton
+     );
+ 
+@@ -1990,6 +2027,39 @@ void MainComponent::paint (
+ 
+ void MainComponent::resized()
+ {
++    // EXP-050E.2D AUDIO COCKPIT GEOMETRY
++    audioSettingsButton.setBounds (
++        getWidth() - 150,
++        12,
++        130,
++        30
++    );
++
++    const int cockpitWidth =
++        juce::jmax (
++            320,
++            juce::jmin (
++                620,
++                getWidth() - 40
++            )
++        );
++
++    const int cockpitHeight =
++        juce::jmax (
++            300,
++            juce::jmin (
++                700,
++                getHeight() - 90
++            )
++        );
++
++    audioSettingsPanel.setBounds (
++        getWidth() - cockpitWidth - 20,
++        54,
++        cockpitWidth,
++        cockpitHeight
++    );
++
+     auto area =
+         getLocalBounds();
+ 
+@@ -2701,3 +2771,8 @@ void MainComponent::mouseUp (
+     dragTrackIndex = -1;
+     dragClipIndex = -1;
+ }
++
++
++
++
++
+diff --git a/Source/UI/MainComponent.h b/Source/UI/MainComponent.h
+index 8cc7145..1d63621 100644
+--- a/Source/UI/MainComponent.h
++++ b/Source/UI/MainComponent.h
+@@ -1,10 +1,11 @@
+-#pragma once
++∩╗┐#pragma once
+ 
+ #include <juce_gui_basics/juce_gui_basics.h>
+ 
+ #include "../Core/JADContext.h"
+ 
+ #include "JADLookAndFeel.h"
++#include "AudioSettingsPanel.h"
+ #include "PluginLibraryPanel.h"
+ #include "SessionOverviewPanel.h"
+ #include "StartupOverlay.h"
+@@ -160,6 +161,7 @@ private:
+     TransportPanel transportPanel;
+     SessionOverviewPanel sessionOverviewPanel;
+     StartupOverlay startupOverlay;
++    AudioSettingsPanel audioSettingsPanel;
+     SynthVoicePanel synthVoicePanel;
+     PluginLibraryPanel pluginLibraryPanel;
+     VirtualKeyboardPanel keyboardPanel;
+@@ -197,6 +199,10 @@ private:
+         "SNAP"
+     };
+ 
++    juce::TextButton audioSettingsButton {
++        "AUDIO"
++    };
++
+     juce::TextButton keyboardTabButton {
+         "KEYBOARD"
+     };
+@@ -241,3 +247,4 @@ private:
+         MainComponent
+     )
+ };
++
+diff --git a/Source/UI/PluginLibraryPanel.cpp b/Source/UI/PluginLibraryPanel.cpp
+index f4ed305..938bdcd 100644
+--- a/Source/UI/PluginLibraryPanel.cpp
++++ b/Source/UI/PluginLibraryPanel.cpp
+@@ -2,8 +2,10 @@
+ 
+ PluginLibraryPanel::PluginLibraryPanel (
+     PluginCatalog& catalogToUse,
++    AudioSystem& audioSystemToUse,
+     JADLookAndFeel& lookAndFeelToUse)
+     : catalog (catalogToUse),
++      audioSystem (audioSystemToUse),
+       jadLookAndFeel (lookAndFeelToUse)
+ {
+     titleLabel.setText (
+@@ -166,6 +168,113 @@ PluginLibraryPanel::PluginLibraryPanel (
+             refreshPlugins();
+         };
+ 
++    loadButton.onClick =
++        [this]
++        {
++            if (
++                selectedPluginIndex < 0
++                || selectedPluginIndex >= visiblePlugins.size()
++            )
++            {
++                detailLabel.setText (
++                    "SELECT A PLUGIN FIRST",
++                    juce::dontSendNotification
++                );
++
++                return;
++            }
++
++            const auto description =
++                visiblePlugins[
++                    selectedPluginIndex
++                ];
++
++            juce::String errorMessage;
++
++            const auto sampleRate =
++                audioSystem.getSampleRate();
++
++            const auto blockSize =
++                audioSystem.getBufferSize();
++
++            if (
++                sampleRate <= 0.0
++                || blockSize <= 0
++            )
++            {
++                detailLabel.setText (
++                    "AUDIO DEVICE NOT READY",
++                    juce::dontSendNotification
++                );
++
++                return;
++            }
++
++            auto instance =
++                catalog.createInstance (
++                    description,
++                    sampleRate,
++                    blockSize,
++                    errorMessage
++                );
++
++            if (instance == nullptr)
++            {
++                detailLabel.setText (
++                    "INSTANCE FAILED | "
++                        + (
++                            errorMessage.isNotEmpty()
++                                ? errorMessage
++                                : juce::String (
++                                    "UNKNOWN PLUGIN ERROR"
++                                )
++                        ),
++                    juce::dontSendNotification
++                );
++
++                return;
++            }
++
++            const auto loadedName =
++                instance->getName();
++
++            if (
++                ! audioSystem.installTrackPlugin (
++                    std::move (instance)
++                )
++            )
++            {
++                detailLabel.setText (
++                    "ENGINE LOAD FAILED",
++                    juce::dontSendNotification
++                );
++
++                return;
++            }
++
++            detailLabel.setText (
++                "CHEESE HIGHWAY ONLINE | "
++                    + loadedName
++                    + " | "
++                    + juce::String (
++                        sampleRate,
++                        0
++                    )
++                    + " HZ | "
++                    + juce::String (
++                        blockSize
++                    )
++                    + " SAMPLES",
++                juce::dontSendNotification
++            );
++
++            loadButton.setButtonText (
++                "LOADED INTO TRACK 1"
++            );
++
++            repaint();
++        };
++
+     allButton.onClick =
+         [this]
+         {
+diff --git a/Source/UI/PluginLibraryPanel.h b/Source/UI/PluginLibraryPanel.h
+index afbaf01..927bb4d 100644
+--- a/Source/UI/PluginLibraryPanel.h
++++ b/Source/UI/PluginLibraryPanel.h
+@@ -2,6 +2,7 @@
+ 
+ #include <juce_gui_basics/juce_gui_basics.h>
+ 
++#include "../Audio/AudioSystem.h"
+ #include "../Plugins/PluginCatalog.h"
+ #include "JADLookAndFeel.h"
+ 
+@@ -12,6 +13,7 @@ class PluginLibraryPanel :
+ public:
+     PluginLibraryPanel (
+         PluginCatalog& catalogToUse,
++        AudioSystem& audioSystemToUse,
+         JADLookAndFeel& lookAndFeelToUse
+     );
+ 
+@@ -60,13 +62,13 @@ private:
+     ) const;
+ 
+     PluginCatalog& catalog;
++    AudioSystem& audioSystem;
+     JADLookAndFeel& jadLookAndFeel;
+ 
+     juce::Array<juce::PluginDescription> visiblePlugins;
+ 
+     int selectedPluginIndex = -1;
+-
+-    Filter filter =
++Filter filter =
+         Filter::all;
+ 
+     juce::Label titleLabel;
+diff --git a/Source/UI/VirtualKeyboardPanel.cpp b/Source/UI/VirtualKeyboardPanel.cpp
+index c0429bf..41789d1 100644
+--- a/Source/UI/VirtualKeyboardPanel.cpp
++++ b/Source/UI/VirtualKeyboardPanel.cpp
+@@ -1,4 +1,4 @@
+-#include "VirtualKeyboardPanel.h"
++∩╗┐#include "VirtualKeyboardPanel.h"
+ 
+ #include <array>
+ 
+@@ -32,10 +32,11 @@ namespace
+ 
+ VirtualKeyboardPanel::VirtualKeyboardPanel (
+     AudioSystem& audioSystemToUse,
++    MidiSystem& midiSystemToUse,
+     JADLookAndFeel& lookAndFeelToUse)
+     : audioSystem (audioSystemToUse),
+       jadLookAndFeel (lookAndFeelToUse),
+-      midiSystem (audioSystem),
++      midiSystem (midiSystemToUse),
+       keyboard (
+           midiSystem.getKeyboardState(),
+           juce::MidiKeyboardComponent::horizontalKeyboard
+@@ -1015,4 +1016,5 @@ void VirtualKeyboardPanel::resized()
+     );
+ 
+     repaint();
+-}
+\ No newline at end of file
++}
++
+diff --git a/Source/UI/VirtualKeyboardPanel.h b/Source/UI/VirtualKeyboardPanel.h
+index 2dc7a60..021206e 100644
+--- a/Source/UI/VirtualKeyboardPanel.h
++++ b/Source/UI/VirtualKeyboardPanel.h
+@@ -1,4 +1,4 @@
+-#pragma once
++∩╗┐#pragma once
+ 
+ #include <juce_gui_basics/juce_gui_basics.h>
+ #include <juce_audio_utils/juce_audio_utils.h>
+@@ -15,6 +15,7 @@ class VirtualKeyboardPanel :
+ public:
+     VirtualKeyboardPanel (
+         AudioSystem& audioSystemToUse,
++        MidiSystem& midiSystemToUse,
+         JADLookAndFeel& lookAndFeelToUse
+     );
+ 
+@@ -63,7 +64,7 @@ private:
+     AudioSystem& audioSystem;
+     JADLookAndFeel& jadLookAndFeel;
+ 
+-    MidiSystem midiSystem;
++    MidiSystem& midiSystem;
+ 
+     juce::MidiKeyboardComponent keyboard;
+ 
+@@ -105,4 +106,5 @@ private:
+     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (
+         VirtualKeyboardPanel
+     )
+-};
+\ No newline at end of file
++};
++

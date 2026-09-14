@@ -17,12 +17,18 @@ MainComponent::MainComponent (
       synthVoicePanel (
           context.getAudioSystem()
       ),
+      audioSettingsPanel (
+          context.getAudioSystem(),
+          jadLookAndFeel
+      ),
       pluginLibraryPanel (
           context.getPluginCatalog(),
+          context.getAudioSystem(),
           jadLookAndFeel
       ),
       keyboardPanel (
           context.getAudioSystem(),
+          context.getMidiSystem(),
           jadLookAndFeel
       )
 {
@@ -66,6 +72,34 @@ MainComponent::MainComponent (
         juce::Justification::centredRight
     );
 
+    addAndMakeVisible (
+        audioSettingsPanel
+    );
+
+    audioSettingsPanel.setVisible (
+        false
+    );
+
+    audioSettingsButton.onClick =
+        [this]
+        {
+            const bool shouldShow =
+                ! audioSettingsPanel.isVisible();
+
+            audioSettingsPanel.setVisible (
+                shouldShow
+            );
+
+            if (shouldShow)
+            {
+                audioSettingsPanel.toFront (
+                    true
+                );
+            }
+
+            resized();
+            repaint();
+        };
     addTrackButton.onClick =
         [this]
         {
@@ -213,7 +247,11 @@ MainComponent::MainComponent (
         snapButton
     );
 
+    
     addAndMakeVisible (
+        audioSettingsButton
+    );
+addAndMakeVisible (
         keyboardTabButton
     );
 
@@ -1990,6 +2028,39 @@ void MainComponent::paint (
 
 void MainComponent::resized()
 {
+    // EXP-050E.2D AUDIO COCKPIT GEOMETRY
+    audioSettingsButton.setBounds (
+        getWidth() - 150,
+        12,
+        130,
+        30
+    );
+
+    const int cockpitWidth =
+        juce::jmax (
+            320,
+            juce::jmin (
+                620,
+                getWidth() - 40
+            )
+        );
+
+    const int cockpitHeight =
+        juce::jmax (
+            300,
+            juce::jmin (
+                700,
+                getHeight() - 90
+            )
+        );
+
+    audioSettingsPanel.setBounds (
+        getWidth() - cockpitWidth - 20,
+        54,
+        cockpitWidth,
+        cockpitHeight
+    );
+
     auto area =
         getLocalBounds();
 
@@ -2701,3 +2772,8 @@ void MainComponent::mouseUp (
     dragTrackIndex = -1;
     dragClipIndex = -1;
 }
+
+
+
+
+
