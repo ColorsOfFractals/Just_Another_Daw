@@ -24,7 +24,8 @@ MainComponent::MainComponent (
       pluginLibraryPanel (
           context.getPluginCatalog(),
           context.getAudioSystem(),
-          jadLookAndFeel
+          context.getSessionState(),
+           jadLookAndFeel
       ),
       keyboardPanel (
           context.getAudioSystem(),
@@ -100,6 +101,16 @@ MainComponent::MainComponent (
             resized();
             repaint();
         };
+    pluginLibraryPanel.onTrackAssigned =
+        [this] (int trackIndex)
+        {
+            selectTrack (trackIndex);
+        };
+
+    context.getAudioSystem().setMidiTargetTrack (
+        selectedTrackIndex
+    );
+
     addTrackButton.onClick =
         [this]
         {
@@ -375,6 +386,11 @@ void MainComponent::addTrack()
             session.getTrackCount()
         ) - 1;
 
+    context.getAudioSystem().refreshTrackRoutes();
+    context.getAudioSystem().setMidiTargetTrack (
+        selectedTrackIndex
+    );
+
     clearClipSelection();
 
     refreshWorkspace();
@@ -398,8 +414,15 @@ void MainComponent::deleteSelectedTrack()
     if (track == nullptr)
         return;
 
+    const auto removedTrackIndex =
+        selectedTrackIndex;
+
     session.removeTrack (
         track->getId()
+    );
+
+    context.getAudioSystem().handleTrackRemoved (
+        removedTrackIndex
     );
 
     clearClipSelection();
@@ -442,6 +465,10 @@ void MainComponent::selectTrack (
     }
 
     selectedTrackIndex = index;
+
+    context.getAudioSystem().setMidiTargetTrack (
+        selectedTrackIndex
+    );
 
     if (
         selectedClipTrackIndex

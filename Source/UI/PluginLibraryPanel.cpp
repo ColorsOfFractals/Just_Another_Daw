@@ -42,9 +42,11 @@ private:
 PluginLibraryPanel::PluginLibraryPanel (
     PluginCatalog& catalogToUse,
     AudioSystem& audioSystemToUse,
+    SessionState& sessionStateToUse,
     JADLookAndFeel& lookAndFeelToUse)
     : catalog (catalogToUse),
       audioSystem (audioSystemToUse),
+      sessionState (sessionStateToUse),
       jadLookAndFeel (lookAndFeelToUse)
 {
     titleLabel.setText (
@@ -212,115 +214,8 @@ PluginLibraryPanel::PluginLibraryPanel (
     loadButton.onClick =
         [this]
         {
-            if (
-                selectedPluginIndex < 0
-                || selectedPluginIndex >= visiblePlugins.size()
-            )
-            {
-                detailLabel.setText (
-                    "SELECT A PLUGIN FIRST",
-                    juce::dontSendNotification
-                );
-
-                return;
-            }
-
-            const auto description =
-                visiblePlugins[
-                    selectedPluginIndex
-                ];
-
-            juce::String errorMessage;
-
-            const auto sampleRate =
-                audioSystem.getSampleRate();
-
-            const auto blockSize =
-                audioSystem.getBufferSize();
-
-            if (
-                sampleRate <= 0.0
-                || blockSize <= 0
-            )
-            {
-                detailLabel.setText (
-                    "AUDIO DEVICE NOT READY",
-                    juce::dontSendNotification
-                );
-
-                return;
-            }
-
-            auto instance =
-                catalog.createInstance (
-                    description,
-                    sampleRate,
-                    blockSize,
-                    errorMessage
-                );
-
-            if (instance == nullptr)
-            {
-                detailLabel.setText (
-                    "INSTANCE FAILED | "
-                        + (
-                            errorMessage.isNotEmpty()
-                                ? errorMessage
-                                : juce::String (
-                                    "UNKNOWN PLUGIN ERROR"
-                                )
-                        ),
-                    juce::dontSendNotification
-                );
-
-                return;
-            }
-
-            const auto loadedName =
-                instance->getName();
-
-            
-            pluginEditorWindow.reset();
-
-            if (
-                ! audioSystem.installTrackPlugin (
-                    std::move (instance)
-                )
-            )
-            {
-                detailLabel.setText (
-                    "ENGINE LOAD FAILED",
-                    juce::dontSendNotification
-                );
-
-                return;
-            }
-
-            detailLabel.setText (
-                "CHEESE HIGHWAY ONLINE | "
-                    + loadedName
-                    + " | "
-                    + juce::String (
-                        sampleRate,
-                        0
-                    )
-                    + " HZ | "
-                    + juce::String (
-                        blockSize
-                    )
-                    + " SAMPLES",
-                juce::dontSendNotification
-            );
-
-            loadButton.setButtonText (
-                "LOADED INTO TRACK 1"
-            );
-
-            openEditorButton.setEnabled (true);
-
-            repaint();
-        };
-    openEditorButton.onClick =
+            chooseTrackForSelectedPlugin();
+        };    openEditorButton.onClick =
         [this]
         {
             openPluginEditor();
@@ -355,6 +250,203 @@ PluginLibraryPanel::PluginLibraryPanel (
     refreshPlugins();
 }
 
+void PluginLibraryPanel::chooseTrackForSelectedPlugin()
+{
+    if (
+        selectedPluginIndex < 0
+        || selectedPluginIndex >= visiblePlugins.size()
+    )
+    {
+        detailLabel.setText (
+            "SELECT A PLUGIN FIRST",
+            juce::dontSendNotification
+        );
+        return;
+    }
+
+    juce::PopupMenu targetMenu;
+    targetMenu.addSectionHeader (
+        "WHICH TRACK WOULD YOU LIKE THIS ASSIGNED TO?"
+    );
+
+    const auto trackCount =
+        juce::jmin (
+            static_cast<int> (sessionState.getTrackCount()),
+            AudioSystem::maxTrackCount
+        );
+
+    for (int index = 0; index < trackCount; ++index)
+    {
+        const auto* track =
+            sessionState.getTrack (
+                static_cast<std::size_t> (index)
+            );
+
+        const auto name =
+            track != nullptr
+                ? juce::String (track->getName())
+                : "Track " + juce::String (index + 1);
+
+        const auto currentPlugin =
+            audioSystem.getTrackPluginName (index);
+
+        targetMenu.addItem (
+            index + 1,
+            name
+                + (
+                    currentPlugin.isNotEmpty()
+                        ? "  [" + currentPlugin + "]"
+                        : "  [EMPTY]"
+                )
+        );
+    }
+
+    targetMenu.addSeparator();
+    targetMenu.addItem (
+        1001,
+        "+ NEW TRACK",
+        trackCount < AudioSystem::maxTrackCount
+    );
+
+    targetMenu.showMenuAsync (
+        juce::PopupMenu::Options()
+            .withTargetComponent (&loadButton),
+        [this, trackCount] (int result)
+        {
+            if (result == 0)
+                return;
+
+            int targetTrackIndex = result - 1;
+
+            if (result == 1001)
+            {
+                sessionState.addTrack();
+                audioSystem.refreshTrackRoutes();
+                targetTrackIndex = trackCount;
+            }
+
+            loadSelectedPluginIntoTrack (
+                targetTrackIndex
+            );
+        }
+    );
+}
+
+
+void PluginLibraryPanel::loadSelectedPluginIntoTrack (
+    int trackIndex)
+{
+    if (
+        selectedPluginIndex < 0
+        || selectedPluginIndex >= visiblePlugins.size()
+        || trackIndex < 0
+        || trackIndex >= AudioSystem::maxTrackCount
+    )
+    {
+        return;
+    }
+
+    const auto description =
+        visiblePlugins[selectedPluginIndex];
+
+    const auto sampleRate =
+        audioSystem.getSampleRate();
+
+    const auto blockSize =
+        audioSystem.getBufferSize();
+
+    if (
+        sampleRate <= 0.0
+        || blockSize <= 0
+    )
+    {
+        detailLabel.setText (
+            "AUDIO DEVICE NOT READY",
+            juce::dontSendNotification
+        );
+        return;
+    }
+
+    juce::String errorMessage;
+
+    auto instance =
+        catalog.createInstance (
+            description,
+            sampleRate,
+            blockSize,
+            errorMessage
+        );
+
+    if (instance == nullptr)
+    {
+        detailLabel.setText (
+            "INSTANCE FAILED | "
+                + (
+                    errorMessage.isNotEmpty()
+                        ? errorMessage
+                        : juce::String ("UNKNOWN PLUGIN ERROR")
+                ),
+            juce::dontSendNotification
+        );
+        return;
+    }
+
+    const auto loadedName = instance->getName();
+
+    pluginEditorWindow.reset();
+    editorTrackIndex = -1;
+
+    if (! audioSystem.installTrackPlugin (
+            trackIndex,
+            std::move (instance)
+        ))
+    {
+        detailLabel.setText (
+            "ENGINE LOAD FAILED",
+            juce::dontSendNotification
+        );
+        return;
+    }
+
+    editorTrackIndex = trackIndex;
+
+    if (
+        auto* track = sessionState.getTrack (
+            static_cast<std::size_t> (trackIndex)
+        )
+    )
+    {
+        track->setName (
+            loadedName.toStdString()
+        );
+    }
+
+    detailLabel.setText (
+        "TRACK "
+            + juce::String (trackIndex + 1)
+            + " INSTRUMENT | "
+            + loadedName
+            + " | "
+            + juce::String (sampleRate, 0)
+            + " HZ | "
+            + juce::String (blockSize)
+            + " SAMPLES",
+        juce::dontSendNotification
+    );
+
+    loadButton.setButtonText (
+        "ASSIGNED TO TRACK "
+            + juce::String (trackIndex + 1)
+    );
+
+    openEditorButton.setEnabled (true);
+
+    if (onTrackAssigned)
+        onTrackAssigned (trackIndex);
+
+    repaint();
+}
+
 void PluginLibraryPanel::openPluginEditor()
 {
     if (pluginEditorWindow != nullptr)
@@ -365,7 +457,9 @@ void PluginLibraryPanel::openPluginEditor()
     }
 
     auto* plugin =
-        audioSystem.getTrackPlugin();
+        audioSystem.getTrackPlugin (
+            editorTrackIndex
+        );
 
     if (plugin == nullptr)
     {

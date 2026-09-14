@@ -8,6 +8,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 
 #include <array>
+#include <atomic>
 
 class SessionState;
 class TransportState;
@@ -73,18 +74,41 @@ public:
         const juce::MidiMessage& message
     );
 
+    static constexpr int maxTrackCount = 16;
+
+    void setMidiTargetTrack (
+        int trackIndex
+    ) noexcept;
+
+    int getMidiTargetTrack() const noexcept;
+
     bool installTrackPlugin (
+        int trackIndex,
         std::unique_ptr<juce::AudioPluginInstance> instance
     );
 
-    void restoreNativeSynth();
+    void restoreNativeSynth (
+        int trackIndex = 0
+    );
 
-    bool hasTrackPlugin() const noexcept;
+    bool hasTrackPlugin (
+        int trackIndex
+    ) const noexcept;
 
-    juce::String getTrackPluginName() const;
+    juce::String getTrackPluginName (
+        int trackIndex
+    ) const;
 
     juce::AudioPluginInstance*
-    getTrackPlugin() noexcept;
+    getTrackPlugin (
+        int trackIndex
+    ) noexcept;
+
+    void refreshTrackRoutes();
+
+    void handleTrackRemoved (
+        int removedTrackIndex
+    );
 
 private:
     void audioDeviceIOCallbackWithContext (
@@ -111,12 +135,18 @@ private:
     juce::AudioDeviceManager deviceManager;
 
     SynthSource synthSource;
-    PluginSource pluginSource;
+
+    std::array<
+        PluginSource,
+        maxTrackCount
+    > pluginSources;
 
     std::array<
         TrackProcessor,
-        4
+        maxTrackCount
     > trackProcessors;
+
+    std::atomic<int> midiTargetTrackIndex { 0 };
 
     juce::AudioBuffer<float> masterMixBuffer;
 

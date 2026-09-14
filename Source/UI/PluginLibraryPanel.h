@@ -4,6 +4,9 @@
 
 #include "../Audio/AudioSystem.h"
 #include "../Plugins/PluginCatalog.h"
+#include "../Model/SessionState.h"
+
+#include <functional>
 #include "JADLookAndFeel.h"
 
 class PluginLibraryPanel :
@@ -14,6 +17,7 @@ public:
     PluginLibraryPanel (
         PluginCatalog& catalogToUse,
         AudioSystem& audioSystemToUse,
+        SessionState& sessionStateToUse,
         JADLookAndFeel& lookAndFeelToUse
     );
 
@@ -24,6 +28,8 @@ public:
     ) override;
 
     void resized() override;
+
+    std::function<void (int)> onTrackAssigned;
 
 private:
     enum class Filter
@@ -51,6 +57,12 @@ private:
 
     void openPluginEditor();
 
+    void chooseTrackForSelectedPlugin();
+
+    void loadSelectedPluginIntoTrack (
+        int trackIndex
+    );
+
     void setFilter (
         Filter newFilter
     );
@@ -65,11 +77,13 @@ private:
 
     PluginCatalog& catalog;
     AudioSystem& audioSystem;
+    SessionState& sessionState;
     JADLookAndFeel& jadLookAndFeel;
 
     juce::Array<juce::PluginDescription> visiblePlugins;
 
     int selectedPluginIndex = -1;
+    int editorTrackIndex = -1;
 Filter filter =
         Filter::all;
 
@@ -102,7 +116,7 @@ Filter filter =
     };
 
     juce::TextButton loadButton {
-        "LOAD INTO TRACK"
+        "ASSIGN PLUGIN"
     };
 
     juce::TextButton openEditorButton {

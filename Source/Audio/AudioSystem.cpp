@@ -106,23 +106,49 @@ AudioSystem::getDeviceManager() noexcept
 }
 
 
-void AudioSystem::handleMidiMessage (
-    const juce::MidiMessage& message)
+void AudioSystem::setMidiTargetTrack (
+    int trackIndex) noexcept
 {
-    pluginSource.addMidiMessage (
-        message
+    midiTargetTrackIndex.store (
+        juce::jlimit (0, maxTrackCount - 1, trackIndex)
     );
 }
 
 
-bool AudioSystem::installTrackPlugin (
-    std::unique_ptr<juce::AudioPluginInstance> instance)
+int AudioSystem::getMidiTargetTrack() const noexcept
 {
-    if (instance == nullptr)
-        return false;
+    return midiTargetTrackIndex.load();
+}
+
+
+void AudioSystem::handleMidiMessage (
+    const juce::MidiMessage& message)
+{
+    const auto trackIndex =
+        midiTargetTrackIndex.load();
 
     if (
-        currentSampleRate <= 0.0
+        trackIndex >= 0
+        && trackIndex < maxTrackCount
+        && pluginSources[trackIndex].hasPlugin()
+    )
+    {
+        pluginSources[trackIndex].addMidiMessage (
+            message
+        );
+    }
+}
+
+
+bool AudioSystem::installTrackPlugin (
+    int trackIndex,
+    std::unique_ptr<juce::AudioPluginInstance> instance)
+{
+    if (
+        instance == nullptr
+        || trackIndex < 0
+        || trackIndex >= maxTrackCount
+        || currentSampleRate <= 0.0
         || currentBlockSize <= 0
     )
     {
@@ -133,53 +159,129 @@ bool AudioSystem::installTrackPlugin (
         deviceManager.getAudioCallbackLock()
     );
 
-    pluginSource.prepare (
+    auto& source =
+        pluginSources[trackIndex];
+
+    source.prepare (
         currentSampleRate,
         currentBlockSize
     );
 
-    pluginSource.setPlugin (
+    source.setPlugin (
         std::move (instance)
     );
 
-    trackProcessors[0].setSource (
-        &pluginSource
-    );
+    midiTargetTrackIndex.store (trackIndex);
+    rebuildTrackRoutes();
 
-    return pluginSource.hasPlugin();
+    return source.hasPlugin();
 }
 
 
-void AudioSystem::restoreNativeSynth()
+void AudioSystem::restoreNativeSynth (
+    int trackIndex)
+{
+    if (
+        trackIndex < 0
+        || trackIndex >= maxTrackCount
+    )
+    {
+        return;
+    }
+
+    const juce::ScopedLock callbackLock (
+        deviceManager.getAudioCallbackLock()
+    );
+
+    pluginSources[trackIndex].clearPlugin();
+    rebuildTrackRoutes();
+}
+
+
+bool AudioSystem::hasTrackPlugin (
+    int trackIndex) const noexcept
+{
+    return trackIndex >= 0
+        && trackIndex < maxTrackCount
+        && pluginSources[trackIndex].hasPlugin();
+}
+
+
+juce::String AudioSystem::getTrackPluginName (
+    int trackIndex) const
+{
+    if (! hasTrackPlugin (trackIndex))
+        return {};
+
+    return pluginSources[trackIndex].getPluginName();
+}
+
+
+juce::AudioPluginInstance*
+AudioSystem::getTrackPlugin (
+    int trackIndex) noexcept
+{
+    if (! hasTrackPlugin (trackIndex))
+        return nullptr;
+
+    return pluginSources[trackIndex].getPlugin();
+}
+
+
+void AudioSystem::refreshTrackRoutes()
 {
     const juce::ScopedLock callbackLock (
         deviceManager.getAudioCallbackLock()
     );
 
-    trackProcessors[0].setSource (
-        &synthSource
+    rebuildTrackRoutes();
+}
+
+
+void AudioSystem::handleTrackRemoved (
+    int removedTrackIndex)
+{
+    if (
+        removedTrackIndex < 0
+        || removedTrackIndex >= maxTrackCount
+    )
+    {
+        refreshTrackRoutes();
+        return;
+    }
+
+    const juce::ScopedLock callbackLock (
+        deviceManager.getAudioCallbackLock()
     );
 
-    pluginSource.clearPlugin();
-}
+    // Slot identity is index-based in EXP-051A. Clearing the removed slot and
+    // every later slot prevents a plugin from silently jumping tracks after
+    // SessionState compacts its vector. Later persistence work can key slots
+    // by TrackId without risking a wrong-route surprise today.
+    for (
+        int index = removedTrackIndex;
+        index < maxTrackCount;
+        ++index
+    )
+    {
+        pluginSources[index].clearPlugin();
+    }
 
+    const auto remainingTrackCount =
+        sessionState != nullptr
+            ? static_cast<int> (sessionState->getTrackCount())
+            : 0;
 
-bool AudioSystem::hasTrackPlugin() const noexcept
-{
-    return pluginSource.hasPlugin();
-}
+    midiTargetTrackIndex.store (
+        remainingTrackCount > 0
+            ? juce::jmin (
+                removedTrackIndex,
+                remainingTrackCount - 1
+            )
+            : 0
+    );
 
-
-juce::String AudioSystem::getTrackPluginName() const
-{
-    return pluginSource.getPluginName();
-}
-
-
-juce::AudioPluginInstance*
-AudioSystem::getTrackPlugin() noexcept
-{
-    return pluginSource.getPlugin();
+    rebuildTrackRoutes();
 }
 void AudioSystem::setTestToneEnabled (
     bool enabled
@@ -300,13 +402,24 @@ void AudioSystem::rebuildTrackRoutes()
         );
     }
 
-    // A proven plugin owns Track 0; otherwise the native synth remains
-    // connected as the recoverable lifeboat.
-    trackProcessors[0].setSource (
-        pluginSource.hasPlugin()
-            ? static_cast<AudioSource*> (&pluginSource)
-            : static_cast<AudioSource*> (&synthSource)
-    );
+    for (
+        std::size_t index = 0;
+        index < count;
+        ++index
+    )
+    {
+        auto* source =
+            pluginSources[index].hasPlugin()
+                ? static_cast<AudioSource*> (&pluginSources[index])
+                : nullptr;
+
+        // Track 1 keeps the native synth as the recoverable lifeboat until an
+        // actual plugin is assigned there.
+        if (index == 0 && source == nullptr)
+            source = static_cast<AudioSource*> (&synthSource);
+
+        trackProcessors[index].setSource (source);
+    }
 
     if (
         currentSampleRate > 0.0
@@ -358,10 +471,13 @@ void AudioSystem::audioDeviceAboutToStart (
         currentBlockSize
     );
 
-    pluginSource.prepare (
-        currentSampleRate,
-        currentBlockSize
-    );
+    for (auto& source : pluginSources)
+    {
+        source.prepare (
+            currentSampleRate,
+            currentBlockSize
+        );
+    }
 
     rebuildTrackRoutes();
 }
@@ -370,7 +486,8 @@ void AudioSystem::audioDeviceStopped()
 {
     synthSource.setGate (false);
     synthSource.reset();
-    pluginSource.reset();
+    for (auto& source : pluginSources)
+        source.reset();
 
     for (
         auto& processor :
