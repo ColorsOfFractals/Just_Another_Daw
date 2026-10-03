@@ -1,7 +1,10 @@
-﻿#pragma once
+#pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+
 #include "../Core/JADContext.h"
+
+class UpdateChecker;
 
 class JADApplication : public juce::JUCEApplication
 {
@@ -19,7 +22,7 @@ private:
     class MainWindow;
 
     JADContext context;
+
     std::unique_ptr<MainWindow> mainWindow;
+    std::unique_ptr<UpdateChecker> updateChecker;
 };
-
-

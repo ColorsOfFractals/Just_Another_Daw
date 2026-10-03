@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(
     JAD
-    VERSION 0.0.1
+    VERSION 0.1.0
     LANGUAGES C CXX
 )
 
@@ -10,6 +10,8 @@ add_subdirectory(External/JUCE)
 
 juce_add_gui_app(
     JAD
+    ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/Source/Assets/JAD.png"
+    ICON_SMALL "${CMAKE_CURRENT_SOURCE_DIR}/Source/Assets/JAD.png"
     PRODUCT_NAME "JAD"
 )
 
@@ -20,6 +22,8 @@ target_sources(
 
         Source/App/JADApplication.cpp
         Source/App/JADApplication.h
+        Source/App/UpdateChecker.cpp
+        Source/App/UpdateChecker.h
 
         Source/Core/JADContext.cpp
         Source/Core/JADContext.h
@@ -95,6 +99,7 @@ target_compile_definitions(
     PRIVATE
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
+        JAD_VERSION_STRING="${PROJECT_VERSION}"
         JUCE_PLUGINHOST_VST3=1
 )
 
