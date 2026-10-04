@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(
     JAD
-    VERSION 0.3.4
+    VERSION 0.3.5
     LANGUAGES C CXX
 )
 
@@ -16,7 +16,7 @@ juce_add_binary_data(
 
 juce_add_gui_app(
     JAD
-    VERSION 0.3.4
+    VERSION 0.3.5
     ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/Source/Assets/JAD.png"
     ICON_SMALL "${CMAKE_CURRENT_SOURCE_DIR}/Source/Assets/JAD.png"
     PRODUCT_NAME "JAD"

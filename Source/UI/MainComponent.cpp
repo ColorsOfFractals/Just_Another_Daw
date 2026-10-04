@@ -733,7 +733,7 @@ void MainComponent::showJadCommandDeck()
                 + JAD_VERSION_STRING
                 + "\nBuilt with JUCE\n"
                   "Open-source under GPL-3.0\n\n"
-                  "Hands on timeline. Make the thing."
+                  "Hands on timeline. Make the thing.\n\nUpdater flight test: COMPLETE."
             );
         };
 
