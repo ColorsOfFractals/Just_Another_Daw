@@ -1,4 +1,4 @@
-﻿#include "VirtualKeyboardPanel.h"
+#include "VirtualKeyboardPanel.h"
 
 #include <array>
 
@@ -147,42 +147,45 @@ VirtualKeyboardPanel::VirtualKeyboardPanel (
             changeComputerOctave (1);
         };
 
-    refreshMidiButton.onClick =
+    arpeggiatorButton.setClickingTogglesState (
+        true
+    );
+
+    arpeggiatorButton.setToggleState (
+        midiSystem.isArpeggiatorEnabled(),
+        juce::dontSendNotification
+    );
+
+    arpeggiatorButton.onClick =
         [this]
         {
-            midiSystem.refreshDevices();
-            rebuildMidiDeviceList();
+            const auto enabled =
+                arpeggiatorButton.getToggleState();
+
+            midiSystem.setArpeggiatorEnabled (
+                enabled
+            );
+
+            arpeggiatorButton.setButtonText (
+                enabled
+                    ? "ARP ON"
+                    : "ARP OFF"
+            );
         };
 
-    midiDeviceBox.onChange =
-        [this]
-        {
-            const auto index =
-                midiDeviceBox.getSelectedItemIndex() - 1;
-
-            if (index < 0)
-            {
-                midiSystem.closeDevice();
-                return;
-            }
-
-            midiSystem.openDevice (index);
-        };
 
     addAndMakeVisible (titleLabel);
     addAndMakeVisible (activityLabel);
     addAndMakeVisible (octaveLabel);
     addAndMakeVisible (velocityLabel);
 
-    addAndMakeVisible (midiDeviceBox);
     addAndMakeVisible (keyboardThemeBox);
     addAndMakeVisible (octaveDownButton);
     addAndMakeVisible (octaveUpButton);
-    addAndMakeVisible (refreshMidiButton);
+    addAndMakeVisible (arpeggiatorButton);
     addAndMakeVisible (velocitySlider);
     addAndMakeVisible (keyboard);
 
-    rebuildMidiDeviceList();
     applyKeyboardTheme();
 
     startTimerHz (30);
@@ -198,35 +201,6 @@ VirtualKeyboardPanel::~VirtualKeyboardPanel()
             0.0f
         );
     }
-}
-
-void VirtualKeyboardPanel::rebuildMidiDeviceList()
-{
-    midiDeviceBox.clear (
-        juce::dontSendNotification
-    );
-
-    midiDeviceBox.addItem (
-        "VIRTUAL / NONE",
-        1
-    );
-
-    for (
-        int i = 0;
-        i < midiSystem.getDeviceCount();
-        ++i
-    )
-    {
-        midiDeviceBox.addItem (
-            midiSystem.getDeviceName (i),
-            i + 2
-        );
-    }
-
-    midiDeviceBox.setSelectedId (
-        1,
-        juce::dontSendNotification
-    );
 }
 
 void VirtualKeyboardPanel::applyKeyboardTheme()
@@ -497,8 +471,9 @@ void VirtualKeyboardPanel::timerCallback()
     {
         activityLabel.setText (
             midiSystem.isDeviceOpen()
-                ? "MIDI ONLINE  + CONTROLLER"
-                : "MIDI ONLINE",
+                ? "MIDI  +  "
+                    + midiSystem.getOpenDeviceName()
+                : "MIDI  +  PC KEYBOARD",
             juce::dontSendNotification
         );
     }
@@ -923,13 +898,8 @@ void VirtualKeyboardPanel::resized()
     auto controls =
         area.removeFromTop (42);
 
-    midiDeviceBox.setBounds (
-        controls.removeFromLeft (230)
-            .reduced (3)
-    );
-
-    refreshMidiButton.setBounds (
-        controls.removeFromLeft (125)
+    arpeggiatorButton.setBounds (
+        controls.removeFromLeft (145)
             .reduced (3)
     );
 

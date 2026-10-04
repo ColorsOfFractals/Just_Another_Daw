@@ -3,6 +3,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_basics/juce_audio_basics.h>
 
+#include <array>
 #include <atomic>
 #include <memory>
 #include <vector>
@@ -11,7 +12,8 @@ class AudioSystem;
 
 class MidiSystem :
     private juce::MidiInputCallback,
-    private juce::MidiKeyboardState::Listener
+    private juce::MidiKeyboardState::Listener,
+    private juce::Timer
 {
 public:
     explicit MidiSystem (
@@ -30,6 +32,24 @@ public:
         int index
     ) const;
 
+    juce::String getDeviceIdentifier (
+        int index
+    ) const;
+
+    juce::String getOpenDeviceName() const;
+    juce::String getOpenDeviceIdentifier() const;
+    juce::String getPreferredDeviceIdentifier() const;
+
+    bool isPreferredDeviceAvailable() const;
+
+    void selectComputerKeyboardOnly();
+
+    void setAutoReconnectEnabled (
+        bool shouldReconnect
+    );
+
+    bool isAutoReconnectEnabled() const noexcept;
+
     bool openDevice (
         int index
     );
@@ -45,6 +65,12 @@ public:
     int getActiveNoteCount() const noexcept;
     juce::uint32 getActivitySerial() const noexcept;
 
+    void setArpeggiatorEnabled (
+        bool shouldBeEnabled
+    );
+
+    bool isArpeggiatorEnabled() const noexcept;
+
     void playVirtualNote (
         int midiNote,
         float velocity
@@ -55,12 +81,23 @@ public:
     );
 
 private:
+    void timerCallback() override;
+
+    void loadMidiPreferences();
+    void saveMidiPreferences() const;
+
+    juce::File getMidiPreferencesFile() const;
+
     void handleIncomingMidiMessage (
         juce::MidiInput*,
         const juce::MidiMessage&
     ) override;
 
     void applyMessage (
+        const juce::MidiMessage&
+    );
+
+    void sendArpeggiatorMessage (
         const juce::MidiMessage&
     );
 
@@ -90,9 +127,25 @@ private:
         juce::MidiInput
     > openInput;
 
+    juce::String openDeviceIdentifier;
+    juce::String openDeviceName;
+    juce::String preferredDeviceIdentifier;
+
+    std::atomic<bool> autoReconnectEnabled { true };
+
     std::atomic<int> lastNote { -1 };
     std::atomic<float> lastVelocity { 0.0f };
 
     std::atomic<int> activeNoteCount { 0 };
     std::atomic<juce::uint32> activitySerial { 0 };
+
+    std::atomic<bool> arpeggiatorEnabled { false };
+
+    juce::CriticalSection arpeggiatorLock;
+
+    std::array<bool, 128> heldArpeggiatorNotes {};
+    std::array<float, 128> heldArpeggiatorVelocities {};
+
+    int currentArpeggiatorNote = -1;
+    int arpeggiatorStep = 0;
 };

@@ -31,6 +31,8 @@ public:
     double getSampleRate() const noexcept;
     int getBufferSize() const noexcept;
 
+    double getTransportTempo() const noexcept;
+
     juce::AudioDeviceManager&
     getDeviceManager() noexcept;
 
@@ -111,6 +113,16 @@ public:
     );
 
 private:
+    void renderMetronome (
+        juce::AudioBuffer<float>& destination,
+        int numSamples,
+        double blockStartBeat
+    ) noexcept;
+
+    void triggerMetronomeClick (
+        bool accented
+    ) noexcept;
+
     void audioDeviceIOCallbackWithContext (
         const float* const* inputChannelData,
         int numInputChannels,
@@ -148,6 +160,20 @@ private:
 
     std::atomic<int> midiTargetTrackIndex { 0 };
     std::atomic<bool> recordingCaptureActive { false };
+
+    std::int64_t lastMetronomeBeat { -1 };
+
+    int metronomeSamplesRemaining { 0 };
+    int metronomeClickLengthSamples { 1 };
+
+    double metronomePhase { 0.0 };
+    double metronomeFrequency { 1400.0 };
+
+    float metronomeClickAmplitude { 0.0f };
+
+    std::uint32_t metronomeNoiseState {
+        0x51f15e5u
+    };
 
     juce::AudioBuffer<float> masterMixBuffer;
 

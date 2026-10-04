@@ -2,11 +2,17 @@ cmake_minimum_required(VERSION 3.22)
 
 project(
     JAD
-    VERSION 0.1.0
+    VERSION 0.2.0
     LANGUAGES C CXX
 )
 
 add_subdirectory(External/JUCE)
+
+juce_add_binary_data(
+    JADAssets
+    SOURCES
+        Source/Assets/JAD.png
+)
 
 juce_add_gui_app(
     JAD
@@ -22,6 +28,8 @@ target_sources(
 
         Source/App/JADApplication.cpp
         Source/App/JADApplication.h
+        Source/App/LaunchSplash.cpp
+        Source/App/LaunchSplash.h
         Source/App/UpdateChecker.cpp
         Source/App/UpdateChecker.h
 
@@ -105,6 +113,7 @@ target_compile_definitions(
 
 target_link_libraries(JAD
     PRIVATE
+        JADAssets
         juce::juce_gui_extra
         juce::juce_audio_devices
         juce::juce_audio_basics

@@ -1,4 +1,6 @@
 #include "JADApplication.h"
+
+#include "LaunchSplash.h"
 #include "UpdateChecker.h"
 
 #include "../UI/MainComponent.h"
@@ -7,14 +9,20 @@ class JADApplication::MainWindow :
     public juce::DocumentWindow
 {
 public:
-    explicit MainWindow (JADContext& context)
+    explicit MainWindow (
+        JADContext& context)
         : DocumentWindow (
             "JAD",
-            juce::Colour::fromRGB (18, 18, 24),
+            juce::Colour::fromRGB (
+                18,
+                18,
+                24
+            ),
             DocumentWindow::allButtons
         )
     {
         setUsingNativeTitleBar (true);
+
         setContentOwned (
             new MainComponent (context),
             true
@@ -25,7 +33,8 @@ public:
             getHeight()
         );
 
-        setVisible (true);
+        // LaunchSplash reveals us during its final fade.
+        setVisible (false);
     }
 
     void showUpdateAvailable (
@@ -34,14 +43,20 @@ public:
         auto message =
             "Your little music machine has a new gear ready.\n\n"
             "Installed: "
-            + juce::String (JAD_VERSION_STRING)
+            + juce::String (
+                JAD_VERSION_STRING
+            )
             + "\nAvailable: "
             + release.version;
 
-        if (release.name.isNotEmpty()
-            && release.name != release.version)
+        if (
+            release.name.isNotEmpty()
+            && release.name != release.version
+        )
         {
-            message += "\n\n" + release.name;
+            message +=
+                "\n\n"
+                + release.name;
         }
 
         auto options =
@@ -94,8 +109,40 @@ void JADApplication::initialise (
     const juce::String&)
 {
     mainWindow =
-        std::make_unique<MainWindow> (context);
+        std::make_unique<MainWindow> (
+            context
+        );
 
+    launchSplash =
+        std::make_unique<LaunchSplash> (
+            [this]
+            {
+                revealMainWindow();
+            },
+            [this]
+            {
+                completeLaunch();
+            }
+        );
+}
+
+void JADApplication::revealMainWindow()
+{
+    if (mainWindow == nullptr)
+        return;
+
+    mainWindow->setVisible (true);
+    mainWindow->toFront (true);
+}
+
+void JADApplication::completeLaunch()
+{
+    launchSplash.reset();
+    beginUpdateCheck();
+}
+
+void JADApplication::beginUpdateCheck()
+{
     auto safeWindow =
         juce::Component::SafePointer<MainWindow> (
             mainWindow.get()
@@ -106,8 +153,10 @@ void JADApplication::initialise (
             [safeWindow]
             (std::optional<UpdateChecker::ReleaseInfo> result)
             {
-                if (safeWindow != nullptr
-                    && result.has_value())
+                if (
+                    safeWindow != nullptr
+                    && result.has_value()
+                )
                 {
                     safeWindow->showUpdateAvailable (
                         *result
@@ -122,5 +171,6 @@ void JADApplication::initialise (
 void JADApplication::shutdown()
 {
     updateChecker.reset();
+    launchSplash.reset();
     mainWindow.reset();
 }

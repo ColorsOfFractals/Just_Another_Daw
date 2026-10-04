@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -38,7 +38,6 @@ public:
 private:
     void timerCallback() override;
 
-    void rebuildMidiDeviceList();
     void applyKeyboardTheme();
 
     void changeComputerOctave (
@@ -73,7 +72,6 @@ private:
     juce::Label octaveLabel;
     juce::Label velocityLabel;
 
-    juce::ComboBox midiDeviceBox;
     juce::ComboBox keyboardThemeBox;
 
     juce::TextButton octaveDownButton {
@@ -84,8 +82,8 @@ private:
         "OCT +"
     };
 
-    juce::TextButton refreshMidiButton {
-        "REFRESH MIDI"
+    juce::TextButton arpeggiatorButton {
+        "ARP OFF"
     };
 
     juce::Slider velocitySlider;

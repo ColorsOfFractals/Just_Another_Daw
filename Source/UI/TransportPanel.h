@@ -1,9 +1,53 @@
-﻿#pragma once
+#pragma once
 
-#include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_events/juce_events.h>
+#include <juce_gui_basics/juce_gui_basics.h>
+
+#include <functional>
 
 #include "../Model/TransportState.h"
+
+
+class MetronomeButton final :
+    public juce::TextButton
+{
+public:
+    explicit MetronomeButton (
+        const juce::String& text)
+        : juce::TextButton (text)
+    {
+    }
+
+    std::function<void()> onRightClick;
+
+    void mouseDown (
+        const juce::MouseEvent& event) override
+    {
+        if (event.mods.isPopupMenu())
+        {
+            if (onRightClick)
+                onRightClick();
+
+            return;
+        }
+
+        juce::TextButton::mouseDown (
+            event
+        );
+    }
+
+    void mouseUp (
+        const juce::MouseEvent& event) override
+    {
+        if (event.mods.isPopupMenu())
+            return;
+
+        juce::TextButton::mouseUp (
+            event
+        );
+    }
+};
+
 
 class TransportPanel :
     public juce::Component,
@@ -25,6 +69,7 @@ public:
 private:
     void timerCallback() override;
     void refreshState();
+    void showMetronomeSettings();
 
     TransportState& transport;
 
@@ -32,6 +77,8 @@ private:
     juce::TextButton playButton { "PLAY" };
     juce::TextButton recordButton { "REC" };
     juce::TextButton loopButton { "LOOP" };
+
+    MetronomeButton metronomeButton { "MET" };
 
     juce::Slider tempoSlider;
 

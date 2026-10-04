@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <atomic>
 #include <cstdint>
@@ -58,6 +58,31 @@ public:
     int getTimeSignatureDenominator() const noexcept;
 
     // ------------------------------------------------------------
+    // METRONOME SETTINGS
+    // ------------------------------------------------------------
+
+    void setMetronomeEnabled (bool enabled) noexcept;
+    bool isMetronomeEnabled() const noexcept;
+
+    void setCountInBars (int bars) noexcept;
+    int getCountInBars() const noexcept;
+
+    void setClickDuringPlayback (bool enabled) noexcept;
+    bool isClickDuringPlaybackEnabled() const noexcept;
+
+    void setClickDuringRecording (bool enabled) noexcept;
+    bool isClickDuringRecordingEnabled() const noexcept;
+
+    void setAccentFirstBeat (bool enabled) noexcept;
+    bool isAccentFirstBeatEnabled() const noexcept;
+
+    void setMetronomeVolume (float volume) noexcept;
+    float getMetronomeVolume() const noexcept;
+
+    void setMetronomeSound (int soundIndex) noexcept;
+    int getMetronomeSound() const noexcept;
+
+    // ------------------------------------------------------------
     // LOOP TERRITORY
     // ------------------------------------------------------------
 
@@ -83,6 +108,16 @@ private:
 
     std::atomic<int> timeSignatureNumerator   { 4 };
     std::atomic<int> timeSignatureDenominator { 4 };
+
+    std::atomic<bool> metronomeEnabled { false };
+    std::atomic<int> countInBars { 2 };
+
+    std::atomic<bool> clickDuringPlayback { true };
+    std::atomic<bool> clickDuringRecording { true };
+    std::atomic<bool> accentFirstBeat { true };
+
+    std::atomic<float> metronomeVolume { 0.62f };
+    std::atomic<int> metronomeSound { 0 };
 
     std::atomic<bool> loopEnabled { false };
     std::atomic<double> loopStartBeat { 0.0 };

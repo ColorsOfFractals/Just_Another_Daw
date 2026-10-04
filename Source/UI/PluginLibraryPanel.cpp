@@ -937,40 +937,112 @@ void PluginLibraryPanel::resized()
     auto tools =
         area.removeFromTop (34);
 
-    searchBox.setBounds (
+    // Match the toolbar division to the cabinet/detail division.
+    const auto usableToolsWidth =
+        juce::jmax (
+            0,
+            tools.getWidth() - 10
+        );
+
+    const auto cabinetToolWidth =
+        juce::jmax (
+            220,
+            usableToolsWidth * 55 / 100
+        );
+
+    auto cabinetTools =
         tools.removeFromLeft (
-            juce::jmax (
-                180,
-                tools.getWidth() / 3
+            cabinetToolWidth
+        );
+
+    tools.removeFromLeft (10);
+
+    auto deviceTools =
+        tools;
+
+    // Keep the search field intentionally compact instead of
+    // allowing it to consume the entire cabinet column.
+    const auto searchWidth =
+        juce::jlimit (
+            240,
+            520,
+            cabinetTools.getWidth() * 52 / 100
+        );
+
+    searchBox.setBounds (
+        cabinetTools.removeFromLeft (
+            searchWidth
+        ).reduced (2)
+    );
+
+    constexpr int scanWidth = 110;
+    constexpr int allWidth = 62;
+    constexpr int instrumentsWidth = 110;
+    constexpr int effectsWidth = 82;
+    constexpr int favouritesWidth = 96;
+    constexpr int groupGap = 8;
+
+    const auto buttonGroupWidth =
+        scanWidth
+        + groupGap
+        + allWidth
+        + instrumentsWidth
+        + effectsWidth
+        + favouritesWidth;
+
+    auto buttonGroup =
+        deviceTools.removeFromRight (
+            juce::jmin (
+                buttonGroupWidth,
+                deviceTools.getWidth()
+            )
+        );
+
+    scanButton.setBounds (
+        buttonGroup.removeFromLeft (
+            juce::jmin (
+                scanWidth,
+                buttonGroup.getWidth()
             )
         ).reduced (2)
     );
 
-    scanButton.setBounds (
-        tools.removeFromLeft (110)
-            .reduced (2)
+    buttonGroup.removeFromLeft (
+        juce::jmin (
+            groupGap,
+            buttonGroup.getWidth()
+        )
     );
 
-    tools.removeFromLeft (8);
-
     allButton.setBounds (
-        tools.removeFromLeft (62)
-            .reduced (2)
+        buttonGroup.removeFromLeft (
+            juce::jmin (
+                allWidth,
+                buttonGroup.getWidth()
+            )
+        ).reduced (2)
     );
 
     instrumentsButton.setBounds (
-        tools.removeFromLeft (110)
-            .reduced (2)
+        buttonGroup.removeFromLeft (
+            juce::jmin (
+                instrumentsWidth,
+                buttonGroup.getWidth()
+            )
+        ).reduced (2)
     );
 
     effectsButton.setBounds (
-        tools.removeFromLeft (82)
-            .reduced (2)
+        buttonGroup.removeFromLeft (
+            juce::jmin (
+                effectsWidth,
+                buttonGroup.getWidth()
+            )
+        ).reduced (2)
     );
 
     favouritesButton.setBounds (
-        tools.removeFromLeft (96)
-            .reduced (2)
+        buttonGroup.reduced (2)
     );
 
     area.removeFromTop (2);
@@ -1008,6 +1080,7 @@ void PluginLibraryPanel::resized()
         detail.removeFromTop (30)
             .reduced (10, 0)
     );
+
     auto actionRow =
         detail.removeFromBottom (34)
             .reduced (10, 2);
@@ -1019,7 +1092,9 @@ void PluginLibraryPanel::resized()
         );
 
     openEditorButton.setBounds (
-        actionRow.removeFromRight (editorWidth)
+        actionRow.removeFromRight (
+            editorWidth
+        )
     );
 
     actionRow.removeFromRight (6);

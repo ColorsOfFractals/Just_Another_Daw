@@ -3,7 +3,327 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <functional>
+#include <memory>
 #include <string>
+
+namespace
+{
+class JadCommandDeckComponent final :
+    public juce::Component
+{
+public:
+    JadCommandDeckComponent()
+    {
+        setSize (520, 310);
+
+        titleLabel.setText (
+            "JAD COMMAND DECK",
+            juce::dontSendNotification
+        );
+
+        titleLabel.setFont (
+            juce::FontOptions (20.0f)
+                .withStyle ("Bold")
+        );
+
+        subtitleLabel.setText (
+            "Just Another DAW  |  make music, not menus",
+            juce::dontSendNotification
+        );
+
+        subtitleLabel.setColour (
+            juce::Label::textColourId,
+            juce::Colours::white.withAlpha (0.58f)
+        );
+
+        newButton.onClick = [this]
+        {
+            showComingSoon ("NEW SESSION");
+        };
+
+        openButton.onClick = [this]
+        {
+            showComingSoon ("OPEN SESSION");
+        };
+
+        saveButton.onClick = [this]
+        {
+            showComingSoon ("SAVE SESSION");
+        };
+
+        saveAsButton.onClick = [this]
+        {
+            showComingSoon ("SAVE SESSION AS");
+        };
+
+        preferencesButton.onClick = [this]
+        {
+            runAndDismiss (onPreferences);
+        };
+
+        updatesButton.onClick = [this]
+        {
+            runAndDismiss (onUpdates);
+        };
+
+        aboutButton.onClick = [this]
+        {
+            runAndDismiss (onAbout);
+        };
+
+        githubButton.onClick = [this]
+        {
+            runAndDismiss (onGitHub);
+        };
+
+        closeButton.onClick = [this]
+        {
+            dismiss();
+        };
+
+        for (
+            auto* component :
+            std::initializer_list<juce::Component*> {
+                &titleLabel,
+                &subtitleLabel,
+                &newButton,
+                &openButton,
+                &saveButton,
+                &saveAsButton,
+                &preferencesButton,
+                &updatesButton,
+                &aboutButton,
+                &githubButton,
+                &closeButton
+            }
+        )
+        {
+            addAndMakeVisible (component);
+        }
+    }
+
+    void paint (
+        juce::Graphics& g) override
+    {
+        const auto bounds =
+            getLocalBounds().toFloat();
+
+        juce::ColourGradient background (
+            juce::Colour::fromRGB (55, 25, 91),
+            bounds.getTopLeft(),
+            juce::Colour::fromRGB (7, 66, 88),
+            bounds.getBottomRight(),
+            false
+        );
+
+        background.addColour (
+            0.52,
+            juce::Colour::fromRGB (32, 48, 111)
+        );
+
+        g.setGradientFill (background);
+        g.fillRoundedRectangle (
+            bounds,
+            14.0f
+        );
+
+        g.setColour (
+            juce::Colour::fromRGB (255, 31, 133)
+                .withAlpha (0.88f)
+        );
+
+        g.fillRoundedRectangle (
+            juce::Rectangle<float> (
+                20.0f,
+                66.0f,
+                bounds.getWidth() - 40.0f,
+                3.0f
+            ),
+            1.5f
+        );
+
+        g.setColour (
+            juce::Colours::white.withAlpha (0.09f)
+        );
+
+        g.drawRoundedRectangle (
+            bounds.reduced (1.0f),
+            14.0f,
+            1.0f
+        );
+    }
+
+    void resized() override
+    {
+        auto area =
+            getLocalBounds().reduced (20);
+
+        auto header =
+            area.removeFromTop (48);
+
+        closeButton.setBounds (
+            header.removeFromRight (34)
+                .reduced (3)
+        );
+
+        titleLabel.setBounds (
+            header.removeFromTop (26)
+        );
+
+        subtitleLabel.setBounds (
+            header
+        );
+
+        area.removeFromTop (18);
+
+        constexpr int gap = 10;
+
+        const auto buttonWidth =
+            (area.getWidth() - gap) / 2;
+
+        auto row1 =
+            area.removeFromTop (48);
+
+        newButton.setBounds (
+            row1.removeFromLeft (buttonWidth)
+                .reduced (2)
+        );
+
+        row1.removeFromLeft (gap);
+
+        openButton.setBounds (
+            row1.reduced (2)
+        );
+
+        area.removeFromTop (6);
+
+        auto row2 =
+            area.removeFromTop (48);
+
+        saveButton.setBounds (
+            row2.removeFromLeft (buttonWidth)
+                .reduced (2)
+        );
+
+        row2.removeFromLeft (gap);
+
+        saveAsButton.setBounds (
+            row2.reduced (2)
+        );
+
+        area.removeFromTop (12);
+
+        auto row3 =
+            area.removeFromTop (42);
+
+        preferencesButton.setBounds (
+            row3.removeFromLeft (buttonWidth)
+                .reduced (2)
+        );
+
+        row3.removeFromLeft (gap);
+
+        updatesButton.setBounds (
+            row3.reduced (2)
+        );
+
+        area.removeFromTop (6);
+
+        auto row4 =
+            area.removeFromTop (42);
+
+        aboutButton.setBounds (
+            row4.removeFromLeft (buttonWidth)
+                .reduced (2)
+        );
+
+        row4.removeFromLeft (gap);
+
+        githubButton.setBounds (
+            row4.reduced (2)
+        );
+    }
+
+    std::function<void()> onPreferences;
+    std::function<void()> onUpdates;
+    std::function<void()> onAbout;
+    std::function<void()> onGitHub;
+
+private:
+    void dismiss()
+    {
+        if (
+            auto* callout =
+                findParentComponentOfClass<
+                    juce::CallOutBox
+                >()
+        )
+        {
+            callout->dismiss();
+        }
+    }
+
+    void runAndDismiss (
+        const std::function<void()>& action)
+    {
+        if (action)
+            action();
+
+        dismiss();
+    }
+
+    void showComingSoon (
+        const juce::String& feature)
+    {
+        juce::AlertWindow::showMessageBoxAsync (
+            juce::MessageBoxIconType::InfoIcon,
+            feature,
+            "COMING SOON\n\nThe command deck is online. "
+            "Session persistence is the next engine layer."
+        );
+    }
+
+    juce::Label titleLabel;
+    juce::Label subtitleLabel;
+
+    juce::TextButton newButton {
+        "NEW SESSION"
+    };
+
+    juce::TextButton openButton {
+        "OPEN SESSION"
+    };
+
+    juce::TextButton saveButton {
+        "SAVE"
+    };
+
+    juce::TextButton saveAsButton {
+        "SAVE AS"
+    };
+
+    juce::TextButton preferencesButton {
+        "PREFERENCES"
+    };
+
+    juce::TextButton updatesButton {
+        "CHECK FOR UPDATES"
+    };
+
+    juce::TextButton aboutButton {
+        "ABOUT JAD"
+    };
+
+    juce::TextButton githubButton {
+        "GITHUB"
+    };
+
+    juce::TextButton closeButton {
+        "X"
+    };
+};
+}
 
 MainComponent::MainComponent (
     JADContext& contextToUse)
@@ -20,6 +340,7 @@ MainComponent::MainComponent (
       ),
       audioSettingsPanel (
           context.getAudioSystem(),
+          context.getMidiSystem(),
           jadLookAndFeel
       ),
       pluginLibraryPanel (
@@ -101,6 +422,65 @@ MainComponent::MainComponent (
 
             resized();
             repaint();
+        };
+
+    quantizeGridBox.addItem ("1/4", 1);
+    quantizeGridBox.addItem ("1/8", 2);
+    quantizeGridBox.addItem ("1/16", 3);
+    quantizeGridBox.addItem ("1/32", 4);
+
+    quantizeGridBox.setSelectedId (
+        3,
+        juce::dontSendNotification
+    );
+
+    quantizeButton.onClick =
+        [this]
+        {
+            quantizeSelectedClip();
+        };
+
+    undoButton.onClick =
+        [this]
+        {
+            undoLastQuantize();
+        };
+
+    redoButton.onClick =
+        [this]
+        {
+            redoLastQuantize();
+        };
+
+    refreshEditCommandState();
+
+    // AUDIO SETTINGS CLOSE CALLBACK
+    audioSettingsPanel.onClose =
+        [this]
+        {
+            audioSettingsPanel.setVisible (
+                false
+            );
+
+            resized();
+            repaint();
+        };
+
+    // GO TO HOME TRANSPORT COMMAND
+    goToHomeButton.onClick =
+        [this]
+        {
+            context.getSessionState()
+                .getTransportState()
+                .returnToStart();
+
+            repaint();
+        };
+    // JAD COMMAND DECK BUTTON
+    jadMenuButton.onClick =
+        [this]
+        {
+            showJadCommandDeck();
         };
     pluginLibraryPanel.onTrackAssigned =
         [this] (int trackIndex)
@@ -259,9 +639,34 @@ MainComponent::MainComponent (
         snapButton
     );
 
-    
+    addAndMakeVisible (
+        undoButton
+    );
+
+    addAndMakeVisible (
+        redoButton
+    );
+
+    addAndMakeVisible (
+        quantizeGridBox
+    );
+
+    addAndMakeVisible (
+        quantizeButton
+    );
+
     addAndMakeVisible (
         audioSettingsButton
+    );
+
+    // JAD COMMAND DECK COMPONENT
+    addAndMakeVisible (
+        jadMenuButton
+    );
+
+    // GO TO HOME COMPONENT
+    addAndMakeVisible (
+        goToHomeButton
     );
 addAndMakeVisible (
         keyboardTabButton
@@ -288,6 +693,60 @@ addAndMakeVisible (
     );
 
     startTimerHz (30);
+}
+
+void MainComponent::showJadCommandDeck()
+{
+    auto deck =
+        std::make_unique<
+            JadCommandDeckComponent
+        >();
+
+    deck->onPreferences =
+        [this]
+        {
+            audioSettingsPanel.setVisible (true);
+            audioSettingsPanel.toFront (true);
+            resized();
+            repaint();
+        };
+
+    deck->onUpdates =
+        []
+        {
+            juce::URL (
+                "https://github.com/ColorsOfFractals/"
+                "Just_Another_Daw/releases"
+            ).launchInDefaultBrowser();
+        };
+
+    deck->onAbout =
+        []
+        {
+            juce::AlertWindow::showMessageBoxAsync (
+                juce::MessageBoxIconType::InfoIcon,
+                "ABOUT JAD",
+                "JUST ANOTHER DAW\n\n"
+                "Version 0.1.x development build\n"
+                "Open-source under AGPLv3\n\n"
+                "Hands on timeline. Make the thing."
+            );
+        };
+
+    deck->onGitHub =
+        []
+        {
+            juce::URL (
+                "https://github.com/ColorsOfFractals/"
+                "Just_Another_Daw"
+            ).launchInDefaultBrowser();
+        };
+
+    juce::CallOutBox::launchAsynchronously (
+        std::move (deck),
+        jadMenuButton.getScreenBounds(),
+        nullptr
+    );
 }
 
 MainComponent::~MainComponent()
@@ -438,6 +897,10 @@ void MainComponent::updateLiveRecordingRegion()
                 }
                 else
                 {
+                    clip->setMidiEvents (
+                        track->getRecordedMidiEventsSnapshot()
+                    );
+
                     clip->setName (
                         "MIDI TAKE - "
                             + std::to_string (
@@ -640,6 +1103,211 @@ void MainComponent::clearClipSelection()
     selectedClipIndex = -1;
 }
 
+ClipModel* MainComponent::getSelectedClip() noexcept
+{
+    if (
+        selectedClipTrackIndex < 0
+        || selectedClipIndex < 0
+    )
+    {
+        return nullptr;
+    }
+
+    auto* track =
+        context.getSessionState()
+            .getTrack (
+                static_cast<std::size_t> (
+                    selectedClipTrackIndex
+                )
+            );
+
+    if (track == nullptr)
+        return nullptr;
+
+    return track->getClip (
+        static_cast<std::size_t> (
+            selectedClipIndex
+        )
+    );
+}
+
+
+void MainComponent::quantizeSelectedClip()
+{
+    auto* clip =
+        getSelectedClip();
+
+    if (clip == nullptr)
+    {
+        statusLabel.setText (
+            "SELECT A MIDI CLIP TO QUANTIZE",
+            juce::dontSendNotification
+        );
+
+        return;
+    }
+
+    if (clip->getMidiEventCount() == 0)
+    {
+        statusLabel.setText (
+            "SELECTED CLIP HAS NO OWNED MIDI EVENTS",
+            juce::dontSendNotification
+        );
+
+        return;
+    }
+
+    double gridBeats = 0.25;
+    juce::String gridName = "1/16";
+
+    switch (quantizeGridBox.getSelectedId())
+    {
+        case 1:
+            gridBeats = 1.0;
+            gridName = "1/4";
+            break;
+
+        case 2:
+            gridBeats = 0.5;
+            gridName = "1/8";
+            break;
+
+        case 4:
+            gridBeats = 0.125;
+            gridName = "1/32";
+            break;
+
+        case 3:
+        default:
+            gridBeats = 0.25;
+            gridName = "1/16";
+            break;
+    }
+
+    quantizeUndoEvents =
+        clip->getMidiEventsSnapshot();
+
+    quantizeRedoEvents.clear();
+
+    quantizeHistoryClipId =
+        clip->getId();
+
+    const auto noteCount =
+        clip->quantizeMidi (
+            gridBeats
+        );
+
+    statusLabel.setText (
+        "QUANTIZED "
+            + juce::String (
+                static_cast<int> (
+                    noteCount
+                )
+            )
+            + " NOTES - "
+            + gridName,
+        juce::dontSendNotification
+    );
+
+    refreshEditCommandState();
+    repaint();
+}
+
+
+void MainComponent::undoLastQuantize()
+{
+    auto* clip =
+        getSelectedClip();
+
+    if (
+        clip == nullptr
+        || clip->getId()
+            != quantizeHistoryClipId
+        || quantizeUndoEvents.empty()
+    )
+    {
+        return;
+    }
+
+    quantizeRedoEvents =
+        clip->getMidiEventsSnapshot();
+
+    clip->setMidiEvents (
+        quantizeUndoEvents
+    );
+
+    quantizeUndoEvents.clear();
+
+    statusLabel.setText (
+        "QUANTIZE UNDONE",
+        juce::dontSendNotification
+    );
+
+    refreshEditCommandState();
+    repaint();
+}
+
+
+void MainComponent::redoLastQuantize()
+{
+    auto* clip =
+        getSelectedClip();
+
+    if (
+        clip == nullptr
+        || clip->getId()
+            != quantizeHistoryClipId
+        || quantizeRedoEvents.empty()
+    )
+    {
+        return;
+    }
+
+    quantizeUndoEvents =
+        clip->getMidiEventsSnapshot();
+
+    clip->setMidiEvents (
+        quantizeRedoEvents
+    );
+
+    quantizeRedoEvents.clear();
+
+    statusLabel.setText (
+        "QUANTIZE REDONE",
+        juce::dontSendNotification
+    );
+
+    refreshEditCommandState();
+    repaint();
+}
+
+
+void MainComponent::refreshEditCommandState()
+{
+    auto* clip =
+        getSelectedClip();
+
+    const auto selectedHistoryMatches =
+        clip != nullptr
+        && clip->getId()
+            == quantizeHistoryClipId;
+
+    undoButton.setEnabled (
+        selectedHistoryMatches
+        && ! quantizeUndoEvents.empty()
+    );
+
+    redoButton.setEnabled (
+        selectedHistoryMatches
+        && ! quantizeRedoEvents.empty()
+    );
+
+    quantizeButton.setEnabled (
+        clip != nullptr
+        && clip->getMidiEventCount() > 0
+    );
+}
+
 void MainComponent::setDockPage (
     DockPage page)
 {
@@ -813,6 +1481,202 @@ MainComponent::getTrackPanBounds (
     pan.removeFromLeft (82);
 
     return pan;
+}
+
+juce::Rectangle<int>
+MainComponent::getMixerStripBounds (
+    int trackIndex)
+{
+    if (dockPage != DockPage::mixer)
+        return {};
+
+    auto console =
+        cachedDock.reduced (14);
+
+    console.removeFromTop (46);
+
+    auto& session =
+        context.getSessionState();
+
+    const auto count =
+        static_cast<int> (
+            session.getTrackCount()
+        );
+
+    if (
+        trackIndex < 0
+        || trackIndex >= count
+        || count <= 0
+    )
+    {
+        return {};
+    }
+
+    constexpr int gap = 6;
+    constexpr int masterWidth = 112;
+
+    console.removeFromRight (
+        juce::jmin (
+            masterWidth,
+            console.getWidth() / 4
+        )
+    );
+
+    console.removeFromRight (gap);
+
+    const auto stripWidth =
+        juce::jmax (
+            76,
+            (
+                console.getWidth()
+                - gap * juce::jmax (
+                    0,
+                    count - 1
+                )
+            )
+            / juce::jmax (
+                1,
+                count
+            )
+        );
+
+    const auto x =
+        console.getX()
+        + trackIndex
+            * (
+                stripWidth + gap
+            );
+
+    if (
+        x + stripWidth
+        > console.getRight()
+    )
+    {
+        return {};
+    }
+
+    return {
+        x,
+        console.getY(),
+        stripWidth,
+        console.getHeight()
+    };
+}
+
+
+juce::Rectangle<int>
+MainComponent::getMixerPanBounds (
+    int trackIndex)
+{
+    auto content =
+        getMixerStripBounds (
+            trackIndex
+        )
+        .reduced (7);
+
+    if (content.isEmpty())
+        return {};
+
+    content.removeFromTop (22);
+    content.removeFromTop (24);
+    content.removeFromTop (4);
+
+    return content.removeFromTop (38);
+}
+
+
+juce::Rectangle<int>
+MainComponent::getMixerButtonBounds (
+    int trackIndex,
+    int buttonIndex)
+{
+    auto content =
+        getMixerStripBounds (
+            trackIndex
+        )
+        .reduced (7);
+
+    if (
+        content.isEmpty()
+        || buttonIndex < 0
+        || buttonIndex > 2
+    )
+    {
+        return {};
+    }
+
+    content.removeFromTop (22);
+    content.removeFromTop (24);
+    content.removeFromTop (4);
+    content.removeFromTop (38);
+
+    auto buttons =
+        content.removeFromTop (23);
+
+    const auto buttonWidth =
+        juce::jmax (
+            16,
+            (
+                buttons.getWidth()
+                - 4
+            ) / 3
+        );
+
+    if (buttonIndex == 0)
+        return buttons.removeFromLeft (
+            buttonWidth
+        );
+
+    buttons.removeFromLeft (
+        buttonWidth
+    );
+
+    buttons.removeFromLeft (2);
+
+    if (buttonIndex == 1)
+        return buttons.removeFromLeft (
+            buttonWidth
+        );
+
+    buttons.removeFromLeft (
+        buttonWidth
+    );
+
+    buttons.removeFromLeft (2);
+
+    return buttons;
+}
+
+
+juce::Rectangle<int>
+MainComponent::getMixerMasterMuteBounds()
+{
+    if (dockPage != DockPage::mixer)
+        return {};
+
+    auto console =
+        cachedDock.reduced (14);
+
+    console.removeFromTop (46);
+
+    constexpr int masterWidth = 112;
+
+    auto masterArea =
+        console.removeFromRight (
+            juce::jmin (
+                masterWidth,
+                console.getWidth() / 4
+            )
+        );
+
+    auto content =
+        masterArea.reduced (8);
+
+    content.removeFromTop (24);
+    content.removeFromTop (24);
+    content.removeFromTop (6);
+
+    return content.removeFromTop (22);
 }
 
 juce::Rectangle<int>
@@ -1146,8 +2010,16 @@ void MainComponent::drawTrackRack (
             juce::Justification::centredLeft
         );
 
+        // TRACK TITLE TOGGLE GEOMETRY
         auto controlLine =
-            inner.removeFromTop (17);
+            title;
+
+        controlLine.removeFromLeft (
+            juce::jmin (
+                92,
+                controlLine.getWidth()
+            )
+        );
 
         auto mute =
             controlLine.removeFromLeft (23);
@@ -1929,21 +2801,19 @@ void MainComponent::drawDock (
         0.10f
     );
 
-    if (
-        dockPage
-        != DockPage::mixer
-    )
-    {
+    if (dockPage != DockPage::mixer)
         return;
-    }
 
-    auto body =
-        area.reduced (18);
+    auto console =
+        area.reduced (14);
 
-    body.removeFromTop (48);
+    console.removeFromTop (46);
 
     auto& session =
         context.getSessionState();
+
+    auto& audio =
+        context.getAudioSystem();
 
     const auto count =
         static_cast<int> (
@@ -1953,24 +2823,173 @@ void MainComponent::drawDock (
     if (count <= 0)
         return;
 
-    constexpr int gap = 8;
+    constexpr int gap = 6;
+    constexpr int masterWidth = 112;
+
+    auto masterArea =
+        console.removeFromRight (
+            juce::jmin (
+                masterWidth,
+                console.getWidth() / 4
+            )
+        );
+
+    console.removeFromRight (gap);
 
     const auto stripWidth =
         juce::jmax (
-            62,
+            76,
             (
-                body.getWidth()
-                - gap
-                    * juce::jmax (
-                        0,
-                        count - 1
-                    )
+                console.getWidth()
+                - gap * juce::jmax (0, count - 1)
             )
-            / juce::jmax (
-                1,
-                count
-            )
+            / juce::jmax (1, count)
         );
+
+    const auto drawButton =
+        [&g] (
+            juce::Rectangle<int> bounds,
+            const juce::String& label,
+            bool active,
+            juce::Colour colour)
+        {
+            g.setColour (
+                active
+                    ? colour.withAlpha (0.95f)
+                    : juce::Colours::black.withAlpha (0.42f)
+            );
+
+            g.fillRoundedRectangle (
+                bounds.toFloat(),
+                3.0f
+            );
+
+            g.setColour (
+                active
+                    ? juce::Colours::white
+                    : juce::Colours::white.withAlpha (0.45f)
+            );
+
+            g.setFont (
+                juce::FontOptions (9.0f)
+                    .withStyle ("Bold")
+            );
+
+            g.drawText (
+                label,
+                bounds,
+                juce::Justification::centred
+            );
+        };
+
+    const auto drawFader =
+        [&g] (
+            juce::Rectangle<int> bounds,
+            float gain,
+            juce::Colour colour)
+        {
+            const auto fraction =
+                juce::jlimit (
+                    0.0f,
+                    1.0f,
+                    gain * 0.5f
+                );
+
+            const auto centreX =
+                bounds.getCentreX();
+
+            const auto trackTop =
+                bounds.getY() + 8;
+
+            const auto trackBottom =
+                bounds.getBottom() - 8;
+
+            g.setColour (
+                juce::Colours::black.withAlpha (0.72f)
+            );
+
+            g.fillRoundedRectangle (
+                juce::Rectangle<float> (
+                    static_cast<float> (centreX - 3),
+                    static_cast<float> (trackTop),
+                    6.0f,
+                    static_cast<float> (
+                        trackBottom - trackTop
+                    )
+                ),
+                3.0f
+            );
+
+            for (int tick = 0; tick <= 10; ++tick)
+            {
+                const auto y =
+                    trackTop
+                    + (
+                        trackBottom - trackTop
+                    ) * tick / 10;
+
+                const auto major =
+                    tick % 5 == 0;
+
+                g.setColour (
+                    juce::Colours::white.withAlpha (
+                        major ? 0.34f : 0.16f
+                    )
+                );
+
+                g.drawHorizontalLine (
+                    y,
+                    static_cast<float> (
+                        bounds.getX()
+                        + (major ? 5 : 9)
+                    ),
+                    static_cast<float> (
+                        bounds.getRight()
+                        - (major ? 5 : 9)
+                    )
+                );
+            }
+
+            const auto handleY =
+                trackBottom
+                - static_cast<int> (
+                    fraction
+                    * (
+                        trackBottom - trackTop
+                    )
+                );
+
+            auto handle =
+                juce::Rectangle<int> (
+                    bounds.getX() + 4,
+                    handleY - 6,
+                    bounds.getWidth() - 8,
+                    12
+                );
+
+            g.setColour (
+                colour.withAlpha (0.98f)
+            );
+
+            g.fillRoundedRectangle (
+                handle.toFloat(),
+                3.0f
+            );
+
+            g.setColour (
+                juce::Colours::white.withAlpha (0.74f)
+            );
+
+            g.drawHorizontalLine (
+                handle.getCentreY(),
+                static_cast<float> (
+                    handle.getX() + 4
+                ),
+                static_cast<float> (
+                    handle.getRight() - 4
+                )
+            );
+        };
 
     for (
         int index = 0;
@@ -1978,20 +2997,15 @@ void MainComponent::drawDock (
         ++index
     )
     {
-        if (
-            body.getWidth()
-            < stripWidth
-        )
-        {
+        if (console.getWidth() < stripWidth)
             break;
-        }
 
         auto strip =
-            body.removeFromLeft (
+            console.removeFromLeft (
                 stripWidth
             );
 
-        body.removeFromLeft (gap);
+        console.removeFromLeft (gap);
 
         auto* track =
             session.getTrack (
@@ -2009,30 +3023,38 @@ void MainComponent::drawDock (
             );
 
         g.setColour (
-            colour.withAlpha (0.15f)
+            juce::Colour::fromRGB (
+                15,
+                18,
+                29
+            ).withAlpha (0.92f)
         );
 
         g.fillRoundedRectangle (
             strip.toFloat(),
-            8.0f
+            6.0f
         );
 
         g.setColour (
-            colour.withAlpha (0.45f)
+            colour.withAlpha (0.62f)
         );
 
         g.drawRoundedRectangle (
             strip.toFloat(),
-            8.0f,
-            1.0f
+            6.0f,
+            selectedTrackIndex == index
+                ? 2.0f
+                : 1.0f
         );
 
-        auto text =
-            strip.reduced (8);
+        auto content =
+            strip.reduced (7);
+
+        auto title =
+            content.removeFromTop (22);
 
         g.setColour (
             juce::Colours::white
-                .withAlpha (0.86f)
         );
 
         g.setFont (
@@ -2041,56 +3063,496 @@ void MainComponent::drawDock (
         );
 
         g.drawText (
-            juce::String (
-                track->getName()
-            ),
-            text.removeFromTop (24),
-            juce::Justification::centred
+            track->getName(),
+            title,
+            juce::Justification::centred,
+            true
         );
 
-        auto meter =
-            text.reduced (
-                text.getWidth() / 3,
-                12
-            );
+        auto insert =
+            content.removeFromTop (24)
+                .reduced (1, 2);
 
         g.setColour (
             juce::Colours::black
-                .withAlpha (0.45f)
+                .withAlpha (0.58f)
         );
 
         g.fillRoundedRectangle (
-            meter.toFloat(),
-            4.0f
+            insert.toFloat(),
+            3.0f
         );
 
-        const auto gain =
-            juce::jlimit (
-                0.0f,
-                1.0f,
-                track->getGain()
-                    * 0.5f
+        auto pluginName =
+            audio.getTrackPluginName (
+                index
             );
 
-        auto fill =
-            meter;
-
-        fill.removeFromTop (
-            static_cast<int> (
-                fill.getHeight()
-                * (1.0f - gain)
-            )
-        );
+        if (pluginName.isEmpty())
+        {
+            pluginName =
+                index == 0
+                    ? "NATIVE"
+                    : "NO INSERT";
+        }
 
         g.setColour (
             colour.withAlpha (0.86f)
         );
 
+        g.setFont (8.0f);
+
+        g.drawText (
+            pluginName,
+            insert.reduced (4, 0),
+            juce::Justification::centred,
+            true
+        );
+
+        content.removeFromTop (4);
+
+        auto panArea =
+            content.removeFromTop (38);
+
+        const auto panCentre =
+            panArea.getCentre()
+                .toFloat();
+
+        constexpr float knobRadius = 12.0f;
+
+        g.setColour (
+            juce::Colours::black
+                .withAlpha (0.74f)
+        );
+
+        g.fillEllipse (
+            panCentre.x - knobRadius,
+            panCentre.y - knobRadius,
+            knobRadius * 2.0f,
+            knobRadius * 2.0f
+        );
+
+        const auto pan =
+            juce::jlimit (
+                -1.0f,
+                1.0f,
+                track->getPan()
+            );
+
+        const auto angle =
+            juce::MathConstants<float>::pi
+            * (
+                1.25f
+                + 1.5f
+                    * (
+                        pan + 1.0f
+                    ) * 0.5f
+            );
+
+        g.setColour (
+            colour
+        );
+
+        g.drawLine (
+            panCentre.x,
+            panCentre.y,
+            panCentre.x
+                + std::cos (angle)
+                    * (knobRadius - 3.0f),
+            panCentre.y
+                + std::sin (angle)
+                    * (knobRadius - 3.0f),
+            2.0f
+        );
+
+        g.setColour (
+            juce::Colours::white
+                .withAlpha (0.54f)
+        );
+
+        g.setFont (7.5f);
+
+        g.drawText (
+            "PAN",
+            panArea.removeFromBottom (10),
+            juce::Justification::centred
+        );
+
+        auto buttons =
+            content.removeFromTop (23);
+
+        const auto buttonWidth =
+            juce::jmax (
+                16,
+                (
+                    buttons.getWidth()
+                    - 4
+                ) / 3
+            );
+
+        auto mute =
+            buttons.removeFromLeft (
+                buttonWidth
+            );
+
+        buttons.removeFromLeft (2);
+
+        auto solo =
+            buttons.removeFromLeft (
+                buttonWidth
+            );
+
+        buttons.removeFromLeft (2);
+
+        auto arm =
+            buttons;
+
+        drawButton (
+            mute,
+            "M",
+            track->isMuted(),
+            juce::Colour::fromRGB (
+                232,
+                74,
+                94
+            )
+        );
+
+        drawButton (
+            solo,
+            "S",
+            track->isSolo(),
+            juce::Colour::fromRGB (
+                239,
+                184,
+                48
+            )
+        );
+
+        drawButton (
+            arm,
+            "R",
+            track->isRecordArmed(),
+            colour
+        );
+
+        content.removeFromTop (4);
+
+        auto footer =
+            content.removeFromBottom (19);
+
+        auto valueArea =
+            content.removeFromBottom (18);
+
+        auto meterArea =
+            content.removeFromRight (
+                juce::jmax (
+                    12,
+                    content.getWidth() / 4
+                )
+            );
+
+        content.removeFromRight (3);
+
+        auto faderArea =
+            content;
+
+        drawFader (
+            faderArea,
+            track->getGain(),
+            colour
+        );
+
+        g.setColour (
+            juce::Colours::black
+                .withAlpha (0.68f)
+        );
+
         g.fillRoundedRectangle (
-            fill.toFloat(),
-            4.0f
+            meterArea.toFloat(),
+            3.0f
+        );
+
+        const auto level =
+            juce::jlimit (
+                0.0f,
+                1.0f,
+                track->getGain() * 0.5f
+            );
+
+        auto meterFill =
+            meterArea.reduced (3);
+
+        meterFill.removeFromTop (
+            static_cast<int> (
+                meterFill.getHeight()
+                * (1.0f - level)
+            )
+        );
+
+        juce::ColourGradient meterGradient (
+            juce::Colour::fromRGB (
+                42,
+                222,
+                142
+            ),
+            meterArea.getBottomLeft()
+                .toFloat(),
+            juce::Colour::fromRGB (
+                255,
+                79,
+                112
+            ),
+            meterArea.getTopLeft()
+                .toFloat(),
+            false
+        );
+
+        g.setGradientFill (
+            meterGradient
+        );
+
+        g.fillRoundedRectangle (
+            meterFill.toFloat(),
+            2.0f
+        );
+
+        const auto gainDb =
+            juce::Decibels::gainToDecibels (
+                track->getGain(),
+                -60.0f
+            );
+
+        g.setColour (
+            juce::Colours::white
+                .withAlpha (0.72f)
+        );
+
+        g.setFont (8.0f);
+
+        g.drawText (
+            juce::String (
+                gainDb,
+                1
+            ) + " dB",
+            valueArea,
+            juce::Justification::centred
+        );
+
+        g.setColour (
+            colour.withAlpha (0.92f)
+        );
+
+        g.fillRoundedRectangle (
+            footer.toFloat(),
+            3.0f
+        );
+
+        g.setColour (
+            juce::Colours::white
+        );
+
+        g.setFont (
+            juce::FontOptions (9.0f)
+                .withStyle ("Bold")
+        );
+
+        g.drawText (
+            juce::String (index + 1),
+            footer,
+            juce::Justification::centred
         );
     }
+
+    auto& master =
+        session.getMasterBusState();
+
+    const auto masterColour =
+        jadLookAndFeel.colourC();
+
+    g.setColour (
+        juce::Colour::fromRGB (
+            10,
+            12,
+            22
+        ).withAlpha (0.96f)
+    );
+
+    g.fillRoundedRectangle (
+        masterArea.toFloat(),
+        6.0f
+    );
+
+    g.setColour (
+        masterColour.withAlpha (0.78f)
+    );
+
+    g.drawRoundedRectangle (
+        masterArea.toFloat(),
+        6.0f,
+        1.5f
+    );
+
+    auto masterContent =
+        masterArea.reduced (8);
+
+    g.setColour (
+        juce::Colours::white
+    );
+
+    g.setFont (
+        juce::FontOptions (11.0f)
+            .withStyle ("Bold")
+    );
+
+    g.drawText (
+        "MASTER",
+        masterContent.removeFromTop (24),
+        juce::Justification::centred
+    );
+
+    auto outputSlot =
+        masterContent.removeFromTop (24)
+            .reduced (1, 2);
+
+    g.setColour (
+        juce::Colours::black
+            .withAlpha (0.58f)
+    );
+
+    g.fillRoundedRectangle (
+        outputSlot.toFloat(),
+        3.0f
+    );
+
+    g.setColour (
+        masterColour.withAlpha (0.88f)
+    );
+
+    g.setFont (8.0f);
+
+    g.drawText (
+        "MAIN OUT",
+        outputSlot,
+        juce::Justification::centred
+    );
+
+    masterContent.removeFromTop (6);
+
+    auto muteButton =
+        masterContent.removeFromTop (22);
+
+    drawButton (
+        muteButton,
+        "MUTE",
+        master.isMuted(),
+        juce::Colour::fromRGB (
+            232,
+            74,
+            94
+        )
+    );
+
+    masterContent.removeFromTop (6);
+
+    auto masterValue =
+        masterContent.removeFromBottom (20);
+
+    auto masterFooter =
+        masterContent.removeFromBottom (20);
+
+    auto masterMeter =
+        masterContent.removeFromRight (22);
+
+    masterContent.removeFromRight (5);
+
+    drawFader (
+        masterContent,
+        master.getGain(),
+        masterColour
+    );
+
+    g.setColour (
+        juce::Colours::black
+            .withAlpha (0.72f)
+    );
+
+    g.fillRoundedRectangle (
+        masterMeter.toFloat(),
+        3.0f
+    );
+
+    auto masterFill =
+        masterMeter.reduced (4);
+
+    const auto masterLevel =
+        juce::jlimit (
+            0.0f,
+            1.0f,
+            master.getGain() * 0.5f
+        );
+
+    masterFill.removeFromTop (
+        static_cast<int> (
+            masterFill.getHeight()
+            * (1.0f - masterLevel)
+        )
+    );
+
+    g.setColour (
+        masterColour.withAlpha (0.94f)
+    );
+
+    g.fillRoundedRectangle (
+        masterFill.toFloat(),
+        2.0f
+    );
+
+    const auto masterDb =
+        juce::Decibels::gainToDecibels (
+            master.getGain(),
+            -60.0f
+        );
+
+    g.setColour (
+        juce::Colours::white
+            .withAlpha (0.74f)
+    );
+
+    g.setFont (8.0f);
+
+    g.drawText (
+        juce::String (
+            masterDb,
+            1
+        ) + " dB",
+        masterValue,
+        juce::Justification::centred
+    );
+
+    g.setColour (
+        masterColour.withAlpha (0.92f)
+    );
+
+    g.fillRoundedRectangle (
+        masterFooter.toFloat(),
+        3.0f
+    );
+
+    g.setColour (
+        juce::Colours::white
+    );
+
+    g.setFont (
+        juce::FontOptions (8.5f)
+            .withStyle ("Bold")
+    );
+
+    g.drawText (
+        "OUT",
+        masterFooter,
+        juce::Justification::centred
+    );
 }
 
 void MainComponent::paint (
@@ -2180,11 +3642,7 @@ void MainComponent::paint (
             .withStyle ("Bold")
     );
 
-    g.drawText (
-        "JAD",
-        header.reduced (18),
-        juce::Justification::centredLeft
-    );
+    // JAD TITLE NOW OWNED BY BUTTON
 
     g.setFont (10.5f);
 
@@ -2217,13 +3675,15 @@ void MainComponent::paint (
 
 void MainComponent::resized()
 {
-    // EXP-050E.2D AUDIO COCKPIT GEOMETRY
-    audioSettingsButton.setBounds (
-        getWidth() - 150,
-        12,
-        130,
-        30
+    // JAD COMMAND DECK GEOMETRY
+    jadMenuButton.setBounds (
+        20,
+        11,
+        142,
+        44
     );
+
+    // EXP-050E.2D AUDIO COCKPIT GEOMETRY
 
     const int cockpitWidth =
         juce::jmax (
@@ -2302,8 +3762,68 @@ void MainComponent::resized()
             .reduced (2)
     );
 
+    // EXP-EDIT-001 COMMAND SHELF
+    auto statusArea =
+        commandBar.removeFromRight (
+            juce::jmin (
+                210,
+                commandBar.getWidth()
+            )
+        );
+
     statusLabel.setBounds (
-        commandBar
+        statusArea
+    );
+
+    commandBar.removeFromRight (6);
+
+    audioSettingsButton.setBounds (
+        commandBar.removeFromRight (
+            juce::jmin (
+                132,
+                commandBar.getWidth()
+            )
+        ).reduced (2)
+    );
+
+    commandBar.removeFromLeft (8);
+
+    undoButton.setBounds (
+        commandBar.removeFromLeft (
+            juce::jmin (
+                58,
+                commandBar.getWidth()
+            )
+        ).reduced (2)
+    );
+
+    redoButton.setBounds (
+        commandBar.removeFromLeft (
+            juce::jmin (
+                58,
+                commandBar.getWidth()
+            )
+        ).reduced (2)
+    );
+
+    commandBar.removeFromLeft (4);
+
+    quantizeGridBox.setBounds (
+        commandBar.removeFromLeft (
+            juce::jmin (
+                72,
+                commandBar.getWidth()
+            )
+        ).reduced (2)
+    );
+
+    quantizeButton.setBounds (
+        commandBar.removeFromLeft (
+            juce::jmin (
+                96,
+                commandBar.getWidth()
+            )
+        ).reduced (2)
     );
 
     auto transportArea =
@@ -2319,11 +3839,14 @@ void MainComponent::resized()
         7
     );
 
+    // EXP-PLUGIN-UI-001
+    // The lower workspace now receives enough room for a real
+    // multi-row plugin cabinet instead of a single device strip.
     const int dockHeight =
         juce::jlimit (
-            210,
-            310,
-            area.getHeight() / 3
+            270,
+            410,
+            area.getHeight() * 40 / 100
         );
 
     cachedDock =
@@ -2363,6 +3886,27 @@ void MainComponent::resized()
 
     cachedArrangement =
         area;
+
+    // GO TO HOME ARRANGEMENT GEOMETRY
+    auto arrangementHeader =
+        cachedArrangement.reduced (8);
+
+    arrangementHeader.setHeight (30);
+
+    arrangementHeader.removeFromLeft (
+        juce::jmin (
+            420,
+            juce::jmax (
+                0,
+                arrangementHeader.getWidth() - 120
+            )
+        )
+    );
+
+    goToHomeButton.setBounds (
+        arrangementHeader.removeFromLeft (112)
+            .reduced (2, 3)
+    );
 
     auto dockControls =
         cachedDock.reduced (12);
@@ -2523,6 +4067,132 @@ void MainComponent::mouseDown (
             session.getTrackCount()
         );
 
+    // MIXER CONTROL HIT TEST
+    if (
+        dockPage == DockPage::mixer
+        && cachedDock.contains (point)
+    )
+    {
+        for (
+            int index = 0;
+            index < count;
+            ++index
+        )
+        {
+            const auto strip =
+                getMixerStripBounds (
+                    index
+                );
+
+            if (! strip.contains (point))
+                continue;
+
+            selectTrack (index);
+
+            auto* track =
+                session.getTrack (
+                    static_cast<std::size_t> (
+                        index
+                    )
+                );
+
+            if (track == nullptr)
+                return;
+
+            if (
+                getMixerButtonBounds (
+                    index,
+                    0
+                )
+                .contains (point)
+            )
+            {
+                track->setMuted (
+                    ! track->isMuted()
+                );
+
+                repaint();
+                return;
+            }
+
+            if (
+                getMixerButtonBounds (
+                    index,
+                    1
+                )
+                .contains (point)
+            )
+            {
+                track->setSolo (
+                    ! track->isSolo()
+                );
+
+                repaint();
+                return;
+            }
+
+            if (
+                getMixerButtonBounds (
+                    index,
+                    2
+                )
+                .contains (point)
+            )
+            {
+                track->setRecordArmed (
+                    ! track->isRecordArmed()
+                );
+
+                repaint();
+                return;
+            }
+
+            if (
+                getMixerPanBounds (
+                    index
+                )
+                .contains (point)
+            )
+            {
+                dragMode =
+                    DragMode::trackPan;
+
+                dragTrackIndex =
+                    index;
+
+                dragAnchorX =
+                    event.x;
+
+                dragInitialPan =
+                    track->getPan();
+
+                repaint();
+                return;
+            }
+
+            repaint();
+            return;
+        }
+
+        const auto masterMute =
+            getMixerMasterMuteBounds();
+
+        if (masterMute.contains (point))
+        {
+            auto& master =
+                session.getMasterBusState();
+
+            master.setMuted (
+                ! master.isMuted()
+            );
+
+            repaint();
+            return;
+        }
+
+        return;
+    }
+
     if (
         cachedTrackRack.contains (
             point
@@ -2560,10 +4230,16 @@ void MainComponent::mouseDown (
             auto controls =
                 row.reduced (8, 5);
 
-            controls.removeFromTop (25);
-
+            // TRACK TITLE TOGGLE HITBOXES
             auto toggleLine =
-                controls.removeFromTop (17);
+                controls.removeFromTop (25);
+
+            toggleLine.removeFromLeft (
+                juce::jmin (
+                    92,
+                    toggleLine.getWidth()
+                )
+            );
 
             auto mute =
                 toggleLine.removeFromLeft (23);
@@ -2657,6 +4333,68 @@ void MainComponent::mouseDown (
     const auto timeline =
         getTimelineBounds();
 
+    // PLAYHEAD GRAB HANDLE
+    const auto& transport =
+        context.getSessionState()
+            .getTransportState();
+
+    const auto playheadX =
+        beatToX (
+            transport.getPositionInBeats()
+        );
+
+    // The visible triangle is deliberately tiny.
+    // This larger invisible target makes it pleasant to grab.
+    const juce::Rectangle<int> playheadGrabArea {
+        playheadX - 14,
+        timeline.getY() - 38,
+        28,
+        38
+    };
+
+    if (
+        playheadGrabArea.contains (point)
+    )
+    {
+        dragMode =
+            DragMode::playhead;
+
+        seekTransport (
+            xToBeat (
+                point.x
+            )
+        );
+
+        repaint();
+        return;
+    }
+
+    // CLICKABLE TIMELINE RULER
+    const juce::Rectangle<int> timelineRulerArea {
+        timeline.getX(),
+        timeline.getY() - 30,
+        timeline.getWidth(),
+        30
+    };
+
+    if (
+        timelineRulerArea.contains (
+            point
+        )
+    )
+    {
+        dragMode =
+            DragMode::playhead;
+
+        seekTransport (
+            xToBeat (
+                point.x
+            )
+        );
+
+        repaint();
+        return;
+    }
     if (! timeline.contains (point))
         return;
 
@@ -2756,6 +4494,22 @@ void MainComponent::mouseDrag (
     auto& session =
         context.getSessionState();
 
+    // PLAYHEAD LIVE SCRUB
+    if (
+        dragMode
+        == DragMode::playhead
+    )
+    {
+        seekTransport (
+            xToBeat (
+                event.x
+            )
+        );
+
+        repaint();
+        return;
+    }
+
     if (
         dragMode
         == DragMode::trackGain
@@ -2814,6 +4568,31 @@ void MainComponent::mouseDrag (
 
         if (track == nullptr)
             return;
+
+        // MIXER PAN DRAG
+        if (dockPage == DockPage::mixer)
+        {
+            constexpr float dragRange = 120.0f;
+
+            const auto delta =
+                static_cast<float> (
+                    event.x
+                    - dragAnchorX
+                )
+                / dragRange;
+
+            track->setPan (
+                juce::jlimit (
+                    -1.0f,
+                    1.0f,
+                    dragInitialPan
+                        + delta * 2.0f
+                )
+            );
+
+            repaint();
+            return;
+        }
 
         const auto bounds =
             getTrackPanBounds (

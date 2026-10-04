@@ -15,14 +15,8 @@ class TrackModel
 public:
     using TrackId = std::uint64_t;
 
-    struct RecordedMidiEvent
-    {
-        bool noteOn = false;
-        int noteNumber = 0;
-        float velocity = 0.0f;
-        int channel = 1;
-        double beat = 0.0;
-    };
+    using RecordedMidiEvent =
+        ClipModel::MidiEvent;
 
     explicit TrackModel (
         TrackId trackId = 1,

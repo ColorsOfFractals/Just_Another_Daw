@@ -6,6 +6,7 @@
 #include "../Model/TransportState.h"
 
 #include <algorithm>
+#include <cmath>
 
 AudioSystem::AudioSystem()
 {
@@ -98,6 +99,16 @@ int AudioSystem::getBufferSize() const noexcept
 
     return 0;
 }
+
+
+double AudioSystem::getTransportTempo() const noexcept
+{
+    if (transportState == nullptr)
+        return 120.0;
+
+    return transportState->getTempo();
+}
+
 
 juce::AudioDeviceManager&
 AudioSystem::getDeviceManager() noexcept
@@ -537,6 +548,347 @@ void AudioSystem::audioDeviceStopped()
     currentBlockSize = 0;
 }
 
+void AudioSystem::triggerMetronomeClick (
+    bool accented) noexcept
+{
+    if (
+        transportState == nullptr
+        || currentSampleRate <= 0.0
+    )
+    {
+        return;
+    }
+
+    const auto sound =
+        transportState->getMetronomeSound();
+
+    const auto accentMultiplier =
+        accented
+            ? 1.0f
+            : 0.72f;
+
+    metronomePhase = 0.0;
+
+    switch (sound)
+    {
+        case 1:
+            metronomeFrequency =
+                accented
+                    ? 940.0
+                    : 690.0;
+
+            metronomeClickLengthSamples =
+                static_cast<int> (
+                    currentSampleRate
+                    * 0.042
+                );
+            break;
+
+        case 2:
+            metronomeFrequency =
+                accented
+                    ? 1480.0
+                    : 1040.0;
+
+            metronomeClickLengthSamples =
+                static_cast<int> (
+                    currentSampleRate
+                    * 0.068
+                );
+            break;
+
+        case 3:
+            metronomeFrequency =
+                accented
+                    ? 2650.0
+                    : 1830.0;
+
+            metronomeClickLengthSamples =
+                static_cast<int> (
+                    currentSampleRate
+                    * 0.050
+                );
+            break;
+
+        case 0:
+        default:
+            metronomeFrequency =
+                accented
+                    ? 2180.0
+                    : 1510.0;
+
+            metronomeClickLengthSamples =
+                static_cast<int> (
+                    currentSampleRate
+                    * 0.028
+                );
+            break;
+    }
+
+    metronomeClickLengthSamples =
+        juce::jmax (
+            1,
+            metronomeClickLengthSamples
+        );
+
+    metronomeSamplesRemaining =
+        metronomeClickLengthSamples;
+
+    metronomeClickAmplitude =
+        transportState->getMetronomeVolume()
+        * accentMultiplier;
+}
+
+
+void AudioSystem::renderMetronome (
+    juce::AudioBuffer<float>& destination,
+    int numSamples,
+    double blockStartBeat) noexcept
+{
+    if (
+        transportState == nullptr
+        || currentSampleRate <= 0.0
+        || numSamples <= 0
+    )
+    {
+        return;
+    }
+
+    const auto recordingNow =
+        transportState->isRecording();
+
+    const auto clickAllowed =
+        transportState->isMetronomeEnabled()
+        && transportState->isPlaying()
+        && (
+            recordingNow
+                ? transportState
+                    ->isClickDuringRecordingEnabled()
+                : transportState
+                    ->isClickDuringPlaybackEnabled()
+        );
+
+    if (! clickAllowed)
+    {
+        lastMetronomeBeat = -1;
+        metronomeSamplesRemaining = 0;
+        return;
+    }
+
+    const auto tempo =
+        transportState->getTempo();
+
+    if (tempo <= 0.0)
+        return;
+
+    const auto beatsPerSample =
+        tempo
+        / 60.0
+        / currentSampleRate;
+
+    const auto numerator =
+        juce::jmax (
+            1,
+            transportState
+                ->getTimeSignatureNumerator()
+        );
+
+    if (lastMetronomeBeat < 0)
+    {
+        const auto startWholeBeat =
+            static_cast<std::int64_t> (
+                std::floor (
+                    blockStartBeat
+                )
+            );
+
+        const auto fraction =
+            blockStartBeat
+            - std::floor (
+                blockStartBeat
+            );
+
+        if (
+            fraction
+            > beatsPerSample * 2.0
+        )
+        {
+            lastMetronomeBeat =
+                startWholeBeat;
+        }
+    }
+
+    const auto sound =
+        transportState->getMetronomeSound();
+
+    const auto channels =
+        destination.getNumChannels();
+
+    for (
+        int sample = 0;
+        sample < numSamples;
+        ++sample
+    )
+    {
+        const auto beatPosition =
+            blockStartBeat
+            + static_cast<double> (
+                sample
+            )
+            * beatsPerSample;
+
+        const auto wholeBeat =
+            static_cast<std::int64_t> (
+                std::floor (
+                    beatPosition
+                    + 1.0e-9
+                )
+            );
+
+        if (
+            wholeBeat
+            != lastMetronomeBeat
+        )
+        {
+            const auto beatInBar =
+                static_cast<int> (
+                    (
+                        wholeBeat
+                        % numerator
+                        + numerator
+                    )
+                    % numerator
+                );
+
+            const auto accented =
+                transportState
+                    ->isAccentFirstBeatEnabled()
+                && beatInBar == 0;
+
+            triggerMetronomeClick (
+                accented
+            );
+
+            lastMetronomeBeat =
+                wholeBeat;
+        }
+
+        if (
+            metronomeSamplesRemaining
+            <= 0
+        )
+        {
+            continue;
+        }
+
+        const auto envelope =
+            static_cast<float> (
+                metronomeSamplesRemaining
+            )
+            / static_cast<float> (
+                metronomeClickLengthSamples
+            );
+
+        const auto shapedEnvelope =
+            envelope * envelope;
+
+        const auto sine =
+            static_cast<float> (
+                std::sin (
+                    metronomePhase
+                )
+            );
+
+        float voice = sine;
+
+        if (sound == 1)
+        {
+            metronomeNoiseState ^=
+                metronomeNoiseState << 13;
+
+            metronomeNoiseState ^=
+                metronomeNoiseState >> 17;
+
+            metronomeNoiseState ^=
+                metronomeNoiseState << 5;
+
+            const auto noise =
+                static_cast<float> (
+                    metronomeNoiseState
+                    & 0xffffu
+                )
+                / 32767.5f
+                - 1.0f;
+
+            voice =
+                noise * 0.74f
+                + sine * 0.26f;
+        }
+        else if (sound == 2)
+        {
+            voice =
+                sine
+                + 0.28f
+                    * static_cast<float> (
+                        std::sin (
+                            metronomePhase * 2.0
+                        )
+                    );
+        }
+        else if (sound == 3)
+        {
+            voice =
+                sine >= 0.0f
+                    ? 0.82f
+                    : -0.82f;
+
+            voice +=
+                0.24f
+                * static_cast<float> (
+                    std::sin (
+                        metronomePhase * 2.0
+                    )
+                );
+        }
+
+        const auto value =
+            voice
+            * shapedEnvelope
+            * metronomeClickAmplitude
+            * 0.34f;
+
+        for (
+            int channel = 0;
+            channel < channels;
+            ++channel
+        )
+        {
+            destination.addSample (
+                channel,
+                sample,
+                value
+            );
+        }
+
+        metronomePhase +=
+            juce::MathConstants<double>::twoPi
+            * metronomeFrequency
+            / currentSampleRate;
+
+        while (
+            metronomePhase
+            >= juce::MathConstants<double>::twoPi
+        )
+        {
+            metronomePhase -=
+                juce::MathConstants<double>::twoPi;
+        }
+
+        --metronomeSamplesRemaining;
+    }
+}
+
+
 void AudioSystem::audioDeviceIOCallbackWithContext (
     const float* const*,
     int,
@@ -594,6 +946,12 @@ void AudioSystem::audioDeviceIOCallbackWithContext (
 
     masterMixBuffer.clear();
 
+    const auto metronomeBlockStartBeat =
+        transportState != nullptr
+            ? transportState
+                ->getPositionInBeats()
+            : 0.0;
+
     if (transportState != nullptr)
     {
         transportState->advanceSamples (
@@ -645,6 +1003,12 @@ void AudioSystem::audioDeviceIOCallbackWithContext (
             anyTrackSoloed
         );
     }
+
+    renderMetronome (
+        masterMixBuffer,
+        numSamples,
+        metronomeBlockStartBeat
+    );
 
     const auto masterGain =
         masterBusState != nullptr

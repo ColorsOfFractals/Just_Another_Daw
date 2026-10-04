@@ -1,11 +1,13 @@
-﻿#include "TransportState.h"
+#include "TransportState.h"
 
 #include <algorithm>
+
 
 void TransportState::play() noexcept
 {
     playing.store (true);
 }
+
 
 void TransportState::stop() noexcept
 {
@@ -13,22 +15,26 @@ void TransportState::stop() noexcept
     recording.store (false);
 }
 
+
 void TransportState::beginRecording() noexcept
 {
     recording.store (true);
     playing.store (true);
 }
 
+
 void TransportState::endRecording() noexcept
 {
     recording.store (false);
 }
+
 
 void TransportState::returnToStart() noexcept
 {
     positionBeats.store (0.0);
     positionSamples.store (0);
 }
+
 
 void TransportState::setTempo (
     double beatsPerMinute) noexcept
@@ -42,10 +48,12 @@ void TransportState::setTempo (
     );
 }
 
+
 double TransportState::getTempo() const noexcept
 {
     return tempoBpm.load();
 }
+
 
 void TransportState::setPositionInBeats (
     double beats) noexcept
@@ -58,10 +66,12 @@ void TransportState::setPositionInBeats (
     );
 }
 
+
 double TransportState::getPositionInBeats() const noexcept
 {
     return positionBeats.load();
 }
+
 
 void TransportState::setPositionInSamples (
     std::int64_t samples) noexcept
@@ -74,10 +84,13 @@ void TransportState::setPositionInSamples (
     );
 }
 
-std::int64_t TransportState::getPositionInSamples() const noexcept
+
+std::int64_t
+TransportState::getPositionInSamples() const noexcept
 {
     return positionSamples.load();
 }
+
 
 void TransportState::advanceSamples (
     int numSamples,
@@ -139,15 +152,18 @@ void TransportState::advanceSamples (
     );
 }
 
+
 bool TransportState::isPlaying() const noexcept
 {
     return playing.load();
 }
 
+
 bool TransportState::isRecording() const noexcept
 {
     return recording.load();
 }
+
 
 void TransportState::setTimeSignature (
     int numerator,
@@ -168,15 +184,145 @@ void TransportState::setTimeSignature (
     );
 }
 
-int TransportState::getTimeSignatureNumerator() const noexcept
+
+int
+TransportState::getTimeSignatureNumerator() const noexcept
 {
     return timeSignatureNumerator.load();
 }
 
-int TransportState::getTimeSignatureDenominator() const noexcept
+
+int
+TransportState::getTimeSignatureDenominator() const noexcept
 {
     return timeSignatureDenominator.load();
 }
+
+
+void TransportState::setMetronomeEnabled (
+    bool enabled) noexcept
+{
+    metronomeEnabled.store (
+        enabled
+    );
+}
+
+
+bool TransportState::isMetronomeEnabled() const noexcept
+{
+    return metronomeEnabled.load();
+}
+
+
+void TransportState::setCountInBars (
+    int bars) noexcept
+{
+    const auto legalBars =
+        bars <= 0
+            ? 0
+            : bars == 1
+                ? 1
+                : bars <= 2
+                    ? 2
+                    : 4;
+
+    countInBars.store (
+        legalBars
+    );
+}
+
+
+int TransportState::getCountInBars() const noexcept
+{
+    return countInBars.load();
+}
+
+
+void TransportState::setClickDuringPlayback (
+    bool enabled) noexcept
+{
+    clickDuringPlayback.store (
+        enabled
+    );
+}
+
+
+bool
+TransportState::isClickDuringPlaybackEnabled() const noexcept
+{
+    return clickDuringPlayback.load();
+}
+
+
+void TransportState::setClickDuringRecording (
+    bool enabled) noexcept
+{
+    clickDuringRecording.store (
+        enabled
+    );
+}
+
+
+bool
+TransportState::isClickDuringRecordingEnabled() const noexcept
+{
+    return clickDuringRecording.load();
+}
+
+
+void TransportState::setAccentFirstBeat (
+    bool enabled) noexcept
+{
+    accentFirstBeat.store (
+        enabled
+    );
+}
+
+
+bool
+TransportState::isAccentFirstBeatEnabled() const noexcept
+{
+    return accentFirstBeat.load();
+}
+
+
+void TransportState::setMetronomeVolume (
+    float volume) noexcept
+{
+    metronomeVolume.store (
+        std::clamp (
+            volume,
+            0.0f,
+            1.0f
+        )
+    );
+}
+
+
+float TransportState::getMetronomeVolume() const noexcept
+{
+    return metronomeVolume.load();
+}
+
+
+void TransportState::setMetronomeSound (
+    int soundIndex) noexcept
+{
+    metronomeSound.store (
+        std::clamp (
+            soundIndex,
+            0,
+            3
+        )
+    );
+}
+
+
+int TransportState::getMetronomeSound() const noexcept
+{
+    return metronomeSound.load();
+}
+
 
 void TransportState::setLoopEnabled (
     bool enabled) noexcept
@@ -186,10 +332,12 @@ void TransportState::setLoopEnabled (
     );
 }
 
+
 bool TransportState::isLoopEnabled() const noexcept
 {
     return loopEnabled.load();
 }
+
 
 void TransportState::setLoopRange (
     double startBeat,
@@ -216,10 +364,12 @@ void TransportState::setLoopRange (
     );
 }
 
+
 double TransportState::getLoopStartBeat() const noexcept
 {
     return loopStartBeat.load();
 }
+
 
 double TransportState::getLoopEndBeat() const noexcept
 {
