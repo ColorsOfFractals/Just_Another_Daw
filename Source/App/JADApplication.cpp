@@ -165,143 +165,215 @@ $ExtractPath = Join-Path $UpdateRoot 'Extracted'
 New-Item -Path $UpdateRoot -ItemType Directory -Force | Out-Null
 New-Item -Path $ExtractPath -ItemType Directory -Force | Out-Null
 
-$Worker = New-Object System.ComponentModel.BackgroundWorker
-$Worker.WorkerSupportsCancellation = $true
+$LogDirectory = Join-Path `
+    ([Environment]::GetFolderPath('LocalApplicationData')) `
+    'JAD'
 
-$Cancel.Add_Click({
-    $Cancel.IsEnabled = $false
-    $StatusText.Text = 'Cancelling safely...'
-    $Worker.CancelAsync()
-})
+$LogPath = Join-Path $LogDirectory 'Updater.log'
 
-$Worker.Add_DoWork({
-    param($Sender, $EventArgs)
+New-Item `
+    -Path $LogDirectory `
+    -ItemType Directory `
+    -Force |
+    Out-Null
+
+function Write-UpdateLog {
+    param(
+        [string] $Message
+    )
+
+    $Stamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss.fff'
+
+    Add-Content `
+        -LiteralPath $LogPath `
+        -Value "[$Stamp] $Message" `
+        -Encoding UTF8
+}
+
+function Set-UpdateStage {
+    param(
+        [string] $Message,
+        [double] $ProgressValue,
+        [bool] $Indeterminate = $false
+    )
+
+    $StatusText.Text = $Message
+    $Progress.IsIndeterminate = $Indeterminate
+
+    if (-not $Indeterminate) {
+        $Progress.Value = $ProgressValue
+    }
+
+    $Window.Dispatcher.Invoke(
+        [action] {},
+        [Windows.Threading.DispatcherPriority]::Render
+    )
+}
+
+function Stop-UpdateWithError {
+    param(
+        [string] $Message
+    )
+
+    Write-UpdateLog "FAILED: $Message"
+
+    $script:UpdateFailed = $true
+    $script:UpdateFinished = $true
+
+    $Timer.Stop()
+
+    $StatusText.Text = "UPDATE STOPPED`n$Message"
+    $Progress.IsIndeterminate = $false
+    $Progress.Value = 0
+    $Cancel.Content = 'CLOSE'
+    $Cancel.IsEnabled = $true
+}
+
+Write-UpdateLog '============================================================'
+Write-UpdateLog "Updater started for $Version"
+Write-UpdateLog "Target executable: $TargetExe"
+Write-UpdateLog "ZIP URL: $ZipUrl"
+Write-UpdateLog "Checksum URL: $ChecksumUrl"
+
+$script:UpdateStarted  = $false
+$script:UpdateFinished = $false
+$script:UpdateFailed   = $false
+$script:DownloadTask   = $null
+
+$HttpClient = New-Object System.Net.Http.HttpClient
+
+$HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
+    'JAD-Updater/0.3.2'
+)
+
+$Timer = New-Object Windows.Threading.DispatcherTimer
+
+$Timer.Interval = [TimeSpan]::FromMilliseconds(100)
+
+$Timer.Add_Tick({
+    if (
+        $script:UpdateFinished -or
+        -not $script:DownloadTask
+    ) {
+        return
+    }
+
+    if (-not $script:DownloadTask.IsCompleted) {
+        return
+    }
+
+    $Timer.Stop()
 
     try {
-        $Window.Dispatcher.Invoke(
-            [action] {
-                $StatusText.Text = 'Downloading the newest JAD...'
-                $Progress.Value = 5
-            }
-        )
-
-        $Client = New-Object System.Net.WebClient
-        $Client.Headers.Add(
-            'User-Agent',
-            'JAD-Updater'
-        )
-
-        $Client.Add_DownloadProgressChanged({
-            param($DownloadSender, $DownloadArgs)
-
-            $Percent =
-                5 + [math]::Floor(
-                    $DownloadArgs.ProgressPercentage * 0.65
-                )
-
-            $Window.Dispatcher.BeginInvoke(
-                [action] {
-                    $Progress.Value = $Percent
-                    $StatusText.Text =
-                        "Downloading JAD... $($DownloadArgs.ProgressPercentage)%"
-                }
-            ) | Out-Null
-        })
-
-        $Client.DownloadFileAsync(
-            [uri] $ZipUrl,
-            $ZipPath
-        )
-
-        while ($Client.IsBusy) {
-            if ($Worker.CancellationPending) {
-                $Client.CancelAsync()
-                $EventArgs.Cancel = $true
-                return
-            }
-
-            Start-Sleep -Milliseconds 100
+        if ($script:DownloadTask.IsCanceled) {
+            throw 'The update download was cancelled.'
         }
+
+        if ($script:DownloadTask.IsFaulted) {
+            $DownloadFailure =
+                $script:DownloadTask.Exception.GetBaseException().Message
+
+            throw "Download failed: $DownloadFailure"
+        }
+
+        Set-UpdateStage `
+            -Message 'Saving the new JAD package...' `
+            -ProgressValue 38
+
+        $ZipBytes =
+            $script:DownloadTask.GetAwaiter().GetResult()
+
+        if (-not $ZipBytes -or $ZipBytes.Length -le 0) {
+            throw 'GitHub returned an empty update package.'
+        }
+
+        [System.IO.File]::WriteAllBytes(
+            $ZipPath,
+            $ZipBytes
+        )
+
+        Write-UpdateLog "Downloaded $($ZipBytes.Length) bytes."
 
         if (-not (Test-Path -LiteralPath $ZipPath)) {
             throw 'The release ZIP did not arrive.'
         }
 
         if ($ChecksumUrl) {
-            $Window.Dispatcher.Invoke(
-                [action] {
-                    $StatusText.Text = 'Verifying release integrity...'
-                    $Progress.Value = 74
-                }
-            )
+            Set-UpdateStage `
+                -Message 'Verifying release integrity...' `
+                -ProgressValue 52
 
-            $HashText =
-                $Client.DownloadString(
-                    [uri] $ChecksumUrl
-                )
+            $ChecksumText =
+                $HttpClient
+                    .GetStringAsync($ChecksumUrl)
+                    .GetAwaiter()
+                    .GetResult()
 
-            $ExpectedMatch =
+            $ChecksumMatch =
                 [regex]::Match(
-                    $HashText,
+                    $ChecksumText,
                     '(?i)\b[A-F0-9]{64}\b'
                 )
 
-            if (-not $ExpectedMatch.Success) {
+            if (-not $ChecksumMatch.Success) {
                 throw 'The published SHA-256 checksum is invalid.'
             }
 
-            $Expected =
-                $ExpectedMatch.Value.ToUpperInvariant()
+            $ExpectedHash =
+                $ChecksumMatch.Value.ToUpperInvariant()
 
-            $Actual =
-                (Get-FileHash `
+            $ActualHash = (
+                Get-FileHash `
                     -LiteralPath $ZipPath `
                     -Algorithm SHA256
-                ).Hash.ToUpperInvariant()
+            ).Hash.ToUpperInvariant()
 
-            if ($Expected -ne $Actual) {
+            Write-UpdateLog "Expected SHA256: $ExpectedHash"
+            Write-UpdateLog "Actual SHA256:   $ActualHash"
+
+            if ($ExpectedHash -ne $ActualHash) {
                 throw 'SHA-256 verification failed. The update was not installed.'
             }
         }
 
-        $Window.Dispatcher.Invoke(
-            [action] {
-                $StatusText.Text = 'Unpacking the new music machine...'
-                $Progress.Value = 80
-            }
-        )
+        Set-UpdateStage `
+            -Message 'Unpacking the new build...' `
+            -ProgressValue 67
+
+        if (Test-Path -LiteralPath $ExtractPath) {
+            Remove-Item `
+                -LiteralPath $ExtractPath `
+                -Recurse `
+                -Force
+        }
 
         Expand-Archive `
             -LiteralPath $ZipPath `
             -DestinationPath $ExtractPath `
             -Force
 
-        $NewExe =
-            Get-ChildItem `
-                -LiteralPath $ExtractPath `
-                -Filter 'JAD.exe' `
-                -File `
-                -Recurse |
+        $NewExe = Get-ChildItem `
+            -LiteralPath $ExtractPath `
+            -Filter 'JAD.exe' `
+            -File `
+            -Recurse |
             Select-Object -First 1
 
         if (-not $NewExe) {
             throw 'JAD.exe was not found inside the update package.'
         }
 
-        $Window.Dispatcher.Invoke(
-            [action] {
-                $StatusText.Text = 'Waiting for JAD to hand over the keys...'
-                $Progress.Value = 88
-            }
-        )
+        Write-UpdateLog "Replacement executable: $($NewExe.FullName)"
 
-        # JAD exits immediately after launching this detached helper.
-        # Give Windows a moment to release the executable handle.
+        Set-UpdateStage `
+            -Message 'Waiting for JAD to hand over the keys...' `
+            -ProgressValue 78
+
         Start-Sleep -Milliseconds 1200
 
         $Installed = $false
 
-        for ($Attempt = 1; $Attempt -le 20; $Attempt++) {
+        for ($Attempt = 1; $Attempt -le 30; $Attempt++) {
             try {
                 Copy-Item `
                     -LiteralPath $NewExe.FullName `
@@ -309,9 +381,11 @@ $Worker.Add_DoWork({
                     -Force
 
                 $Installed = $true
+                Write-UpdateLog "Executable replaced on attempt $Attempt."
                 break
             }
             catch {
+                Write-UpdateLog "Replacement attempt $Attempt failed: $($_.Exception.Message)"
                 Start-Sleep -Milliseconds 400
             }
         }
@@ -320,13 +394,11 @@ $Worker.Add_DoWork({
             throw 'Windows would not release the old JAD.exe.'
         }
 
-        $Window.Dispatcher.Invoke(
-            [action] {
-                $StatusText.Text = 'Update complete â€” relaunching JAD!'
-                $Progress.Value = 100
-                $Cancel.IsEnabled = $false
-            }
-        )
+        Set-UpdateStage `
+            -Message 'Update complete - relaunching JAD!' `
+            -ProgressValue 100
+
+        $Cancel.IsEnabled = $false
 
         Start-Process `
             -FilePath $TargetExe `
@@ -336,59 +408,90 @@ $Worker.Add_DoWork({
                     $TargetExe
             )
 
-        Start-Sleep -Milliseconds 1400
+        Write-UpdateLog 'Replacement JAD launched successfully.'
+
+        $script:UpdateFinished = $true
+
+        Start-Sleep -Milliseconds 1200
+
+        try {
+            Remove-Item `
+                -LiteralPath $UpdateRoot `
+                -Recurse `
+                -Force `
+                -ErrorAction SilentlyContinue
+        }
+        catch {
+            Write-UpdateLog "Temporary cleanup warning: $($_.Exception.Message)"
+        }
+
+        $Window.Close()
     }
     catch {
-        $EventArgs.Result = $_.Exception.Message
+        Stop-UpdateWithError `
+            -Message $_.Exception.Message
     }
 })
 
-$Worker.Add_RunWorkerCompleted({
-    param($Sender, $EventArgs)
-
-    if ($EventArgs.Cancelled) {
-        $StatusText.Text = 'Update cancelled. Your current JAD is untouched.'
-        $Progress.Value = 0
-        $Cancel.Content = 'CLOSE'
-        $Cancel.IsEnabled = $true
-
-        $Cancel.Add_Click({
-            $Window.Close()
-        })
-
+$Cancel.Add_Click({
+    if ($script:UpdateFinished) {
+        $Window.Close()
         return
     }
 
-    if ($EventArgs.Result) {
-        $StatusText.Text =
-            "UPDATE STOPPED`n$($EventArgs.Result)"
-
-        $Progress.Value = 0
-        $Cancel.Content = 'CLOSE'
-        $Cancel.IsEnabled = $true
-
-        $Cancel.Add_Click({
-            $Window.Close()
-        })
-
-        return
+    if ($script:DownloadTask -and -not $script:DownloadTask.IsCompleted) {
+        try {
+            $HttpClient.CancelPendingRequests()
+        }
+        catch {
+        }
     }
 
+    Write-UpdateLog 'Update cancelled by the user.'
+
+    $script:UpdateFinished = $true
+    $Timer.Stop()
     $Window.Close()
-
-    try {
-        Remove-Item `
-            -LiteralPath $UpdateRoot `
-            -Recurse `
-            -Force `
-            -ErrorAction SilentlyContinue
-    }
-    catch {
-    }
 })
 
 $Window.Add_ContentRendered({
-    $Worker.RunWorkerAsync()
+    if ($script:UpdateStarted) {
+        return
+    }
+
+    $script:UpdateStarted = $true
+
+    try {
+        Set-UpdateStage `
+            -Message 'Downloading the newest JAD...' `
+            -ProgressValue 12 `
+            -Indeterminate $true
+
+        Write-UpdateLog 'Beginning asynchronous package download.'
+
+        $script:DownloadTask =
+            $HttpClient.GetByteArrayAsync($ZipUrl)
+
+        $Timer.Start()
+    }
+    catch {
+        Stop-UpdateWithError `
+            -Message $_.Exception.Message
+    }
+})
+
+$Window.Add_Closed({
+    try {
+        $Timer.Stop()
+    }
+    catch {
+    }
+
+    try {
+        $HttpClient.Dispose()
+    }
+    catch {
+    }
 })
 
 $null = $Window.ShowDialog()
