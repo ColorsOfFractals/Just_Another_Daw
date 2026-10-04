@@ -240,6 +240,8 @@ $script:UpdateFinished = $false
 $script:UpdateFailed   = $false
 $script:DownloadTask   = $null
 
+Add-Type -AssemblyName System.Net.Http
+
 $HttpClient = New-Object System.Net.Http.HttpClient
 
 $HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
@@ -303,11 +305,7 @@ $Timer.Add_Tick({
                 -Message 'Verifying release integrity...' `
                 -ProgressValue 52
 
-            $ChecksumText =
-                $HttpClient
-                    .GetStringAsync($ChecksumUrl)
-                    .GetAwaiter()
-                    .GetResult()
+            $ChecksumText = $HttpClient.GetStringAsync($ChecksumUrl).GetAwaiter().GetResult()
 
             $ChecksumMatch =
                 [regex]::Match(

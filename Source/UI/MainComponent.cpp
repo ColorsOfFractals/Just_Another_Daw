@@ -726,10 +726,14 @@ void MainComponent::showJadCommandDeck()
             juce::AlertWindow::showMessageBoxAsync (
                 juce::MessageBoxIconType::InfoIcon,
                 "ABOUT JAD",
-                "JUST ANOTHER DAW\n\n"
-                "Version 0.1.x development build\n"
-                "Open-source under AGPLv3\n\n"
-                "Hands on timeline. Make the thing."
+                juce::String (
+                    "JUST ANOTHER DAW\n\n"
+                    "Version "
+                )
+                + JAD_VERSION_STRING
+                + "\nBuilt with JUCE\n"
+                  "Open-source under GPL-3.0\n\n"
+                  "Hands on timeline. Make the thing."
             );
         };
 
