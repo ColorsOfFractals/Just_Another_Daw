@@ -2,10 +2,10 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
+#include "UpdateChecker.h"
 #include "../Core/JADContext.h"
 
 class LaunchSplash;
-class UpdateChecker;
 
 class JADApplication :
     public juce::JUCEApplication
@@ -31,6 +31,10 @@ private:
     void revealMainWindow();
     void completeLaunch();
     void beginUpdateCheck();
+
+    void startSelfUpdate (
+        const UpdateChecker::ReleaseInfo& release
+    );
 
     JADContext context;
 

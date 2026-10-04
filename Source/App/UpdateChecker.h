@@ -13,7 +13,11 @@ public:
         juce::String version;
         juce::String name;
         juce::String notes;
+
         juce::URL releasePage;
+
+        juce::String zipUrl;
+        juce::String checksumUrl;
     };
 
     using ResultCallback =

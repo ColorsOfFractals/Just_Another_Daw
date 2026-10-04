@@ -49,9 +49,11 @@ UpdateChecker::~UpdateChecker()
 void UpdateChecker::checkNow()
 {
     if (! isThreadRunning())
+    {
         startThread (
             juce::Thread::Priority::background
         );
+    }
 }
 
 bool UpdateChecker::isNewerVersion (
@@ -104,7 +106,7 @@ void UpdateChecker::run()
         juce::URL::InputStreamOptions (
             juce::URL::ParameterHandling::inAddress
         )
-        .withConnectionTimeoutMs (6000)
+        .withConnectionTimeoutMs (8000)
         .withExtraHeaders (
             "Accept: application/vnd.github+json\r\n"
             "X-GitHub-Api-Version: 2022-11-28\r\n"
@@ -123,7 +125,8 @@ void UpdateChecker::run()
     if (threadShouldExit() || response.isEmpty())
         return;
 
-    const auto parsed = juce::JSON::parse (response);
+    const auto parsed =
+        juce::JSON::parse (response);
 
     if (! parsed.isObject())
         return;
@@ -156,11 +159,57 @@ void UpdateChecker::run()
             ).toString()
         );
 
-    if (release.version.isEmpty()
+    if (
+        auto* assets =
+            parsed.getProperty (
+                "assets",
+                {}
+            ).getArray()
+    )
+    {
+        for (const auto& asset : *assets)
+        {
+            if (! asset.isObject())
+                continue;
+
+            const auto assetName =
+                asset.getProperty (
+                    "name",
+                    {}
+                ).toString();
+
+            const auto assetUrl =
+                asset.getProperty (
+                    "browser_download_url",
+                    {}
+                ).toString();
+
+            if (
+                assetName.endsWithIgnoreCase (
+                    "-windows-x64.zip"
+                )
+            )
+            {
+                release.zipUrl = assetUrl;
+            }
+            else if (
+                assetName.endsWithIgnoreCase (
+                    ".sha256"
+                )
+            )
+            {
+                release.checksumUrl = assetUrl;
+            }
+        }
+    }
+
+    if (
+        release.version.isEmpty()
         || ! isNewerVersion (
             release.version,
             JAD_VERSION_STRING
-        ))
+        )
+    )
     {
         return;
     }
